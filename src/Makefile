@@ -1,5 +1,5 @@
 pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python
-EXEs = ../bin/py_helloworld   ../bin/py_Plot   ../bin/py_plot
+EXEs = ../bin/py_helloworld   ../bin/py_Plot 
 
 all: $(EXEs)
 default: $(EXEs)
