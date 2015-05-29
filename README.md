@@ -1,11 +1,10 @@
 
-Here I have a collection of python routines, and a powerful, convenient programme py_Plot 
-
-To install, first install anaconda
+A collection of python routines, and a powerful programme py_Plot.
+Install anaconda first
 
 	http://continuum.io/downloads
 
-Then add something like this to your bashrc:
+Then add something like this to ~/.bashrc:
 
 	export pythonlibPATH=/home/xiaodongli/software/pythonlib
 	export PYTHONPATH=${pythonlibPATH}:${PYTHONPATH}
@@ -14,7 +13,7 @@ Then add something like this to your bashrc:
 To use the libraries, type this in your source
 
 	import stdA as stdA
-	execfile('/home/xiaodongli/software/pythonlib/stdA.py')
+		or you can type "execfile('/home/xiaodongli/software/pythonlib/stdA.py')"
 
 To install py_Plot
 	
@@ -22,7 +21,11 @@ To install py_Plot
 	Modify the first line of Makefile "pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python"
 	make
 
-Examples of using py_Plot
+To see how to use py_Plot
+
+	py_Plot
+
+Here is an example
 	
 	py_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -savefig T -figfmt png -showfig F 
 		3d scatter plot 1th, 2th, 3th columns of all files end with .txt
@@ -30,10 +33,10 @@ Examples of using py_Plot
 		all plottings saved as png files, no display on the screen
 
 
-Add your own EXE to src:
+Write your own EXE
 
 	cd src
-	./Add_EXE YOURBINNAME
+	./Add_EXE YOUREXENAME
 
-		A file named 'src/py_YOURBINNAME.py' will be created and its information will be added to Makefile.
-		Edit that .py file, then you can use it by type 'py_YOURBINNAME' in your command
+		A file named 'src/py_YOUREXENAME.py' will be created and its information will be added to Makefile.
+		Edit that .py file, then make
