@@ -1,6 +1,7 @@
 
 A collection of python routines, and a powerful programme py_Plot.
-Install anaconda first
+
+To use it, firstly download and install anaconda
 
 	http://continuum.io/downloads
 
