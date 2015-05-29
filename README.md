@@ -24,11 +24,11 @@ To install py_Plot
 
 Examples of using py_Plot
 	
-	py_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -savefig T -figfmt png -showfig F -randrat 0.1
-		3d scatter plot columns 4, 5, 6 of all files end with .txt
-		do not display the figure
-		all figures saved as eps files
-		randomly plot 10% of the file 
+	py_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -savefig T -figfmt png -showfig F 
+		3d scatter plot 1th, 2th, 3th columns of all files end with .txt
+		randomly select 10% of the file and plot
+		all plottings saved as png files, no display on the screen
+
 
 Add your own EXE to src:
 
