@@ -1,13 +1,7 @@
 
-1. What are things here
+Here I have a collection of python routines, and a powerful, convenient programme py_Plot 
 
-	a. A collection of python routines 
-	b. A powerful, convenient programme py_Plot 
-
-2. How to install
-
-
-Install anaconda to have all libraries needed
+To install, first install anaconda
 
 	http://continuum.io/downloads
 
@@ -17,36 +11,20 @@ Then add something like this to your bashrc:
 	export PYTHONPATH=${pythonlibPATH}:${PYTHONPATH}
 	export PATH=${pythonlibPATH}/bin:${PATH}
 
-###############################
- python library
-###############################
+To use the libraries, type this in your source
 
-The most useful one is stdA.
-I also wrote something for 2pcf and boss data.
-
-To use them
-
+	import stdA as stdA
 	execfile('/home/xiaodongli/software/pythonlib/stdA.py')
 
-Or 
-	import stdA as stdA
-
-
-###############################
- python bin
-###############################
-
-Python EXEs which can be used in terminal.
-
-To compile 
+To install py_Plot
 	
 	cd src
 	Modify the first line of Makefile "pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python"
 	make
 
-Add your own EXE:
+Add your own EXE to src:
 
 	cd src
 	./Add_EXE YOURBINNAME
 
-A file named 'src/py_YOURBINNAME.py' will be created and its information will be added to Makefile. Edit that .py file, then you can call it by shell command 'py_YOURBINNAME'
+		A file named 'src/py_YOURBINNAME.py' will be created and its information will be added to Makefile. Edit that .py file, then you can call it by shell command 'py_YOURBINNAME'
