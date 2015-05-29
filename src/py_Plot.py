@@ -26,7 +26,14 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-automaticcolor,autoc,autocolor,automaticc/T,F]   if T, automatically assign color'+\
 	'\n\t\t[-showleg/T,F]          if T, show legend'+\
 	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax]   set the range of x,y in figure'+\
-	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '
+	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '+\
+	'\n\n\t###############################'+\
+	'\n\t   An example'+\
+        '\n\n\t\tpy_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -savefig T -figfmt png -showfig F '+\
+        '\n\n\t\t\t3d scatter plot the first, second, third columns of all txt files'+\
+        '\n\t\t\trandomly choose 10% of these files and only plot that part'+\
+        '\n\t\t\tall plottings saved as png files, no display on the screen'#+\
+
 	
 
 cmdargs = sys.argv
