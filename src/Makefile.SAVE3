@@ -1,0 +1,15 @@
+pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python
+EXEs = ../bin/py_helloworld   ../bin/py_Plot 
+
+all: $(EXEs)
+default: $(EXEs)
+
+../bin/%: %.py
+	rm -rf ../bin/$*
+	echo '${pythonbin}' >> ../bin/$*
+	cat  $*.py >> ../bin/$*
+	chmod a+x ../bin/$*
+		
+clean :
+	rm -rf ${EXEs}
+	

@@ -1,0 +1,15 @@
+pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python
+EXEs = ../bin/LSSpy_helloworld  ../bin/LSSpy_test ../bin/LSSpy_test
+
+default: $(EXEs)
+
+../bin/%: %.py
+	rm -rf ../bin/$*
+	echo '${pythonbin}' >> ../bin/$*
+	cat  $*.py >> ../bin/$*
+	chmod a+x ../bin/$*
+
+		
+clean :
+	rm -rf ${EXEs}
+	
