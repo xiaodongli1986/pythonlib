@@ -1,17 +1,17 @@
 
 A collection of python routines, and a powerful programme py_Plot.
 
-To use it, firstly download and install anaconda
+Download and install anaconda
 
 	http://continuum.io/downloads
 
-Then add something like this to ~/.bashrc:
+In ~/.bashrc
 
 	export pythonlibPATH=/home/xiaodongli/software/pythonlib
 	export PYTHONPATH=${pythonlibPATH}:${PYTHONPATH}
 	export PATH=${pythonlibPATH}/bin:${PATH}
 
-To use the libraries, type this in your source
+To use the libraries
 
 	import stdA as stdA
 		or you can type "execfile('/home/xiaodongli/software/pythonlib/stdA.py')"
