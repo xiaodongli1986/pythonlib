@@ -70,7 +70,7 @@ def mockfile_orig(catname, catname2, imock, RSDstr='RSD'):
 
 # J08.dat.z_0.mge8e12.00.compact.patch4.RSD-radial-selected
 	elif catname2 == 'LC93':
-		return mockdir_orig+catname+'/'+catname2+'_massge2.0e12_rle1817.%02i'%isky+'.compact.patch%1i'%ipatch+'.'+RSDstr+'-radial-selected'
+		return mockdir_orig+catname+'/'+catname2+'_massge3.5e12_rle1817.%02i'%isky+'.compact.patch%1i'%ipatch+'.'+RSDstr+'-radial-selected'
 
 def mockranfile_sep_orig(catname, imock):
 	return mockdir_orig+catname+'/random.%02i'%imock+'.0vxvyvz.log10massfrom10to14.compact.patch2.noRSD-radial-selected'
