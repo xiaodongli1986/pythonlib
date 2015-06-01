@@ -21,7 +21,6 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-titlefs/-titlefontsize, -labelfs/-labelfontsize, -fs/-fontsize ]  size of font'+\
 	'\n\t\t[-figtitle figtitle]  title of figure; by default name of the data file'+\
 	'\n\t\t[-xlabel, -ylabel, -zlabel, -bins, -linecolor/-lc, -color/-c, -linewidth/-lw, -pointsize/-ps  -figxsize, -figysize ] detail plot settings '+\
-	'\n\t\t[-singlecolfile/T,F]    set as true for single column file'+\
 	'\n\t\t[-singleplot/T,F]       if T, all files plotted in one plot'+\
 	'\n\t\t[-automaticcolor,autoc,autocolor,automaticc/T,F]   if T, automatically assign color'+\
 	'\n\t\t[-showleg/T,F]          if T, show legend'+\
@@ -34,7 +33,7 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
         '\n\t\t\trandomly choose 10% of these files and only plot that part'+\
         '\n\t\t\tall plottings saved as png files, no display on the screen'#+\
 
-	
+#	'\n\t\t[-singlecolfile/T,F]    set as true for single column file'+\
 
 cmdargs = sys.argv
 
@@ -75,7 +74,7 @@ linecolor = 'k'
 color = 'k'
 bins = 50
 origfigtitle = ''
-singlecolfile = False
+#singlecolfile = False
 showfig = True
 figxsize =8 
 figysize =6
@@ -198,14 +197,14 @@ if len(cmdargs) >=4:
 				linewidth=float(opt2)
 			elif opt1 in ['-pointsize', '-ps']:
 				pointsize=float(opt2)	
-			elif opt1 == '-singlecolfile':
-				if opt2[0] == 'T':
-					singlecolfile = True
-				elif opt2[0] == 'F':
-					singlecolfile = False
-				else:
-					print 'ERROR (PlotIJ)!: wrong singlecolfile; must start with T or F: ', singlecolfile
-					sys.exit()
+#			elif opt1 == '-singlecolfile':
+#				if opt2[0] == 'T':
+#					singlecolfile = True
+#				elif opt2[0] == 'F':
+#					singlecolfile = False
+#				else:
+#					print 'ERROR (PlotIJ)!: wrong singlecolfile; must start with T or F: ', singlecolfile
+#					sys.exit()
 			elif opt1 == '-singleplot':
 				if opt2[0] == 'T':
 					singleplot = True
@@ -260,13 +259,14 @@ for filename in filenames:
 	if not singleplot:
 		fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
 
-	if randrat >= 1.0:
-		data = np.loadtxt(filename)
-	else:
-		data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
+	#if randrat >= 1.0:
+#		data = np.loadtxt(filename)
+#	else:
+#		data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
+	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
 
-	if singlecolfile:
-		data = [[x] for x in data]
+#	if singlecolfile:
+#		data = [[x] for x in data]
 
 	if plotfun == 'plot':
 		colstr = str(xcol)+'-'+str(ycol)
