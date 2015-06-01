@@ -66,7 +66,7 @@ def isfile(filename, exit_if_not_exit=False):
 		else:
 			return True
 
-def loadtxt_rand(filename, rat=0.1, printinfo=False):
+def loadtxt_rand(filename, rat=0.1, printinfo=False, maxnlines_read = 1.0e20):
 	nowf = open(filename, 'r') 
 	rlt = []
 	nlines = 0
@@ -84,6 +84,8 @@ def loadtxt_rand(filename, rat=0.1, printinfo=False):
 			else:
 				rlt.append([float(x) for x in wordlist])
 				nlines_read += 1
+		if nlines_read >= maxnlines_read:
+			break
 	nowf.close()
 	if printinfo:
 		print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename

@@ -16,6 +16,7 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\tOptions:'+\
 	'\n\t\t[-savefig savefig]  T or F; save the plot as an eps file;  '+\
 	'\n\t\t[-randrat randrat]  Randomly selecly a portion of file to plot; must be positive; can >1;'+\
+	'\n\t\t[-maxnlines_read/-maxlines/-ml maxnlines_read] maximal number of lines read in'+\
 	'\n\t\t[-figfmt figfmt]  format of figure; by default png'+\
 	'\n\t\t[-showfig showfig]  whether show the figure; by default True; set as False if creating many files'+\
 	'\n\t\t[-titlefs/-titlefontsize, -labelfs/-labelfontsize, -fs/-fontsize ]  size of font'+\
@@ -28,9 +29,10 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '+\
 	'\n\n\t###############################'+\
 	'\n\t   An example'+\
-        '\n\n\t\tpy_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -savefig T -figfmt png -showfig F '+\
+        '\n\n\t\tpy_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -ml 10000 -savefig T -figfmt png -showfig F '+\
         '\n\n\t\t\t3d scatter plot the first, second, third columns of all txt files'+\
-        '\n\t\t\trandomly choose 10% of these files and only plot that part'+\
+        '\n\t\t\trandomly choose 10% of these files and only plot that part; '+\
+	'\n\t\t\tcontrol the maximal # of lines read in to 10000;'+\
         '\n\t\t\tall plottings saved as png files, no display on the screen'#+\
 
 #	'\n\t\t[-singlecolfile/T,F]    set as true for single column file'+\
@@ -82,6 +84,7 @@ singleplot=False
 automaticcolor=False
 showleg=False
 histrange=None
+maxnlines_read=1.0e20
 
 xmin=None
 xmax=None
@@ -221,6 +224,8 @@ if len(cmdargs) >=4:
 				else:
 					print 'ERROR (PlotIJ)!: wrong automaticcolor; must start with T or F: ', opt2
 					sys.exit()
+			elif opt1 in ['-maxnlines_read', '-maxlines', '-ml']:
+				maxnlines_read = int(opt2)
 			elif opt1 in ['-setxmin', '-xmin']:
 				xmin = float(opt2)
 			elif opt1 in ['-setxmax', '-xmax']:
@@ -263,7 +268,7 @@ for filename in filenames:
 #		data = np.loadtxt(filename)
 #	else:
 #		data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
-	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
+	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read)
 
 #	if singlecolfile:
 #		data = [[x] for x in data]
