@@ -150,6 +150,11 @@ def binsplittedfilename_list(datafilelist, totbin=3, ibin=''):
 			rlt.append(binsplittedfilename(nowfile, ibin, totbin))
 	return rlt
 
+def numHR3mock(catname):
+	if catname in ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N' ]:
+		return 108
+	elif catname in ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S' ]:
+		return 216
 	
 ### Useful routines checking files...
 

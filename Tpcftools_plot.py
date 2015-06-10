@@ -1,4 +1,4 @@
-def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.linspace(0,1,11), ismin_of_intxi = 6, ismax_of_intxi = 50, lsfun=None, lcfun=None, xifunction = intxi_FractionalS, figxsize=16, figysize=8, deltais = 2, autoleg=True, ignore_catname_in_leg=True,markersize=1,normedintxi=False,no_s_sq_in_y=False):
+def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.linspace(0,1,11), ismin_of_intxi = 6, ismax_of_intxi = 50, lsfun=None, lcfun=None, xifunction = intxi_FractionalS, figxsize=16, figysize=8, deltais = 2, autoleg=True, legiskey=False, ignore_catname_in_leg=True, markersize=1, normedintxi=False, no_s_sq_in_y=False, plot_theta=True):
 	""" Plot xi(s,mu) as a funtion of scale and angle"""
 	itcolors = itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k', 'gray'])
 	fig=plt.figure(figsize=(figxsize,figysize));  
@@ -18,6 +18,8 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.
 				if nowleg[0:4] != 'data':
 					if nowleg.find('--') >= 1:
 						nowleg = nowleg[nowleg.find('--')+2:len(nowleg)]
+		elif legiskey:
+			nowleg = keyname = key_leg
 		else:
 	                keyname, nowleg = key_leg
 		
@@ -69,16 +71,17 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.
                 ax2.plot(muedgemids, intxis, marker='o', markersize=markersize, ls=ls, lw=3, label = nowleg, c=lc)
                 ax2.set_xlabel('$1-\\mu$', fontsize=25)
                 ax2.set_ylabel(ylabel2, fontsize=25)
-
-		ax3 = ax2.twiny()
-		ax3.set_xlim(0,1.0)
-		thetas = [0,20, 30, 40, 50, 60, 70, 80, 90]
-		xticks2 = [1-np.cos(theta/(180.0/np.pi)) for theta in thetas]
-		#xtickslabels2 = [frommutotheta(xtick) for xtick in xticks]
-		ax3.set_xticks(xticks2)
-		xtick2labels = [str(theta)+'$^{\\circ}$' for theta in thetas]
-		ax3.set_xticklabels(xtick2labels, color='r')
-		ax3.set_xlabel('$\\theta$', fontsize=27, color='r')
+		
+		if plot_theta:
+			ax3 = ax2.twiny()
+			ax3.set_xlim(0,1.0)
+			thetas = [0,20, 30, 40, 50, 60, 70, 80, 90]
+			xticks2 = [1-np.cos(theta/(180.0/np.pi)) for theta in thetas]
+			#xtickslabels2 = [frommutotheta(xtick) for xtick in xticks]
+			ax3.set_xticks(xticks2)
+			xtick2labels = [str(theta)+'$^{\\circ}$' for theta in thetas]
+			ax3.set_xticklabels(xtick2labels, color='r')
+			ax3.set_xlabel('$\\theta$', fontsize=27, color='r')
 
 	for ax in [ax1, ax2]:
 	    ax.grid(); ax.legend(loc='best', frameon=False, fontsize=13)

@@ -188,33 +188,33 @@ def packed_count(DR, ismin, ismax, imumin, imumax):
     #print ismin, ismax, imumin, imumax
     return Sumed_DR
 
-def smu__xifunname(calcquan):
+def smu__xifunname(xifunction):
     """	Name of the function which calculate the  """
-    if calcquan in [intxi, intxi_FractionalS]:
+    if xifunction in [intxi, intxi_FractionalS]:
         name =  'int--xi'
-    elif calcquan == int_s_square_xi:
+    elif xifunction == int_s_square_xi:
         name =  'int--s-square-xi'
-    elif calcquan == int_s_xi:
+    elif xifunction == int_s_xi:
         name =  'int--s-xi'
-    elif calcquan == int_s3_xi:
+    elif xifunction == int_s3_xi:
         name =  'int--s3-xi'
-    elif calcquan == int_1overs_xi:
+    elif xifunction == int_1overs_xi:
         name =  'int--1overs-xi'
-    elif calcquan == intxi_rat:
+    elif xifunction == intxi_rat:
         name =  'int--xi_rat'
-    elif calcquan == int_s_square_xi_rat:
+    elif xifunction == int_s_square_xi_rat:
         name =  'int--s-square-xi_rat'
-    elif calcquan == int_weightedmu_s2xi:
+    elif xifunction == int_weightedmu_s2xi:
         name =  'int--weightedmu_s2xi'
-    elif calcquan == int_weighteds_s2xi:
+    elif xifunction == int_weighteds_s2xi:
         name =  'int--weighteds_s2xi'
-    elif calcquan == int_weightedmu_xi:
+    elif xifunction == int_weightedmu_xi:
         name =  'int--weightedmu_xi'
-    elif calcquan == intxi_FractionalS_normed__by_full_mu_range:
+    elif xifunction == intxi_FractionalS_normed__by_full_mu_range:
 	name =  'int--xi_normed'
-    elif calcquan == int_s_squre_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_squre_xi_normed__by_full_mu_range:
 	name =  'int--s-squre-xi_normed'
-    elif calcquan == int_s_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_xi_normed__by_full_mu_range:
 	name =  'int--s-xi_normed'
     return name
 
@@ -597,7 +597,7 @@ def int_s_xi_normed__by_full_mu_range(DDlist, DRlist, RRlist, ismin_float, ismax
 
 
 def settingstr_2pcf(nowsmin=5, nowsmax=100, nownummubin=10, nowminmucut=0.1, RSDcor=True, flexiblesmin=False, flexiblesmax=False, 	
-	diffchisqmethod = 'use_lastrbin_as_ref', calcquan = 0):
+	diffchisqmethod = 'use_lastrbin_as_ref', xifunction = 0):
     nowstr = 's'+str(nowsmin)+'to'+str(nowsmax)+'--'+str(nownummubin)+'mubins--muge%.3f'%nowminmucut+'--RSDCor'+str(RSDcor)
     if flexiblesmin:
         nowstr += '--flexiblesmin'
@@ -605,64 +605,64 @@ def settingstr_2pcf(nowsmin=5, nowsmax=100, nownummubin=10, nowminmucut=0.1, RSD
         nowstr += '--flexiblesmax'
     if diffchisqmethod == 'use_weightedavg_as_ref':
         nowstr += '.use_weightedavg_as_ref'
-    if calcquan == int_s_square_xi:
-        nowstr += '.calcquan--s-square-xi'
-    elif calcquan == int_s_xi:
-        nowstr += '.calcquan--s-xi'
-    elif calcquan == int_s3_xi:
-        nowstr += '.calcquan--s3-xi'
-    elif calcquan == int_1overs_xi:
-        nowstr += '.calcquan--1overs-xi'
-    elif calcquan == intxi_rat:
-        nowstr += '.calcquan--intxi_rat'
-    elif calcquan == int_s_square_xi_rat:
-        nowstr += '.calcquan--int_s_square_xi_rat'
-    elif calcquan == int_weightedmu_s2xi:
+    if xifunction == int_s_square_xi:
+        nowstr += '.xifunction--s-square-xi'
+    elif xifunction == int_s_xi:
+        nowstr += '.xifunction--s-xi'
+    elif xifunction == int_s3_xi:
+        nowstr += '.xifunction--s3-xi'
+    elif xifunction == int_1overs_xi:
+        nowstr += '.xifunction--1overs-xi'
+    elif xifunction == intxi_rat:
+        nowstr += '.xifunction--intxi_rat'
+    elif xifunction == int_s_square_xi_rat:
+        nowstr += '.xifunction--int_s_square_xi_rat'
+    elif xifunction == int_weightedmu_s2xi:
         nowstr += '.int_weightedmu_s2xi'
-    elif calcquan == int_weighteds_s2xi:
+    elif xifunction == int_weighteds_s2xi:
         nowstr += '.int_weighteds_s2xi'
-    elif calcquan == int_weightedmu_xi:
+    elif xifunction == int_weightedmu_xi:
         nowstr += '.int_weightedmu_xi'
-    elif calcquan == intxi_FractionalS_normed__by_full_mu_range:
+    elif xifunction == intxi_FractionalS_normed__by_full_mu_range:
 	nowstr += '.intxi_FractionalS_normed__by_full_mu_range'
-    elif calcquan == int_s_squre_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_squre_xi_normed__by_full_mu_range:
 	nowstr += '.int_s_squre_xi_normed__by_full_mu_range'
-    elif calcquan == int_s_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_xi_normed__by_full_mu_range:
 	nowstr += '.int_s_xi_normed__by_full_mu_range'
     return nowstr
 
 #def filename_2pcfcovmat(nowsmin=5, nowsmax=100, nownummubin=2, nowminmucut=0.1, rsdstr = 'norsd', nowdir='./2pcfdata/covmatchisqs-Oct31/', 
 def filename_2pcfcovmat(nowsmin=5, nowsmax=100, nownummubin=2, nowminmucut=0.1, rsdstr = 'norsd', nowdir='./2pcfdata/covmatchisqs-Dec15/', 
-	extraprefix='', diffchisqmethod = 'use_lastrbin_as_ref', calcquan = 0):
+	extraprefix='', diffchisqmethod = 'use_lastrbin_as_ref', xifunction = 0):
     nowstr = nowdir+'/'+extraprefix+'covmats--s'+str(nowsmin)+'to'+str(nowsmax)+'--'+str(nownummubin)\
            +'mubins--muge%.3f'%nowminmucut+'--'+rsdstr+'.covmat'
     if diffchisqmethod == 'use_weightedavg_as_ref':
         nowstr += '.use_weightedavg_as_ref'
-    if calcquan == int_s_square_xi:
-        nowstr += '.calcquan--s-square-xi'
-    elif calcquan == int_s_xi:
-        nowstr += '.calcquan--s-xi'
-    elif calcquan == int_s3_xi:
-        nowstr += '.calcquan--s3-xi'
-    elif calcquan == int_1overs_xi:
-        nowstr += '.calcquan--1overs-xi'
-    elif calcquan == intxi_rat:
-        nowstr += '.calcquan--intxi_rat'
-    elif calcquan == int_s_square_xi_rat:
-        nowstr += '.calcquan--int_s_square_xi_rat'
-    elif calcquan == int_weightedmu_s2xi:
+    if xifunction == int_s_square_xi:
+        nowstr += '.xifunction--s-square-xi'
+    elif xifunction == int_s_xi:
+        nowstr += '.xifunction--s-xi'
+    elif xifunction == int_s3_xi:
+        nowstr += '.xifunction--s3-xi'
+    elif xifunction == int_1overs_xi:
+        nowstr += '.xifunction--1overs-xi'
+    elif xifunction == intxi_rat:
+        nowstr += '.xifunction--intxi_rat'
+    elif xifunction == int_s_square_xi_rat:
+        nowstr += '.xifunction--int_s_square_xi_rat'
+    elif xifunction == int_weightedmu_s2xi:
         nowstr += '.int_weightedmu_s2xi'
-    elif calcquan == int_weighteds_s2xi:
+    elif xifunction == int_weighteds_s2xi:
         nowstr += '.int_weighteds_s2xi'
-    elif calcquan == int_weightedmu_xi:
+    elif xifunction == int_weightedmu_xi:
         nowstr += '.int_weightedmu_xi'
-    elif calcquan == intxi_FractionalS_normed__by_full_mu_range:
+    elif xifunction == intxi_FractionalS_normed__by_full_mu_range:
 	nowstr += '.intxi_FractionalS_normed__by_full_mu_range'
-    elif calcquan == int_s_squre_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_squre_xi_normed__by_full_mu_range:
 	nowstr += '.int_s_squre_xi_normed__by_full_mu_range'
-    elif calcquan == int_s_xi_normed__by_full_mu_range:
+    elif xifunction == int_s_xi_normed__by_full_mu_range:
 	nowstr += '.int_s_xi_normed__by_full_mu_range'
-    elif calcquan != intxi and calcquan != intxi_FractionalS:
+    elif xifunction != intxi and xifunction != intxi_FractionalS:
 	print 'Error!!!! Unkonwn quantity!'
 	nowstr += '.unkown-quantity'
     return nowstr
@@ -788,7 +788,7 @@ import numpy as np
 
 
 def make_2pcf_plottings(nowsmins=[5],nowsmaxs=[100],iomws=[0,1,2,3,4],irbinlist=[0,1,2,3,4], noplot=False, plotRSDeff=False,
-                   nowxrange=[],nowyrange=[],plotnoRSD=True,plotRSD=True,printsetttings=False, calcquan=intxi,
+                   nowxrange=[],nowyrange=[],plotnoRSD=True,plotRSD=True,printsetttings=False, xifunction=intxi,
 		   chisqmethod = 'minus',
                    iimocklist=range(len(imocks)),muedges=np.linspace(0,1,11), minmucut = -1, RSDcor=True, RSDcortozero=False,
 		   consistsrange=False,
@@ -801,14 +801,14 @@ def make_2pcf_plottings(nowsmins=[5],nowsmaxs=[100],iomws=[0,1,2,3,4],irbinlist=
 
     ### Range of s
     # Minimal/Maximal indice of s
-    if calcquan == intxi or calcquan == packed_count:
+    if xifunction == intxi or xifunction == packed_count:
 	    nowismins = [min(max(0,int((nows-smin)/deltas)),numsbin) for nows in nowsmins]
 	    nowismaxs = [min(max(0,int((nows-smin)/deltas)),numsbin) for nows in nowsmaxs]
     else:
 	    nowismins = [min(max(0,(nows-smin)/deltas),numsbin) for nows in nowsmins]
 	    nowismaxs = [min(max(0,(nows-smin)/deltas),numsbin) for nows in nowsmaxs]
 #    else:
-#    	print 'ERROR (make_2pcf_plottings)! Unknown calcquan!'
+#    	print 'ERROR (make_2pcf_plottings)! Unknown xifunction!'
 #    	return
     	
     ### Binning of mu
@@ -899,7 +899,7 @@ def make_2pcf_plottings(nowsmins=[5],nowsmaxs=[100],iomws=[0,1,2,3,4],irbinlist=
                 if consistsrange:
                     nowsmin = nowsmins[i_of_smin]*rescalfac[iomw][irbin]
                     nowsmax = nowsmaxs[i_of_smin]*rescalfac[iomw][irbin]
-                    if calcquan == intxi or calcquan == packed_count:
+                    if xifunction == intxi or xifunction == packed_count:
                     	nowismin = min(max(0,int((nowsmin-smin)/deltas)),numsbin)
 	                nowismax = min(max(0,int((nowsmax-smin)/deltas)),numsbin)
 	            else:
@@ -923,9 +923,9 @@ def make_2pcf_plottings(nowsmins=[5],nowsmaxs=[100],iomws=[0,1,2,3,4],irbinlist=
                         
                     ### calculate integral xi,  save result to binnedxis
                     binnedxis1[i_of_mock][i_of_bin] = \
-                        [ calcquan(DD1, DR1, RR1, nowismin, nowismax, muedge[0], muedge[1]) for muedge in i_muedges]
+                        [ xifunction(DD1, DR1, RR1, nowismin, nowismax, muedge[0], muedge[1]) for muedge in i_muedges]
                     binnedxis2[i_of_mock][i_of_bin] = \
-                        [ calcquan(DD2, DR2, RR2, nowismin, nowismax, muedge[0], muedge[1]) for muedge in i_muedges]
+                        [ xifunction(DD2, DR2, RR2, nowismin, nowismax, muedge[0], muedge[1]) for muedge in i_muedges]
 
             ### Normalization & Plotting & Chisq calculation 
             # Figure
