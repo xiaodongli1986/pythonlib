@@ -21,8 +21,10 @@ FIG_X_SIZE = 18; FIG_Y_SIZE = 6; FIG_FONT_SIZE = 18
 
 Figlabelsize = 16; plt.rc('xtick', labelsize=Figlabelsize); plt.rc('ytick', labelsize=Figlabelsize)
 
+# Constants
 CONST_C = 299792.458 #unit: km/s
-
+Area_AllSky = 4*np.pi*(180.0/np.pi)**2.0 # Total degree squares of the whole sky
+Seconds_per_day = S1D = 3600*24# how many 
 
 PLOT_COLOR_ARRAY = ['b', 'r', 'g', 'k', 'c', 'y', 'gray']
 PLOT_STYLE_ARRAY = ['-', '--', '-.', '..']
@@ -248,7 +250,7 @@ def ReviseRA(RA):
                 rlt[row] = rlt[row] - 360
 	return rlt
 
-Area_AllSky = 4*np.pi*(180.0/np.pi)**2.0 # Total degree squares of the whole sky
+
 def area_from_radec(ramin, ramax, decmin, decmax, degreefac = np.pi/180.0):
     return (np.sin(decmax*degreefac)-np.sin(decmin*degreefac)) * (ramax-ramin) / degreefac
 

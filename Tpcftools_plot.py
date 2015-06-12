@@ -1,8 +1,11 @@
-def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.linspace(0,1,11), ismin_of_intxi = 6, ismax_of_intxi = 50, lsfun=None, lcfun=None, xifunction = intxi_FractionalS, figxsize=16, figysize=8, deltais = 2, autoleg=True, legiskey=False, ignore_catname_in_leg=True, markersize=1, normedintxi=False, no_s_sq_in_y=False, plot_theta=True):
+def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.linspace(0,1,11), ismin_of_intxi = 6, ismax_of_intxi = 50, lsfun=None, lcfun=None, xifunction = intxi_FractionalS, figxsize=16, figysize=8, deltais = 2, autoleg=True, legiskey=False, ignore_catname_in_leg=True, markersize=1, normedintxi=False, no_s_sq_in_y=False, plot_theta=True, only_plot_shape=False, showleg=True, lw=3):
 	""" Plot xi(s,mu) as a funtion of scale and angle"""
 	itcolors = itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k', 'gray'])
 	fig=plt.figure(figsize=(figxsize,figysize));  
-	ax1=fig.add_subplot(121); ax2=fig.add_subplot(122)
+	if not only_plot_shape:
+		ax1=fig.add_subplot(121); ax2=fig.add_subplot(122)
+	else:
+		ax2 = fig.add_subplot(111); ax1=ax2
 	ylabel2 = '$\\int_{'+str(ismin_of_intxi)+'}^{'+str(ismax_of_intxi)+'} \\xi(s,\\mu) ds$ '
 	if xifunction != intxi_FractionalS:
 		ylabel2 = smu__xifunname(xifunction)+'$(s_{\\rm min}='+str(ismin_of_intxi)+',\\ s_{\\rm max}='+str(ismax_of_intxi)+')$'
@@ -49,14 +52,14 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.
 		    else:
 	                    packedxiasy.append(packedxi(DDlist, DRlist, RRlist, ismin, ismax, imumin, imumax))
                     ismin += deltais;
-
-                ax1.plot(sasx, packedxiasy, marker='o', markersize=1, ls=ls, lw=3, label = nowleg, c=lc)
-                ax1.set_xlabel('$s\ [\\rm Mpc/h]$', fontsize=25)
-		if not no_s_sq_in_y:
-	                ax1.set_ylabel('$s^2\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
-		else:
-	                ax1.set_ylabel('$\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
-                ax1.set_xlim(0,150)
+		if not only_plot_shape:
+	                ax1.plot(sasx, packedxiasy, marker='o', markersize=1, ls=ls, lw=lw, label = nowleg, c=lc)
+	                ax1.set_xlabel('$s\ [\\rm Mpc/h]$', fontsize=25)
+			if not no_s_sq_in_y:
+		                ax1.set_ylabel('$s^2\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
+			else:
+		                ax1.set_ylabel('$\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
+	                ax1.set_xlim(0,150)
 
                 ### \int xi ds as a function of mu
                 i_muedges = smu__get_imuedges(muedges,smusettings);
@@ -68,7 +71,7 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.
 		if normedintxi:
 			intxis = normto1(intxis);
 
-                ax2.plot(muedgemids, intxis, marker='o', markersize=markersize, ls=ls, lw=3, label = nowleg, c=lc)
+                ax2.plot(muedgemids, intxis, marker='o', markersize=markersize, ls=ls, lw=lw, label = nowleg, c=lc)
                 ax2.set_xlabel('$1-\\mu$', fontsize=25)
                 ax2.set_ylabel(ylabel2, fontsize=25)
 		
@@ -84,7 +87,8 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None,muedges = np.
 			ax3.set_xlabel('$\\theta$', fontsize=27, color='r')
 
 	for ax in [ax1, ax2]:
-	    ax.grid(); ax.legend(loc='best', frameon=False, fontsize=13)
+	    ax.grid(ls='--'); 
+	    if showleg: ax.legend(loc='best', frameon=False, fontsize=13)
 
 	fig.tight_layout()
 	return fig, ax1, ax2

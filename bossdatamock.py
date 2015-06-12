@@ -56,8 +56,23 @@ catinfo_5binsplit = {
 			'DR12v4-LOWZ-S':   [436.07,     653.53,     820.32,     939.13,    1042.28,    1172.73]
 			}
 
-HR4catname2list = ['LC93', 'J08.dat.z_0', 'J08.dat.z_0.5']
+HR4catname2list = ['HR4PSB', 'J08', 'LC93', 'M12', 'V13', 'B08', 'J08.dat.z_0', 'J08.dat.z_0.5', ]
 catname2list = ['HR3'] + HR4catname2list
+
+def numHR3mock(catname):
+	if catname in ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N' ]:
+		return 108
+	elif catname in ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S' ]:
+		return 216
+
+def catinfo_nummock(catname, catname2):
+	if catname2 == 'HR3':
+		return catinfo_npatch[catname]*27
+	elif catname2 in catname2list:
+		return catinfo_npatch[catname]
+	else:
+		print 'ERROR (catinfo_nummock): Unknown catname2! ', catname2
+		return
 
 miniscan_omwlist = [[0.26, -1.0], [1.0, -1.0], [0.0, -1.0], [0.26, -3.0], [0.26, -0.2] ]
 miniscan_scanname = 'miniscan'
@@ -71,6 +86,14 @@ execfile(pythonlibPATH+'/bossdatamock_files.py')
 #### commands
 
 ### These are filenames of 2pcf but we think it is more related with Sec. commands rather than files, so put them in this section
+
+def Tpcf_keyname(catname, catname2, RSDstr='noRSD', imock=0, ibin=0, totbin=0):
+    keyname = catname+'-'+catname2
+    if catname2 != 'data':
+        keyname += ('-'+RSDstr+'-mock'+str(imock))
+    if totbin >= 1:
+        keyname += ('--'+str(ibin)+'bin-of-'+str(totbin))
+    return keyname
 
 def Tpcf_suffix(rmax=150, nbins=150, mubins=120):
 	return '.rmax'+str(rmax)+'.'+str(nbins)+'rbins.'+str(mubins)+'mubins'

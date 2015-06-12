@@ -69,7 +69,7 @@ def mockfile_orig(catname, catname2, imock, RSDstr='RSD'):
 		return mockdir_orig+catname+'/'+catname2+'.mge4.05e12.%02i'%isky+'.compact.patch%1i'%ipatch+'.'+RSDstr+'-radial-selected'
 
 # J08.dat.z_0.mge8e12.00.compact.patch4.RSD-radial-selected
-	elif catname2 == 'LC93':
+	elif catname2 in ['LC93', 'J08', 'M12', 'V13', 'B08', 'HR4PSB']:
 		return mockdir_orig+catname+'/'+catname2+'_massge3.5e12_rle1817.%02i'%isky+'.compact.patch%1i'%ipatch+'.'+RSDstr+'-radial-selected'
 
 def mockranfile_sep_orig(catname, imock):
@@ -150,11 +150,7 @@ def binsplittedfilename_list(datafilelist, totbin=3, ibin=''):
 			rlt.append(binsplittedfilename(nowfile, ibin, totbin))
 	return rlt
 
-def numHR3mock(catname):
-	if catname in ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N' ]:
-		return 108
-	elif catname in ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S' ]:
-		return 216
+
 	
 ### Useful routines checking files...
 
