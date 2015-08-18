@@ -3,6 +3,7 @@ import numpy as np
 import mpl_toolkits.mplot3d.axes3d as Axes3D
 import commands, os, random, scipy.integrate, copy
 import scipy.ndimage as ndimage
+ 
 
 ########################################
 ### Basic definition
