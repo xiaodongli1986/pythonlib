@@ -5,7 +5,7 @@ import commands
 import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits.mplot3d.axes3d as Axes3D
-import commands, os, random, scipy.integrate, copy, sys, time, datetime
+import commands, os, random, scipy.integrate, copy, sys, time, datetime, timeit
 import scipy.ndimage as ndimage
 import glob as glob
 import textwrap
@@ -25,6 +25,9 @@ Figlabelsize = 16; plt.rc('xtick', labelsize=Figlabelsize); plt.rc('ytick', labe
 CONST_C = 299792.458 #unit: km/s
 Area_AllSky = 4*np.pi*(180.0/np.pi)**2.0 # Total degree squares of the whole sky
 Seconds_per_day = S1D = 3600*24# how many 
+
+
+
 
 PLOT_COLOR_ARRAY = ['b', 'r', 'g', 'k', 'c', 'y', 'gray']
 PLOT_STYLE_ARRAY = ['-', '--', '-.', '..']
@@ -55,6 +58,8 @@ def get_color_style(sepreturn=False,init=False):
 ### General useful functions
 ############################################################
 
+
+
 def callsys(cmd): # This file only used in .py python code; not for ipython notebook (you can not get any screen print!)
 	os.system(cmd)
 
@@ -68,7 +73,7 @@ def isfile(filename, exit_if_not_exit=False):
 		else:
 			return True
 
-def loadtxt_rand(filename, rat=0.1, printinfo=False, maxnlines_read = 1.0e20):
+def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20):
 	nowf = open(filename, 'r') 
 	rlt = []
 	nlines = 0
@@ -92,6 +97,9 @@ def loadtxt_rand(filename, rat=0.1, printinfo=False, maxnlines_read = 1.0e20):
 	if printinfo:
 		print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
 	return rlt
+
+def quickload_1col(nowfile):
+	return [float(nowstr) for nowstr in (open(nowfile,'r').readlines())]
 	
 def get_funame(function):
 	totstr = str(function)
@@ -330,6 +338,7 @@ def shfile__qsubjoblist(shfilename, jobshfilelist, binlocation='#!/bin/bash'):
 		f0.write('qsub '+jobshfile + '\n')
 	f0.close()
 
+
 def loadfile(datafile, noreturn=True):
     rlt = []
     nowfile = open(datafile, 'r')
@@ -352,6 +361,10 @@ def load_strarray(datafile, exitcode='#'):
             break
         data.append(str_to_numbers(nowstr, exitcode=exitcode, do_float_conver=False))
     return data
+
+def print_file(nowfile, prefix='\t\t'):
+	for nowstr in open(nowfile,'r').readlines():
+		print prefix, nowstr[0:len(nowstr)-1]
 
 def cp_except(file1, file2, except_lines = [], except_strs = []):
 	if len(except_lines) != len(except_strs):
@@ -394,8 +407,31 @@ def str_merge(strlist, div=' '):
 	rlt = ''
 	for i in range(len(strlist)-1):
 		rlt += (strlist[i] + div)
-	rlt += strlist[i+1]
+	rlt += strlist[len(strlist)-1]
 	return rlt
+## This generate a string of exclamation markers
+def exmsf(num=50, exm='#'):
+	return str_merge([exm for row in range(num)], div ='')
+def addreturn(nowstr):
+	return '\n'+nowstr+'\n'
+
+exms100 = exmsf(100)
+exms50 = exmsf(50)
+exms40 = exmsf(40)
+exms30 = exmsf(30)
+exms20 = exmsf(20)
+exms10 = exmsf(10)
+exms = exms50
+
+exms100rt = exms100return = addreturn(exms100)
+exms50rt = exms50return = addreturn(exms50)
+exms40rt = exms40return = addreturn(exms40)
+exms30rt = exms30return = addreturn(exms30)
+exms20rt= exms20return = addreturn(exms20)
+exms10rt = exms10return = addreturn(exms10)
+exmsrt = exmsreturn = addreturn(exms)
+
+
 
 def fmtstrlist(X, fmtstr='', div='', endstr=''):
 	nowstr = ''
@@ -531,3 +567,59 @@ def invert_ax(ax, axes='x'):
 	else:
 		print 'ERROR (invert_ax): wrong axes (must be x,y,z)! ', axes
 
+## Plot om-w contour
+def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
+                    ommin = 0.01, ommax = 0.6, wmin = -2.0, wmax = -0.0,  do_smooth=True, smsigma=0.5, 
+                    extratitle = '', titleftsize=15, notitle = False,
+                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  nolegend = False, nolabel = False, legftsize=15,
+                    noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1):
+    if True:
+        smsigma = smsigma
+        if do_smooth:
+            Z = ndimage.gaussian_filter(chisqlist, sigma=smsigma, order=0)
+        else:
+            Z = chisqlist
+        if use_ratCL:
+            chisqA, chisqB, chisqC = list_find_CL_chisqcut(chisqlist, [sigA, sigB, sigC])
+            #chisqA, likeratioA = find_CL_chisqcut(Z, sigA)
+            #chisqB, likeratioB = find_CL_chisqcut(Z, sigB)
+            #chisqC, likeratioC = find_CL_chisqcut(Z, sigC)
+            #print chisqA, likeratioA, chisqB, likeratioB, chisqC, likeratioC
+        else:
+            chisqA = 2.3; chisqB = 6.17; chisqC = 11.83;
+
+        X = [-100,-99]; Y=[0,0]
+        if plotformat == 1:
+            ax.contourf(omlist, wlist, Z, [0, chisqC], colors='0.75')
+            ax.contourf(omlist, wlist, Z, [0, chisqB], colors='0.65')
+            ax.contourf(omlist, wlist, Z, [0, chisqA], colors='0.55' )
+            ax.plot(X,Y,c='0.55',lw=10,label=label)
+        elif plotformat == 2:
+            ax.contour(omlist, wlist, Z, [chisqA, chisqB, chisqC], colors='r', linewidths = 2, linestyles = 'dashed')
+            ax.plot(X,Y,c='r',lw=3,ls='--',label=label)
+        elif plotformat == 3:
+            ax.contour(omlist, wlist, Z, [chisqA, chisqB, chisqC], colors='b', linewidths = 2)
+            ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
+            
+        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
+        
+        ax.set_xlim(ommin,ommax);   ax.set_ylim(wmin, wmax)
+        if showgrid:
+            grid(b=True, which='major', color='g', linestyle='-');
+            grid(b=True, which='minor', color='g', linestyle='--');
+        if not notitle:
+            ax.set_title(extratitle, fontsize=titleftsize)
+        if not nolegend:
+            ax.legend(loc='upper left',prop={'size':legftsize},frameon=False)
+        if not nolabel and not noxticks:
+            ax.set_xlabel('$\Omega_m$', fontsize=26)
+        if not nolabel and not noyticks:
+            ax.set_ylabel('$w$', fontsize=26)
+        if noyticks:
+            for ylabel_i in ax.get_yticklabels():
+                ylabel_i.set_fontsize(0.0)
+                ylabel_i.set_visible(False)
+        if noxticks:
+            for xlabel_i in ax.get_xticklabels():
+                xlabel_i.set_fontsize(0.0)
+                xlabel_i.set_visible(False)

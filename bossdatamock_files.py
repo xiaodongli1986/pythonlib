@@ -238,3 +238,9 @@ def boss2pcf_check_splitfiles(catname, totbin = 3, printinfo=True):
 	    for ibin in range(totbin):
 	        splitfilelist.append(binsplittedfilename(nowfile, ibin+1,totbin))
 	isfiles(splitfilelist,printinfo)
+
+execfile(pythonlibPATH+'/Tpcftools_cmds.py')
+smufile_sample__data = Tpcfrltfilename(finesplittedfilename(datafile('DR12v4-CMASS-N')))
+smufile_sample__LC93RSD = Tpcfrltfilename(binsplittedfilename(mockfile('DR12v4-CMASS-N',  'LC93', 0, 'RSD'), 1))
+smufile_sample__LC93noRSD = Tpcfrltfilename(binsplittedfilename(mockfile('DR12v4-CMASS-N',  'LC93', 0, 'noRSD'), 1))
+

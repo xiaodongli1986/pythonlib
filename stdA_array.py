@@ -2,6 +2,15 @@
 ### Arrays
 ###############################
 
+# print
+def print_2dmat(X, fmt='%.5f', div = ' '):
+    for x in X:
+        nowstr = ''
+        for xx in x:
+            nowstr += fmt%xx
+            nowstr += div
+        print nowstr
+
 # Some manipulation
 def XmultY(X, Y, a=1,b=1,c=1):
 	if a==1 and b==1 and c==1:
@@ -15,7 +24,8 @@ def XplusY(X, Y, a=1,b=1):
 	else:
 		return [(X[row]*a)+(Y[row]*b) for row in range(len(X))]
 
-
+def product(iterable):
+    return reduce(operator.mul, iterable, 1)
 
 # Selecting columns from multi dim arrau
 def Xfromdata(data, i=0):
@@ -161,8 +171,12 @@ def FuncSelcX_index(X, func):
 		if func(X[row]):
 			rlt.append(row)
 	return rlt
-	
 
+# Polynomial fitting
+	
+def polyfitY(X, Y, deg):
+    polyfitrlt = polyfit(X, Y, deg=deg)
+    return polyval(polyfitrlt, X) 
 
 ### return rows where the redshift lies within certain region
 ### universially can be applied to any multi-component array to limit the range of a certain component
@@ -215,6 +229,8 @@ def sumlist(A):
 	for a in A:
 		rlt += a
 	return rlt
+def array_merge(A):
+	return sumlist(A)
 def get_absarray(X):
 	return [abs(x) for x in X]
 def get_sumarray(X,Y):
@@ -396,6 +412,12 @@ def array_to_str(A,div=' '):
         nowstr += div
     return nowstr
 
+def array_to_str_fmtted(A,div=' ', fmt='%.4f'):
+    nowstr = '';
+    for a in A:
+        nowstr += fmt%a
+        nowstr += div
+    return nowstr
 
 def strarray_to_float1D(A, replace = False):
 	if not replace:
@@ -426,4 +448,12 @@ def get_mid_array1d(data):
 def get_mid_array2d(data):
 	return [[(data[row1][row2]+data[row1][row2+1]+data[row1+1][row2]+data[row1+1][row2+1])*0.25 for row2 in range(len(data[row1])-1)] for row1 in range(len(data)-1)]
 
+# merge two list, within finite digits
+def merge_two_list_finitedigits(A,B, numdigit=7,sortlist=True):
+    X = [round(x,numdigit) for x in list(A)] + [round(x,7) for x in list(B)]
+    X = list(set(X))
+    if sortlist: X.sort()
+    return X
 
+def check_interval(A):
+    return min(abs(A[i]-A[i-1]) for i in range(len(A)))

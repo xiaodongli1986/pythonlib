@@ -2,7 +2,9 @@
 import commands
 pythonlibPATH=commands.getoutput('echo $pythonlibPATH')
 execfile(pythonlibPATH+'/stdA.py')
+execfile(pythonlibPATH+'/Tpcftools.py')
 pyfile=pythonlibPATH+'/'+'bossdatamock.py'
+
 
 #########################
 ## Information
@@ -56,8 +58,66 @@ catinfo_5binsplit = {
 			'DR12v4-LOWZ-S':   [436.07,     653.53,     820.32,     939.13,    1042.28,    1172.73]
 			}
 
-HR4catname2list = ['HR4PSB', 'J08', 'LC93', 'M12', 'V13', 'B08', 'J08.dat.z_0', 'J08.dat.z_0.5', ]
+
+Sky_catname = {
+
+		'N': ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N'],
+		'S': ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S'],
+}
+
+BinSplittedSamplesInfo = BSSInfo = {'DR12v4-CMASS-N.1of3': [18725,
+  [1172.8135587285176, 1367.46449618721],
+  1290.4871557760512,
+  0.47873744348042169],
+ 'DR12v4-CMASS-N.2of3': [18841,
+  [1367.4758209144834, 1507.2175881895753],
+  1435.1365031697192,
+  0.54042051192754192],
+ 'DR12v4-CMASS-N.3of3': [18790,
+  [1507.2276432245405, 1772.2946147685748],
+  1611.0862985944852,
+  0.61837420611805005],
+ 'DR12v4-CMASS-S.1of3': [7013,
+  [1172.7993424045378, 1365.3068030406646],
+  1288.0926526086776,
+  0.477733513782784],
+ 'DR12v4-CMASS-S.2of3': [7009,
+  [1365.3317290265579, 1510.9479606317341],
+  1436.7370960107269,
+  0.54111478956376302],
+ 'DR12v4-CMASS-S.3of3': [6728,
+  [1510.98262251195, 1771.907739298638],
+  1612.1428285931556,
+  0.61885258511184971],
+ 'DR12v4-LOWZ-N.1of3': [8341,
+  [436.21214997434919, 775.2369519438621],
+  620.79159235544296,
+  0.2166779110732702],
+ 'DR12v4-LOWZ-N.2of3': [8235,
+  [775.34261495589806, 975.37329132422531],
+  885.91545920580427,
+  0.31626963338286124],
+ 'DR12v4-LOWZ-N.3of3': [8229,
+  [975.39158482687094, 1172.7149706359958],
+  1067.2988676645298,
+  0.38740354788560033],
+ 'DR12v4-LOWZ-S.1of3': [3759,
+  [436.11039625285252, 767.15675348944467],
+  616.62055993763897,
+  0.21514912385540902],
+ 'DR12v4-LOWZ-S.2of3': [3771,
+  [767.25600340989843, 972.61266226851455],
+  879.61419584539203,
+  0.31384444920337418],
+ 'DR12v4-LOWZ-S.3of3': [3811,
+  [972.80401044952532, 1172.7182126421237],
+  1064.4748098662978,
+  0.38627569336678647]}
+
+HR4LCcatname2list = ['J08', 'LC93', 'M12', 'V13', 'B08',]
+HR4catname2list = ['HR4PSB',  'J08.dat.z_0', 'J08.dat.z_0.5', ] + HR4LCcatname2list
 catname2list = ['HR3'] + HR4catname2list
+RSDstrlist = ['noRSD', 'RSD']
 
 def numHR3mock(catname):
 	if catname in ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N' ]:
@@ -78,98 +138,40 @@ miniscan_omwlist = [[0.26, -1.0], [1.0, -1.0], [0.0, -1.0], [0.26, -3.0], [0.26,
 miniscan_scanname = 'miniscan'
 
 #########################################
+### NS scan
+
+NSscan_omlist = np.linspace(0.06, 0.86, 9)
+NSscan_wlist = np.linspace(-3.0, 0.0, 7)
+NSscan_omwlist = sumlist([[[om,w] for om in NSscan_omlist] for w in NSscan_wlist])
+NSscan_scanname = 'NS-97Scan'
+
+#########################################
+### Dense1 scan
+
+#Dense1subscan_omlist = np.linspace(0.06, 0.56, 21)
+#Dense1subscan_wlist = np.linspace(-2.0, 0.0, 41)
+
+Dense1subscan_omlist = np.linspace(0.06, 0.66, 25)
+Dense1subscan_wlist = np.linspace(-2.5, 0.0, 51)
+
+Dense1subscan_omwlist = sumlist([[[om,w] for om in Dense1subscan_omlist] for w in Dense1subscan_wlist])
+Dense1subscan_scanname = 'Dense1sub--'+str(len(Dense1subscan_omlist))+'-'+str(len(Dense1subscan_wlist))+'-Scan'
+
+## Total scan: all om, w in the previous NS-97Scan are included into the omlist, wlist
+
+Dense1scan_omlist = [x for x in Dense1subscan_omlist]
+Dense1scan_wlist = [x for x in Dense1subscan_wlist]
+
+Dense1scan_omlist = merge_two_list_finitedigits(Dense1scan_omlist, NSscan_omlist, sortlist=True)
+Dense1scan_wlist = merge_two_list_finitedigits(Dense1scan_wlist, NSscan_wlist, sortlist=True)
+Dense1scan_omwlist = sumlist([[[om,w] for om in Dense1scan_omlist] for w in Dense1scan_wlist])
+
+Dense1scan_scanname = 'Dense1--'+str(len(Dense1scan_omlist))+'-'+str(len(Dense1scan_wlist))+'-Scan'
+
+#########################################
 ### Files (name, check)
 
 execfile(pythonlibPATH+'/bossdatamock_files.py')
-
-######################################
-#### commands
-
-### These are filenames of 2pcf but we think it is more related with Sec. commands rather than files, so put them in this section
-
-def Tpcf_keyname(catname, catname2, RSDstr='noRSD', imock=0, ibin=0, totbin=0):
-    keyname = catname+'-'+catname2
-    if catname2 != 'data':
-        keyname += ('-'+RSDstr+'-mock'+str(imock))
-    if totbin >= 1:
-        keyname += ('--'+str(ibin)+'bin-of-'+str(totbin))
-    return keyname
-
-def Tpcf_suffix(rmax=150, nbins=150, mubins=120):
-	return '.rmax'+str(rmax)+'.'+str(nbins)+'rbins.'+str(mubins)+'mubins'
-
-def Tpcfrltfilename(galfile, rmax=150, nbins=150, mubins=120):
-	return galfile+Tpcf_suffix(rmax, nbins, mubins)+'.2pcf'
-
-def Tpcfrrfilename(ranfile, rmax=150, nbins=150, mubins=120):
-	return ranfile+Tpcf_suffix(rmax, nbins, mubins)+'.rr'
-
-def Tpcf_create_shfile(galfile, ranfile, rmax=150, nbins=150, mubins=120, ncpu=160, 
-	shfilename='', jobname='', printinfo=True,
-	exedir='/home/xiaodongli/software/csabiu-kstat-8b4343c51687/bin/2pcf',
-	exit_if_filenotexit=True,
-	checkexit=True,
-	maxlenjobname=30):
-	if checkexit or exit_if_filenotexit:
-		if not isfile(galfile):
-			print '\n (Tpcf_creat_shfile) WARNING! galfile not found: ', galfile, '\n'
-			if exit_if_filenotexit:
-				sys.exit()
-		if not isfile(ranfile):
-			print ' (Tpcf_creat_shfile) WARNING! ranfile not found: ', ranfile, '\n'
-			if exit_if_filenotexit:
-				sys.exit()
-	cmd = cmd_Tpcf(galfile, ranfile, rmax, nbins, mubins)
-	path, filename = separate_path_file(galfile)
-	if jobname == '':
-		jobname = filename+Tpcf_suffix(rmax, nbins, mubins)
-		if len(jobname) > maxlenjobname:
-			jobname = jobname[0:maxlenjobname]
-	if shfilename == '':
-		shfilename = galfile + Tpcf_suffix(rmax, nbins, mubins) + '.run_sge_baekdu.sh'
-	cmdstr = '\n\n## Tpcf job file created by Tpcf_create_shfile()\n\n# shfile dir: '+shfilename+'\n# galfile : '+galfile+'\n# ranfile : '+ranfile+'\n# rmax, nbins, mubins = '+str((rmax, nbins, mubins))+'\n# exedir : '+exedir+'\n\n'+cmd_Tpcf(galfile, ranfile, rmax, nbins, mubins, exedir)
-	shfile_baekdu(shfilename, jobname, ncpu, cmdstr, printinfo = printinfo )
-	#if printinfo:
-	#	print ' (Tpcf_create_shfile) shfile created: ', shfilename	
-	return shfilename
-
-def Tpcf_create_shfiles(galfilelist, ranfilelist, rmax=150, nbins=150, mubins=120, ncpu=160, 
-	shfilename='', jobname='', printinfo=True,
-	exedir='/home/xiaodongli/software/csabiu-kstat-8b4343c51687/bin/2pcf',
-	exit_if_filenotexit=True,
-	checkexit=True,
-	maxlenjobname=1000):
-	cmdstr = ''
-	for ifile in range(len(galfilelist)):
-		galfile, ranfile = galfilelist[ifile], ranfilelist[ifile]
-		if checkexit or exit_if_filenotexit:
-			if not isfile(galfile):
-				print '\n (Tpcf_creat_shfile) WARNING! galfile not found: ', galfile, '\n'
-				if exit_if_filenotexit:
-					sys.exit()
-			if not isfile(ranfile):
-				print '\n (Tpcf_creat_shfile) WARNING! ranfile not found: ', ranfile, '\n'
-				if exit_if_filenotexit:
-					sys.exit()
-		cmd = cmd_Tpcf(galfile, ranfile, rmax, nbins, mubins)
-		path, filename = separate_path_file(galfile)
-		if ifile == 0:
-			if jobname == '':
-				jobname = filename+Tpcf_suffix(rmax, nbins, mubins)+'.'+str(len(galfilelist))+'jobs'
-				if len(jobname) > maxlenjobname:
-					jobname = jobname[0:maxlenjobname]
-			if shfilename == '':
-				shfilename = galfile + Tpcf_suffix(rmax, nbins, mubins) +'.'+str(len(galfilelist))+'jobs'+ '.run_sge_baekdu.sh'
-		cmdstr += '\n\n## Tpcf job file created by Tpcf_create_shfile()\n\n# shfile dir: '+shfilename+'\n# galfile : '+galfile+'\n# ranfile : '+ranfile+'\n# rmax, nbins, mubins = '+str((rmax, nbins, mubins))+'\n# exedir : '+exedir+'\n\n'+cmd_Tpcf(galfile, ranfile, rmax, nbins, mubins, exedir)
-	shfile_baekdu(shfilename, jobname, ncpu, cmdstr, printinfo = printinfo )
-	#if printinfo:
-	#	print ' (Tpcf_create_shfile) shfile created: ', shfilename	
-	return shfilename
-
-
-def cmd_Tpcf(galfile, ranfile, rmax, nbins, mubins, exedir='/home/xiaodongli/software/csabiu-kstat-8b4343c51687/bin/2pcf'):
-	cmd='mpirun '+exedir+' -gal '+galfile+' -ran '+ranfile+' -rmax '+str(rmax)+' -nbins '+str(nbins)+' -tbins '+str(mubins)+' -out '+Tpcfrltfilename(galfile, rmax, nbins, mubins)+' -iso ANISO -decp SMU -RR '+Tpcfrrfilename(ranfile, rmax, nbins, mubins)+' -wgt .true.'
-	return cmd
 
 def cmd_filesplit(filename, redges):
     cmd = 'LSS_Rbinned-Split-Data '+filename+' '+str(len(redges)-1)+' '+fmtstrlist(redges, '%.2f', ' ')
@@ -351,3 +353,5 @@ def redshiftreduce_data(BOSSdata, zmin=0.43, zmax=0.7, ix=0, iy=1, iz=2):
     else:
        indice = Xinrange(BOSSR, comov_r_dft(0.15), comov_r_dft(0.43), onlyreturnindex=True)
     return Xs(BOSSdata, indice), indice
+
+execfile(pythonlibPATH+'/bossdatamock_smu.py')

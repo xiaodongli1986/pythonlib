@@ -94,7 +94,7 @@ def get_covmat(Xs):
 						    #Covariance[M] // MatrixForm    
 
 
-def chisq_like_cov_xbar(X, Cov, Xbar = []):
+def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     p=len(X);
     npcov = np.mat(Cov);
     invcov = npcov.I;
@@ -110,7 +110,7 @@ def chisq_like_cov_xbar(X, Cov, Xbar = []):
     for i in range(p):
         for j in range(p):
             chisq += Xdiff[i]*invcov[i,j]*Xdiff[j]
-    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * exp(-0.5 * (chisq));
+    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * exp(-0.5 * (chisq-chisq0));
     return chisq, like
 
 def get_er_erofer(X):
@@ -163,6 +163,7 @@ def get_chisqs_from_yyerlists(Ys, YErs, diffchisqmethod = 'use_weightedavg_as_re
 ##############################################################
 
 def get_cut(Xlike, CL=0.683):
+    import copy
     copylike = copy.copy(Xlike);
     copylike.sort(reverse=True);
     totlike = sum(copylike);
