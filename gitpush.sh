@@ -1,5 +1,6 @@
 git pull
-git add *.sh
+git add gitpush.sh
+git add geditfiles.sh
 git add *.py
 git add src/*.py
 git add src/Makefile
