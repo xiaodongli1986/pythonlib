@@ -58,6 +58,12 @@ catinfo_5binsplit = {
 			'DR12v4-LOWZ-S':   [436.07,     653.53,     820.32,     939.13,    1042.28,    1172.73]
 			}
 
+SixBinRedshift_NS = [0.2154098242, 0.3156545036, 0.3869159269, 0.4785988874, 0.5408209467, 0.6186561000]
+
+
+SixBinRedshift_N = [0.21600642244568982, 0.31646577619767519, 0.38721946672537055, 0.47897499723114539, 0.54059313570594303, 0.61850917062883259]
+
+SixBinRedshift_S = [0.21410525733734107, 0.31388039435706311, 0.38625224442260986, 0.47757238122842527, 0.54144257236794946, 0.61905709858835356]
 
 Sky_catname = {
 
@@ -65,54 +71,54 @@ Sky_catname = {
 		'S': ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S'],
 }
 
-BinSplittedSamplesInfo = BSSInfo = {'DR12v4-CMASS-N.1of3': [18725,
-  [1172.8135587285176, 1367.46449618721],
-  1290.4871557760512,
-  0.47873744348042169],
- 'DR12v4-CMASS-N.2of3': [18841,
-  [1367.4758209144834, 1507.2175881895753],
-  1435.1365031697192,
-  0.54042051192754192],
- 'DR12v4-CMASS-N.3of3': [18790,
-  [1507.2276432245405, 1772.2946147685748],
-  1611.0862985944852,
-  0.61837420611805005],
- 'DR12v4-CMASS-S.1of3': [7013,
-  [1172.7993424045378, 1365.3068030406646],
-  1288.0926526086776,
-  0.477733513782784],
- 'DR12v4-CMASS-S.2of3': [7009,
-  [1365.3317290265579, 1510.9479606317341],
-  1436.7370960107269,
-  0.54111478956376302],
- 'DR12v4-CMASS-S.3of3': [6728,
-  [1510.98262251195, 1771.907739298638],
-  1612.1428285931556,
-  0.61885258511184971],
- 'DR12v4-LOWZ-N.1of3': [8341,
-  [436.21214997434919, 775.2369519438621],
-  620.79159235544296,
-  0.2166779110732702],
- 'DR12v4-LOWZ-N.2of3': [8235,
-  [775.34261495589806, 975.37329132422531],
-  885.91545920580427,
-  0.31626963338286124],
- 'DR12v4-LOWZ-N.3of3': [8229,
-  [975.39158482687094, 1172.7149706359958],
-  1067.2988676645298,
-  0.38740354788560033],
- 'DR12v4-LOWZ-S.1of3': [3759,
-  [436.11039625285252, 767.15675348944467],
-  616.62055993763897,
-  0.21514912385540902],
- 'DR12v4-LOWZ-S.2of3': [3771,
-  [767.25600340989843, 972.61266226851455],
-  879.61419584539203,
-  0.31384444920337418],
- 'DR12v4-LOWZ-S.3of3': [3811,
-  [972.80401044952532, 1172.7182126421237],
-  1064.4748098662978,
-  0.38627569336678647]}
+BinSplittedSamplesInfo = BSSInfo ={'DR12v4-CMASS-N.1of3': [188227,
+  [1172.741406785507, 1367.469046283597],
+  1291.0535627205716,
+  0.47897499723114539],
+ 'DR12v4-CMASS-N.2of3': [188206,
+  [1367.4732224621805, 1507.2199077616378],
+  1435.5345281492446,
+  0.54059313570594303],
+ 'DR12v4-CMASS-N.3of3': [188227,
+  [1507.2201048559464, 1772.3398525139473],
+  1611.3844045605133,
+  0.61850917062883259],
+ 'DR12v4-CMASS-S.1of3': [68966,
+  [1172.7636691935306, 1365.3090581727679],
+  1287.7082096923421,
+  0.47757238122842527],
+ 'DR12v4-CMASS-S.2of3': [68973,
+  [1365.3116190881847, 1510.9783351604913],
+  1437.4925575154489,
+  0.54144257236794946],
+ 'DR12v4-CMASS-S.3of3': [68968,
+  [1510.98262251195, 1772.3354903962963],
+  1612.5944239099224,
+  0.61905709858835356],
+ 'DR12v4-LOWZ-N.1of3': [82746,
+  [436.07187411187164, 775.24922582434101],
+  618.95992640133159,
+  0.21600642244568982],
+ 'DR12v4-LOWZ-N.2of3': [82745,
+  [775.25446374475644, 975.37966607041835],
+  886.42475118915456,
+  0.31646577619767519],
+ 'DR12v4-LOWZ-N.3of3': [82745,
+  [975.38246906830341, 1172.7353404558635],
+  1066.8380569241624,
+  0.38721946672537055],
+ 'DR12v4-LOWZ-S.1of3': [37841,
+  [436.08566381217133, 767.20797202023391],
+  613.77080078879521,
+  0.21410525733734107],
+ 'DR12v4-LOWZ-S.2of3': [37838,
+  [767.2228201274321, 972.79080390696379],
+  879.70764728807524,
+  0.31388039435706311],
+ 'DR12v4-LOWZ-S.3of3': [37844,
+  [972.80004343547478, 1172.7239164963337],
+  1064.4160778934527,
+  0.38625224442260986]}
 
 HR4LCcatname2list = ['J08', 'LC93', 'M12', 'V13', 'B08',]
 HR4catname2list = ['HR4PSB',  'J08.dat.z_0', 'J08.dat.z_0.5', ] + HR4LCcatname2list
@@ -145,6 +151,8 @@ NSscan_wlist = np.linspace(-3.0, 0.0, 7)
 NSscan_omwlist = sumlist([[[om,w] for om in NSscan_omlist] for w in NSscan_wlist])
 NSscan_scanname = 'NS-97Scan'
 
+
+#########################################
 #########################################
 ### Dense1 scan
 
@@ -167,6 +175,48 @@ Dense1scan_wlist = merge_two_list_finitedigits(Dense1scan_wlist, NSscan_wlist, s
 Dense1scan_omwlist = sumlist([[[om,w] for om in Dense1scan_omlist] for w in Dense1scan_wlist])
 
 Dense1scan_scanname = 'Dense1--'+str(len(Dense1scan_omlist))+'-'+str(len(Dense1scan_wlist))+'-Scan'
+
+
+#########################################
+#########################################
+### Dense2 scan
+#########################################
+
+Dense2subscan_omlist = np.linspace(0.06, 0.41, 14*5+1)
+
+Dense2subscan_wlist = np.linspace(-1.5, -0.4, 22*2+1)
+
+Dense2subscan_omwlist = sumlist([[[om,w] for om in Dense2subscan_omlist] for w in Dense2subscan_wlist])
+Dense2subscan_scanname = 'Dense2sub--'+str(len(Dense2subscan_omlist))+'-'+str(len(Dense2subscan_wlist))+'-Scan'
+
+## Total scan: all om, w in the previous NS-97Scan are included into the omlist, wlist
+
+Dense2scan_omlist = [x for x in Dense2subscan_omlist]
+Dense2scan_wlist = [x for x in Dense2subscan_wlist]
+
+Dense2scan_omlist = merge_two_list_finitedigits(Dense2scan_omlist, Dense1scan_omlist, sortlist=True)
+Dense2scan_wlist = merge_two_list_finitedigits(Dense2scan_wlist, Dense1scan_wlist, sortlist=True)
+Dense2scan_omwlist = sumlist([[[om,w] for om in Dense2scan_omlist] for w in Dense2scan_wlist])
+
+Dense2scan_scanname = 'Dense2--'+str(len(Dense2scan_omlist))+'-'+str(len(Dense2scan_wlist))+'-Scan'
+
+#########################################
+#########################################
+#########################################
+### Dense2sub + Dense1
+Dense2sub_Dense1_scanomwlist = [[omw[0], omw[1]] for omw in Dense2subscan_omwlist]
+
+omw_er = 0.000001
+#Dense2sub_Dense1_num_omw_added = 0
+for i in range(len(Dense1scan_omwlist)):
+    om, w = Dense1scan_omwlist[i]
+    if not ((om > 0.060 - omw_er) and (om < 0.41 + omw_er) and (w > -1.5-omw_er) and (w < -0.4 + omw_er)):
+        Dense2sub_Dense1_scanomwlist.append([om, w])
+        #Dense2sub_Dense1_num_omw_added += 1
+
+#########################################
+#########################################
+
 
 #########################################
 ### Files (name, check)

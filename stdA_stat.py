@@ -1,4 +1,33 @@
-		
+from scipy import stats
+
+def nsigofsigCL(sig):
+	if sig == sig1:
+		return 1
+	elif sig == sig2:
+		return 2
+	elif sig == sig3:
+		return 3
+	elif sig == sig4:
+		return 4
+	elif sig == sig5:
+		return 5
+	elif sig == sig6:
+		return 6
+	elif sig == sig7:
+		return 7
+	else:
+		return stats.norm.interval(sig, loc=0.0, scale=1.0)[1]		
+
+### Convert    a x^2 + b x + c     to    (x-x0)^2/sig^2 + chisq0 
+def abc_to_f0sigchisq0(a, b, c):
+    f0 = - b / (2.0*a)
+    sig = 1.0 / np.sqrt(float(a))
+    chisq0 = c - b*b/4.0/a
+    return f0, sig, chisq0
+def chisq__f0_sig_chisq0(f, f0, sig, chisq0=0):
+    return (f-f0)**2.0 / sig**2.0 + chisq0
+def chisq__f0_sig_chisq0_str(f0, sig, chisq0, f0sigfmt='%.5f', chisq0fmt='%.1f' ):
+    return ('chi^2 = (f-'+f0sigfmt%f0+')^2 / '+f0sigfmt%sig+'^2 + '+chisq0fmt%chisq0)  
 
 
 def binned_quan(X, Y, nbin, Xrange=''): ## binned quantities
@@ -294,3 +323,12 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
     
     return margwlike, margomlike,wbf, wl, wr, ombf, oml, omr
 
+### Useful test for plot_contour  and  marg like (seems there is serious problem -- improve it later!!!)
+
+#omlist = np.linspace(-5, 5, 70)
+#wlist = np.linspace(-5, 5, 80)
+#chisqlist = [[(omlist[iom])**2.0 + (wlist[iw])**2.0  for iom in range(len(omlist))] for iw in range(len(wlist))]
+#margwlike, margomlike, wbf, wl, wr, ombf, oml, omr = get_margconstraint(chisqlist, omlist, wlist)
+#fig, ax = figax()
+#plot_contour(ax, omlist, wlist, chisqlist, ommin=min(omlist), ommax=max(omlist), wmin=min(wlist), wmax=max(wlist), )
+#ax.grid()

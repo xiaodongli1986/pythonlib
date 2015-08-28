@@ -177,6 +177,29 @@ def FuncSelcX_index(X, func):
 def polyfitY(X, Y, deg):
     polyfitrlt = polyfit(X, Y, deg=deg)
     return polyval(polyfitrlt, X) 
+      
+def polystr(polyfit, deg=2, fmt='%.1f', valstr = 'x'):
+            nowstr = ''
+            nowdeg = deg
+            for i in range(deg):
+                coef = polyfit[i]
+                if i>= 1 and coef > 0:
+                    nowstr += ' + '
+                else:
+                    nowstr += '  '
+                nowstr += (fmt%coef)
+                if nowdeg >1:
+                    nowstr += (' '+valstr+'^'+str(nowdeg))
+                else:
+                    nowstr += (' '+valstr)
+                nowdeg -= 1
+            i = deg
+            coef = polyfit[i]
+            if i>= 1 and coef > 0:
+                    nowstr += ' + '
+            nowstr += (fmt%coef)
+            return nowstr
+
 
 ### return rows where the redshift lies within certain region
 ### universially can be applied to any multi-component array to limit the range of a certain component

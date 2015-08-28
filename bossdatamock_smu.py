@@ -17,6 +17,8 @@ def smufiles_noAP_binsplitted(catnamelist=catnamelist, catname2list=catname2list
                             binsplittedfilename(mockfile(catname, catname2, imock, RSDstr),  ibin+1, totbin)))
     return smufilelist
 
+ 
+
 def smu__intxi__plot_all_binsplited_files(smu__intxi__settings=smu__intxi__settings_std, prefix='std-'):
     import bossdatamock; execfile(bossdatamock.pyfile)
     intxifilelist  = smu__intxi_calcwrite_list( 

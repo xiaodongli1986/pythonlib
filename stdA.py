@@ -10,6 +10,7 @@ import scipy.ndimage as ndimage
 import glob as glob
 import textwrap
 
+
 pythonlibPATH = commands.getoutput('echo $pythonlibPATH')
 pyfile=pythonlibPATH+'/'+'stdA.py'
 
@@ -269,10 +270,18 @@ def area_from_radec(ramin, ramax, decmin, decmax, degreefac = np.pi/180.0):
 def Hz(omegam, w, h, z):
     return 100*h*np.sqrt(omegam*(1.0+z)**3.0 + (1.0-omegam)*(1.0+z)**(3.0*(1+w)))
 
+def Hz_Mpc_to_h(omegam, w, h, z):
+    return 100*np.sqrt(omegam*(1.0+z)**3.0 + (1.0-omegam)*(1.0+z)**(3.0*(1+w)))
+
 def comov_r(omegam, w, h, z):
     global CONST_C
     x, y = scipy.integrate.quad(lambda x: 1.0/Hz(omegam, w, h, x), 0, z)
     return CONST_C * x * h 
+
+def DA(omegam, w, h, z):
+	return comov_r(omegam, w, h, z) / (1.0 + z)
+def DA_pro_H(omegam, w, h, z):
+	return DA(omegam, w, h, z) * Hz_Mpc_to_h(omegam, w, h, z)
 
 def comov_r_dft(z, omegam=0.26, w=-1.0, h=0.7):
     return comov_r(omegam, w, h, z)
@@ -462,8 +471,11 @@ def separate_path_file(path):
 ### Statistics
 ############################################################
 
+
 ### CLs of 1-7 sigma
 sig1=0.683;sig2=0.954;sig3=0.9973;sig4=0.999937;sig5=0.99999943;sig6=0.999999998;sig7=0.9999999999974
+
+
 
 # Get the mean & variance, with errors
 def get_stat_from_list(x,getvarer = False):
@@ -571,34 +583,40 @@ def invert_ax(ax, axes='x'):
 def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                     ommin = 0.01, ommax = 0.6, wmin = -2.0, wmax = -0.0,  do_smooth=True, smsigma=0.5, 
                     extratitle = '', titleftsize=15, notitle = False,
-                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  nolegend = False, nolabel = False, legftsize=15,
-                    noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1):
+                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, 
+                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75,
+                    noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
+	            show_marg_rlt = True):
     if True:
         smsigma = smsigma
         if do_smooth:
             Z = ndimage.gaussian_filter(chisqlist, sigma=smsigma, order=0)
         else:
             Z = chisqlist
+        if sigs == None:
+            sigs = [sigA, sigB, sigC]
+       
         if use_ratCL:
-            chisqA, chisqB, chisqC = list_find_CL_chisqcut(chisqlist, [sigA, sigB, sigC])
+            chisqs = list_find_CL_chisqcut(chisqlist, sigs)
             #chisqA, likeratioA = find_CL_chisqcut(Z, sigA)
             #chisqB, likeratioB = find_CL_chisqcut(Z, sigB)
             #chisqC, likeratioC = find_CL_chisqcut(Z, sigC)
             #print chisqA, likeratioA, chisqB, likeratioB, chisqC, likeratioC
         else:
-            chisqA = 2.3; chisqB = 6.17; chisqC = 11.83;
+            chisqs = [ 2.3, 6.17,  11.83]
 
+        numchisq = len(chisqs)
         X = [-100,-99]; Y=[0,0]
         if plotformat == 1:
-            ax.contourf(omlist, wlist, Z, [0, chisqC], colors='0.75')
-            ax.contourf(omlist, wlist, Z, [0, chisqB], colors='0.65')
-            ax.contourf(omlist, wlist, Z, [0, chisqA], colors='0.55' )
+            colorlist = [str(x) for x in np.linspace(color2, color1, numchisq)]
+            for row in range(numchisq):
+                ax.contourf(omlist, wlist, Z, [0, chisqs[numchisq - row - 1]], colors = colorlist[row])
             ax.plot(X,Y,c='0.55',lw=10,label=label)
         elif plotformat == 2:
-            ax.contour(omlist, wlist, Z, [chisqA, chisqB, chisqC], colors='r', linewidths = 2, linestyles = 'dashed')
+            ax.contour(omlist, wlist, Z, chisqs, colors='r', linewidths = 2, linestyles = 'dashed')
             ax.plot(X,Y,c='r',lw=3,ls='--',label=label)
         elif plotformat == 3:
-            ax.contour(omlist, wlist, Z, [chisqA, chisqB, chisqC], colors='b', linewidths = 2)
+            ax.contour(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
             ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
             
         ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
@@ -623,3 +641,13 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
             for xlabel_i in ax.get_xticklabels():
                 xlabel_i.set_fontsize(0.0)
                 xlabel_i.set_visible(False)
+        if show_marg_rlt:
+            margwlike, margomlike, wbf, wl, wr, ombf, oml, omr = get_margconstraint(chisqlist, omlist, wlist)
+            omuper = omr-ombf;
+            omler = ombf-oml;
+            wuper = wr-wbf;
+            wler = wbf-wl;
+            omtext = '$\Omega_m=%.3f'%ombf+'^{+%.3f'%omuper+'}_{-%.3f'%omler+'}$'
+            wtext = '$w=%.3f'%wbf+'^{+%.3f'%wuper+'}_{-%.3f'%wler+'}$'
+            ax.text(0.02, 0.2,omtext,  transform=ax.transAxes, fontsize=legftsize)
+            ax.text(0.02, 0.1,wtext, transform=ax.transAxes, fontsize=legftsize)

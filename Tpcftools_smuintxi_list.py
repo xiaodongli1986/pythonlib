@@ -14,6 +14,14 @@ smu__intxi__settings_std_30bin = {
             'xifunction': intxi_FractionalS,
             'smin':6.0, 'smax':50, 'mumin':0.01, 'mumax':1.0, 'nummubin':31, # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
                }
+smu__intxi__settings_std_35bin = {
+            'xifunction': intxi_FractionalS,
+            'smin':6.0, 'smax':50, 'mumin':0.01, 'mumax':1.0, 'nummubin':36, # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
+               }
+smu__intxi__settings_std_45bin = {
+            'xifunction': intxi_FractionalS,
+            'smin':6.0, 'smax':50, 'mumin':0.01, 'mumax':1.0, 'nummubin':46, # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
+               }
 smu__intxi__settings_std_50bin = {
             'xifunction': intxi_FractionalS,
             'smin':6.0, 'smax':50, 'mumin':0.01, 'mumax':1.0, 'nummubin':51, # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
