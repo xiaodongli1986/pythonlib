@@ -1,7 +1,8 @@
 def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np.linspace(0,1,11), 
 	ismin_of_intxi = 6, ismax_of_intxi = 50, deltais = 2, 
 	xifunction = intxi_FractionalS, lsfun=None, lcfun=None, 
-	figxsize=16, figysize=8, markersize=1, lw=3, showleg=True, plot_theta=True, legfs=13,
+	figxsize=16, figysize=8, markersize=1, lw=3, showleg=True, plot_theta=True, legfs=13, givenfigaxs=None,
+	leftpanel_xrange = [], figtilt = None,
 	only_plot_shape=False, # do not display the left panel; only show xi as a function of mu
 	autoleg=True, # automatic create label
 	legiskey=False,  # use key as label in legend
@@ -11,11 +12,14 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	 ):
 	""" Plot xi(s,mu) as a funtion of scale and angle"""
 	itcolors = itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k', 'gray'])
-	fig=plt.figure(figsize=(figxsize,figysize));  
-	if not only_plot_shape:
-		ax1=fig.add_subplot(121); ax2=fig.add_subplot(122)
+	if givenfigaxs == None:
+		fig=plt.figure(figsize=(figxsize,figysize));  
+		if not only_plot_shape:
+			ax1=fig.add_subplot(121); ax2=fig.add_subplot(122)
+		else:
+			ax2 = fig.add_subplot(111); ax1=ax2
 	else:
-		ax2 = fig.add_subplot(111); ax1=ax2
+		fig, ax1, ax2 = givenfigaxs
 	ylabel2 = '$\\int_{'+str(ismin_of_intxi)+'}^{'+str(ismax_of_intxi)+'} \\xi(s,\\mu) ds$ '
 	if xifunction != intxi_FractionalS:
 		ylabel2 = smu__xifunname(xifunction)+'$(s_{\\rm min}='+str(ismin_of_intxi)+',\\ s_{\\rm max}='+str(ismax_of_intxi)+')$'
@@ -69,7 +73,10 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 		                ax1.set_ylabel('$s^2\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
 			else:
 		                ax1.set_ylabel('$\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
-	                ax1.set_xlim(0,150)
+			if leftpanel_xrange != []:
+				ax1.set_xlim(leftpanel_xrange)
+			else:
+		                ax1.set_xlim(min(sasx),max(sasx))
 
                 ### \int xi ds as a function of mu
                 i_muedges = smu__get_imuedges(muedges,smusettings);
@@ -101,6 +108,8 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	    if showleg: ax.legend(loc='best', frameon=False, fontsize=legfs)
 
 	fig.tight_layout()
+	if figtilt != None:
+		fig.set_title(figtilt, fontsize=24)
 	return fig, ax1, ax2
 
 

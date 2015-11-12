@@ -5,7 +5,37 @@ datadir_orig = '/home/xiaodongli/SparseFilaments/data/input/DR12/'
 mockdir_orig = '/home/xiaodongli/SparseFilaments/data/input/HR4/DR12_mock/'
 datamockdir = '/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/'
 
+datamockdir_cluster = '/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/'
+datamockdir_local = '/home/xiaodongli/SparseFilaments/data/local_input/boss2pcf/data/'
+
+
+### This means the directory is on local laptop
+datamockdir = datamockdir_local
+
 ### files
+
+## nbar files
+
+bossnardir = datamockdir+'../../DR12/nbar/'
+bossnbarfiles = {'DR12v4-CMASS-N':	'nbar-cmass-dr12v4-N-Reid.dat.ReCalom0p26',
+	'DR12v4-CMASS-S':	'nbar-cmass-dr12v4-S-Reid.dat.ReCalom0p26',
+	'DR12v4-LOWZ-N':	'nbar-lowz-dr12v4-N-Reid.dat.ReCalom0p26',
+	'DR12v4-LOWZ-S':	'nbar-lowz-dr12v4-S-Reid.dat.ReCalom0p26'
+}
+
+icol_nbar_zcen = 0
+icol_nbar_zlow = 1
+icol_nbar_zhigh = 2
+icol_nbar_nbar_boss = 3
+icol_nbar_wfkp_boss = 4
+icol_nbar_shell_vol_boss = 5
+icol_nbar_numgal = 6
+icol_nbar_shell_vol_WMAP5 = 7
+icol_nbar_nbar_WMAP5 = 8
+
+#zcen     zlow      zhigh     nbar         wfkp      shell_vol     num-gal     shell_vol(ReCalc)  nbar(omReCalc)
+
+## samples
 def datafile(catname, suffix = ''):
 	return datamockdir+catname+'/data'+suffix
 def dataranfile(catname, suffix = ''):

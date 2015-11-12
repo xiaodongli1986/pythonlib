@@ -19,7 +19,9 @@ catinfo_npatch = {
 			'DR12v4-CMASS-N' : 4,
 			'DR12v4-CMASS-S' : 8,
 			'DR12v4-LOWZ-N' : 4,
-			'DR12v4-LOWZ-S' : 8
+			'DR12v4-LOWZ-S' : 8,
+			'DR12v4-CMASS' : 4,
+			'DR12v4-LOWZ' : 4
 			}
 
 catinfo_redshiftrange = {
@@ -65,11 +67,14 @@ SixBinRedshift_N = [0.21600642244568982, 0.31646577619767519, 0.3872194667253705
 
 SixBinRedshift_S = [0.21410525733734107, 0.31388039435706311, 0.38625224442260986, 0.47757238122842527, 0.54144257236794946, 0.61905709858835356]
 
-Sky_catname = {
+Seven_Edges = [436.07,     775.25,     975.38,    1172.74,    1367.47,    1507.22,    1772.34 ]
 
+Sky_catname = {
 		'N': ['DR12v4-CMASS-N', 'DR12v4-LOWZ-N'],
 		'S': ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S'],
+		'NS': ['DR12v4-CMASS', 'DR12v4-LOWZ']
 }
+
 
 BinSplittedSamplesInfo = BSSInfo ={'DR12v4-CMASS-N.1of3': [188227,
   [1172.741406785507, 1367.469046283597],
@@ -130,10 +135,14 @@ def numHR3mock(catname):
 		return 108
 	elif catname in ['DR12v4-CMASS-S', 'DR12v4-LOWZ-S' ]:
 		return 216
+	elif catname in ['DR12v4-CMASS']:
+		return 72
+	elif catname in ['DR12v4-LOWZ']:
+		return 72
 
 def catinfo_nummock(catname, catname2):
 	if catname2 == 'HR3':
-		return catinfo_npatch[catname]*27
+		return numHR3mock(catname)
 	elif catname2 in catname2list:
 		return catinfo_npatch[catname]
 	else:

@@ -199,6 +199,13 @@ def calc_xils(DD, DR, RR,dim=0):
     elif dim == 2:
 	return [[(DD[row1][row2]-2*DR[row1][row2])/RR[row1][row2]+1 for row2 in range(len(DD[row1]))] for row1 in range(len(DD))]
 
+def xi_natural(dd, dr, rr):
+    return dd/rr - 1.0
+def xi_davis(dd, dr, rr):
+    return dd/dr - 1.0
+def xi_LS(dd, dr, rr):
+    return (dd-2*dr)/rr + 1.0
+
 def packed_count(DR, ismin, ismax, imumin, imumax):
     """	count # of pairs within certain range of s, mu"""
     #ismin, ismax, imumin, imumax = get_is(smin), get_is(smax), get_imu(mumin), get_imu(mumax)
@@ -239,6 +246,10 @@ def smu__xifunname(xifunction):
 	name =  'int--s-squre-xi_normed'
     elif xifunction == int_s_xi_normed__by_full_mu_range:
 	name =  'int--s-xi_normed'
+    elif xifunction ==  intxi_FractionalS:
+	name = 'int--xi'
+    else:
+	name = 'int--xi'
     return name
 
 
@@ -815,12 +826,57 @@ def chisq_of_intxiatdiffr_cov(binnedxis,printinfo=False, diffchisqmethod='use_la
                 totchisq += chisq; totlike *= like
     return totchisq, totlike, covmats
 
+
+
+### something dealing with   number counts   and   merging of two 2pcf files...
+
+def weighted_sum_of_counts(a, b, weiA, weiB):
+    #if random.rand() > 0.999:
+    #    print a, b, '\t', a*weiA, b*weiB, '\t', (a*weiA + b*weiB) / (weiA + weiB)
+    return (a*weiA + b*weiB) / (weiA + weiB)
+
+def merge_2pcf_files(gal_sumweiA, ran_sumweiA,
+                     gal_sumweiB, ran_sumweiB,
+                     #catnameA, galfileA, ranfileA, ## Info of the first 2pCF file
+                     #catnameB, galfileB, ranfileB, ## Info of the second 2pCF file
+                     TpcffileA, ## Name of 1st
+                     TpcffileB, ## Name of 2rd
+                     TpcffileC  ## Name of 3rd (the merged result)
+                     ):
+    dataA = np.loadtxt(TpcffileA)
+    dataB = np.loadtxt(TpcffileB)
+    
+    nowf = open(TpcffileC, 'w')
+    nowf.write(open(TpcffileA,'r').readline())
+    for irow in range(len(dataA)):
+        cosmin, cosmax, rmin, rmax, DDnormA, DRnormA, RRnormA, xinaturalA, xidavisA, xiLSA = dataA[irow]
+        cosmin, cosmax, rmin, rmax, DDnormB, DRnormB, RRnormB, xinaturalB, xidavisB, xiLSB = dataB[irow]
+        DDnormC = weighted_sum_of_counts(DDnormA, DDnormB, gal_sumweiA**2.0, gal_sumweiB**2.0)
+        DRnormC = weighted_sum_of_counts(DRnormA, DRnormB, gal_sumweiA*ran_sumweiA, gal_sumweiB*ran_sumweiB)
+        RRnormC = weighted_sum_of_counts(RRnormA, RRnormB, ran_sumweiA**2.0, ran_sumweiB**2.0)
+        xinautral  = xi_natural(DDnormC, DRnormC, RRnormC) 
+        xidavis    =   xi_davis(DDnormC, DRnormC, RRnormC) 
+        xiLS       =      xi_LS(DDnormC, DRnormC, RRnormC) 
+        if False:
+            print 'cosmin, cosmax, rmin, rmax, DDnormA, DRnormA, RRnormA, xinaturalA, xidavisA, xiLSA = ',
+            print cosmin, cosmax, rmin, rmax, DDnormA, DRnormA, RRnormA, xinaturalA, xidavisA, xiLSA
+            print 'cosmin, cosmax, rmin, rmax, DDnormB, DRnormB, RRnormB, xinaturalB, xidavisB, xiLSB = ',
+            print cosmin, cosmax, rmin, rmax, DDnormB, DRnormB, RRnormB, xinaturalB, xidavisB, xiLSB
+            print 'DDnormA, DDnormB = ', DDnormA, DDnormB
+            print 'DRnormA, DRnormB = ', DRnormA, DRnormB
+            print 'RRnormA, RRnormB = ', RRnormA, RRnormB
+            print 'gal_sumweiA, gal_sumweiB, ran_sumweiA, ran_sumweiB = ', gal_sumweiA,gal_sumweiB,ran_sumweiA,ran_sumweiB
+            print cosmin, cosmax, rmin, rmax, '\t', xiLSA, xiLSB, '\t', xiLS
+            print 'DDnormA, DDnormB, DDnormC, DRnormA, DRnormB, DRnormC, RRnormA, RRnormB, RRnormC = ',
+            print DDnormA, DDnormB, DDnormC, DRnormA, DRnormB, DRnormC, RRnormA, RRnormB, RRnormC
+            return 
+        nowf.write(array_to_str_fmtted([cosmin, cosmax, rmin, rmax, DDnormC, DRnormC, RRnormC, 
+                xinautral, xidavis, xiLS], fmt='%14.7e')+'\n')
+    return TpcffileC
+
+
 imocks = range(1,9)
 import numpy as np
-
-
-
-
 ### Useful Shell Commands
 execfile(pythonlibPATH+'/Tpcftools_cmds.py')
 

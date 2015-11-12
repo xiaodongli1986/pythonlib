@@ -77,6 +77,7 @@ def randXpart(X, rat=0.1, deepcopy=False, onlyreturnvalue=False, onlyreturnindex
 
 ### averaging of 2d arrays... arraylists will be 3d list; first index is the index of array.
 def get_avg_array2D(arraylists, furtherdivfac = 1.0):
+    import copy
     avgarray = copy.deepcopy(arraylists[0])
     divfac   = float(len(arraylists)) * furtherdivfac
     nrow = len(arraylists[0])

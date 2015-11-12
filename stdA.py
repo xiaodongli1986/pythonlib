@@ -313,7 +313,15 @@ def omwstr(om, w, fmt='%.4f', sep1='', sep2='_'):
     return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w
 def cosmoconvertedfilename(filename, om, w): ### filename
 	return filename + '.cosmo-converted.' + omwstr(om,w)
-
+def omws_from_om_w(oms, ws, TwoDlist=True):
+	if TwoDlist:
+		return [[[om, w]  for om in oms] for w in ws]
+	else:
+		omws = []
+		for w in ws:
+			for om in oms:
+				omws.append([om,w])
+		return omws
 
 ### very specialized cosmological functions
 
@@ -331,7 +339,7 @@ execfile(pythonlibPATH+'/stdA_array.py')
 
 def getfilelist(path):
 	"""	List of files from ls"""
-	return commands.getoutput('ls '+path).split()
+	return commands.getoutput('ls '+path).split('\n')
 
 def shfile__cmdlist(shfilename, cmdlist, binlocation='#!/bin/bash'):
 	f0 = open(shfilename, 'w')
@@ -547,6 +555,11 @@ def ppt_firstpage(filename='sample', title='Please input title', datestr=None, n
     print 'Saving to file: ', figname
     fig.savefig(figname, format=fmt)
     plt.show()
+
+def StraightLine(fixedx, ymin, ymax, numpoint=2):
+	X = [fixedx for row in range(numpoint)]
+	Y = np.linspace(ymin, ymax, numpoint)
+	return X, Y
 
 def ppt_textpage(filename='sample', inputtext='Please input text',  textfs=18, wrapsize=35,
                   figxsize=8, figysize=6, fmt='pdf'):

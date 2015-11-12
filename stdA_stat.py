@@ -142,6 +142,22 @@ def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * exp(-0.5 * (chisq-chisq0));
     return chisq, like
 
+def chisq_invcov_xbar(X, InvCov, Xbar = [], chisq0=0):
+    p=len(X);
+    #invcov = np.mat(InvCov);
+    if Xbar == []:
+        Xdiff = X
+    else:
+        Xdiff = [X[row]-Xbar[row] for row in range(p)]
+    #print 'Xdiff:', Xdiff
+    #print 'covmat: ', npcov
+    #print 'invcov:', invcov
+    chisq = 0.0;
+    for i in range(p):
+        for j in range(p):
+            chisq += Xdiff[i]*InvCov[i,j]*Xdiff[j]
+    return chisq
+
 def get_er_erofer(X):
     x_av, x_var, x_av_er, x_var_er = get_stat_from_list(X)
     erofvar = x_var_er
