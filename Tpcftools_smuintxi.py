@@ -496,6 +496,7 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                             use_omw_testfun=False,
                             sigs = [0.683, 0.954, 0.997],
                             skip_calc_if_chisqfile_found = True,
+			    only_plot__no_calc = False,
                             refine_intxi = None,
 			    #oms=oms, ws=ws, omws=omws, scanname=scanname,
                             ):
@@ -535,7 +536,18 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                                                          numchisq=numchisq, prefix=scanname+'--',
                                                          normedintxi=normedintxi, refine_intxi=refine_intxi)
 
-	       if skip_calc_if_chisqfile_found and isfile(chisqfilename):
+	       if only_plot__no_calc:
+			if isfile(chisqfilename):
+				print '\t\tSkip computation: using chisqs loaded from file: ', chisqfilename
+				pass
+			else:
+				for i in range(7):
+					print 
+				print ' *** *** File not found!!! *** *** '
+				for i in range(7):
+					print 
+				return
+	       elif skip_calc_if_chisqfile_found and isfile(chisqfilename):
 			print '\t\tSkip computation: using chisqs loaded from file: ', chisqfilename
 			pass
 	       else:
@@ -858,6 +870,7 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                      check_tot_sep_match = False, 
                      saverlt = True,
                      EnhancedOmWGrid=[50,50],
+		     save_orig_chisq=True, # could be helpful when the orignal chisq come from many files
                      ):
      DPname_txt = DistancePrior_name(DistancePrior, 0, 0, nametype='txt' )
      if (not multifiles) or print_all_filename:
@@ -900,7 +913,21 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                 chisqfilename += ('.'+str(len(chisqfile))+'files')
                 if iskip != 0:
                     chisqfilename += ('.'+str(iskip)+'skiped')
-
+     if save_orig_chisq:
+	file0, fileNoCorrection, fileCorrected = chisqfilename+'.AllInfo', chisqfilename+'.NoCorrection', chisqfilename+'.Corrected'
+	np.savetxt(file0, chisqdata, fmt='%20.10f',
+		header = 'Columns:  omegam,    w,    chisq before systematic correction,   chisq value after systematic correction,    five chisq values before correction (separate chisqs in five redshift bins),    five chisq values after correction (separate chisqs in five redshift bins)')
+	f1, f2 = open(fileNoCorrection,'w'), open(fileCorrected, 'w')
+	oms_all, ws_all, noRSDCor_tot_chisqs, RSDCor_tot_chisqs = Xsfromdata(chisqdata, [0,1,2,3])
+	for ichisq in range(len(oms_all)):
+		om, w, chisq1, chisq2 = oms_all[ichisq], ws_all[ichisq], noRSDCor_tot_chisqs[ichisq], RSDCor_tot_chisqs[ichisq]
+		f1.write('%.10f'%om+'\t%.10f'%w+'\t%.10f'%chisq1+'\n')
+		f2.write('%.10f'%om+'\t%.10f'%w+'\t%.10f'%chisq2+'\n')
+	print '\t\t** chisq values re-saved to files: '
+	print '\t\t\t', file0
+	print '\t\t\t', fileNoCorrection
+	print '\t\t\t', fileCorrected
+	f1.close(); f2.close()
      if do_DPfit_RandomWalk_search == None:
 	RW_max_step = 1
 	RW_min_BC = 1

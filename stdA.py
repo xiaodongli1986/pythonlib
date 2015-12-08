@@ -87,7 +87,7 @@ def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20):
 		x = random.uniform(0,1)
 		if x <= rat:
 			wordlist = nowstr.split()
-			if wordlist[0] == '#':
+			if wordlist[0][0] == '#':
 				continue
 			else:
 				rlt.append([float(x) for x in wordlist])
@@ -599,7 +599,7 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                     sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, 
                     nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75,
                     noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
-	            show_marg_rlt = True):
+	            show_marg_rlt = True, scatter_WMAP5=True):
     if True:
         smsigma = smsigma
         if do_smooth:
@@ -631,8 +631,8 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
         elif plotformat == 3:
             ax.contour(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
             ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
-            
-        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
+        if scatter_WMAP5:
+	        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
         
         ax.set_xlim(ommin,ommax);   ax.set_ylim(wmin, wmax)
         if showgrid:
