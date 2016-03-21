@@ -9,6 +9,7 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	ignore_catname_in_leg=True, # when autoleg, do not display catname in label
 	normedintxi=False, # normalize amplitude of intxi
 	no_s_sq_in_y=False, #
+	return_XY = False,
 	 ):
 	""" Plot xi(s,mu) as a funtion of scale and angle"""
 	itcolors = itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k', 'gray'])
@@ -28,6 +29,7 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 		key_leg_list = list(Tpcfdatas.keys())
 		autoleg=True
 
+	Xs1, Ys1, Xs2, Ys2 = [], [], [], []
 	for key_leg in key_leg_list:                
             	if autoleg:
 			nowleg = keyname = key_leg
@@ -67,6 +69,8 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	                    packedxiasy.append(packedxi(DDlist, DRlist, RRlist, ismin, ismax, imumin, imumax))
                     ismin += deltais;
 		if not only_plot_shape:
+			Xs1.append([x for x in sasx])
+			Ys1.append([x for x in packedxiasy])
 	                ax1.plot(sasx, packedxiasy, marker='o', markersize=1, ls=ls, lw=lw, label = nowleg, c=lc)
 	                ax1.set_xlabel('$s\ [\\rm Mpc/h]$', fontsize=25)
 			if not no_s_sq_in_y:
@@ -88,6 +92,8 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 		if normedintxi:
 			intxis = normto1(intxis);
 
+		Xs2.append([x for x in muedgemids])
+		Ys2.append([x for x in intxis])
                 ax2.plot(muedgemids, intxis, marker='o', markersize=markersize, ls=ls, lw=lw, label = nowleg, c=lc)
                 ax2.set_xlabel('$1-\\mu$', fontsize=25)
                 ax2.set_ylabel(ylabel2, fontsize=25)
@@ -110,7 +116,10 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	fig.tight_layout()
 	if figtilt != None:
 		fig.set_title(figtilt, fontsize=24)
-	return fig, ax1, ax2
+	if not return_XY: 
+		return fig, ax1, ax2
+	else:
+		return fig, ax1, ax2, [X1s, Y1s, X2s, Y2s]
 
 
 

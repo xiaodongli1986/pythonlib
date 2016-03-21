@@ -414,3 +414,4 @@ def redshiftreduce_data(BOSSdata, zmin=0.43, zmax=0.7, ix=0, iy=1, iz=2):
     return Xs(BOSSdata, indice), indice
 
 execfile(pythonlibPATH+'/bossdatamock_smu.py')
+execfile(pythonlibPATH+'/bossdatamock_ChisqInfo.py')

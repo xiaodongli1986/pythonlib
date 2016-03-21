@@ -348,3 +348,223 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
 #fig, ax = figax()
 #plot_contour(ax, omlist, wlist, chisqlist, ommin=min(omlist), ommax=max(omlist), wmin=min(wlist), wmax=max(wlist), )
 #ax.grid()
+
+
+########################################
+### 2d linear interpolations
+def LinearInterpolation_2d(x1, y1,  x2, y2,  f_x1y1, f_x1y2, f_x2y1, f_x2y2,   x3, y3):
+    '''
+        Value of f(x3, y3) from f(x1,y1), f(x1,y2), f(x2,y1), f(x2,y2)
+        Method = Linear Interpolation in 2d
+        
+        ### Testing code:
+        
+            import stdA; execfile(stdA.pyfile);
+            deltaxy = 0.1
+            x1, y1, x2, y2 = 1, 1, 1+deltaxy, 1+deltaxy
+            x3, y3 = 1+deltaxy*0.17, 1+deltaxy*0.5
+            def fun(x,y):
+                return x**2+y*100
+            print LinearInterpolation_2d(x1, y1, x2, y2, fun(x1,y1), fun(x1,y2), fun(x2,y1), fun(x2,y2), x3, y3), fun(x3,y3)
+            print 'fun(x1,y1), fun(x1,y2), fun(x2,y1), fun(x2,y2) = ', fun(x1,y1), fun(x1,y2), fun(x2,y1), fun(x2,y2)
+    '''
+    fracx = (x3-x1) / (x2-x1)
+    fracy = (y3-y1) / (y2-y1)
+    #print fracx, fracy
+    f_x3y1 = f_x1y1 + (f_x2y1-f_x1y1) * fracx
+    f_x3y2 = f_x1y2 + (f_x2y2-f_x1y2) * fracx
+    f_x3y3 = f_x3y1 + (f_x3y2-f_x3y1) * fracy
+    #print 'f_x3y1, f_x3y2, f_x3y3 = ', f_x3y1, f_x3y2, f_x3y3
+    return f_x3y3
+
+def LinearInterpolation_2d_UniformGrid(xmin, xmax, numx,   ymin, ymax, numy,   F_2d,   X3, Y3):
+    '''
+        Values of f(x3, y3) from F_2d
+        F_2d: 2d list with numx rows, numy columns
+        X3, Y3: 1d list with same length
+        Method = Linear Interpolation in 2d
+        
+        A useful sentence:
+            LinearInterpolation_2d_UniformGrid(min(X), max(X), len(X), min(Y),max(Y),len(Y), 
+                chisqlist, X3, Y3)
+    '''
+    if len(X3) != len(Y3):
+        print 'Error (LinearInterpolation_2d_UniformGrid) !!!! Length of X3, Y3 not matching: ', len(X3), len(Y3)
+        return
+    deltax = (xmax-xmin) / (numx - 1.0)
+    deltay = (ymax-ymin) / (numy - 1.0)
+    F3s = []
+    for row in range(len(X3)):
+        x, y = X3[row], Y3[row]
+        ### ix and iy
+        ix, iy = int((x-xmin)/deltax), int((y-ymin)/deltay)
+        ix = min(ix, numx-2)
+        iy = min(iy, numy-2)
+        ix = max(ix,0); iy = max(iy,0)
+        ### x1,x2,y1,y2 and the fs
+        x1,y1 = xmin+ix*deltax, ymin+iy*deltay
+        x2,y2 = x1+deltax, y1+deltay
+        f_x1y1, f_x1y2, f_x2y1, f_x2y2 = F_2d[iy][ix], F_2d[iy+1][ix], F_2d[iy][ix+1], F_2d[iy+1][ix+1]
+        ### 
+        f_xy = LinearInterpolation_2d(x1, y1,  x2, y2,  f_x1y1, f_x1y2, f_x2y1, f_x2y2,   x,y)         
+        F3s.append(f_xy)
+    return F3s
+
+########################################
+########################################
+### Tools for cosmomc
+
+def COSMOMC_load_contours(filename, upper_limit_of_loadin=100, upper_limit_of_loadiny=100):
+    ''' 
+	Load in the cosmomc contour boundary outputed by matlab
+	To have outputed boundary in cosmomc add this in Getdist.f90: (cosmomc version: October 12; delete the three slashes)
+		              if (PlotContMATLAB(aunit,rootname,j,j2,do_shading) .and. &
+                  num_contours /= 0) then
+
+               write (aunit,'(a)') '[C h] = contour(x1,x2,pts,cnt,lineM{1});'
+               write (aunit,'(a)') 'set(h,''LineWidth'',lw1);'
+               write (aunit,*) 'hold on; axis manual; '
+
+                plotfile = numcat(trim(numcat(trim(rootname)//'_2D_',colix(j)-2))//'_',colix(j2)-2) !xiaodongli
+                write(aunit,'(a)') 'csvwrite(\'\'\'//trim(plotfile)//'.2dcon.txt'',C'');' !xiaodongli 
+'''
+    data = np.loadtxt(filename, delimiter=',')
+    contours = []
+    now_index = -1
+    for row in range(len(data)):
+        if data[row][0] > upper_limit_of_loadin or data[row][1] > upper_limit_of_loadiny:
+            now_index += 1
+            contours.append([])
+        else:
+            contours[now_index].append([x for x in data[row]])
+    return contours
+
+
+def MCMC_cosmomc_fmt_convert(MCMCfile, suffix = '.CosmomcFmtConverted', ipt_outputfile = '', fmtstr = '%20.10e'):
+	'''Convert a chisq result file into the format of cosmomc.
+	    fmt before conversion: par1, par2, ..., chisq
+	    fmt after conversion:  weight, chisq/2, par1, par2, ...
+	'''
+	### determine the outputfile name
+	if ipt_outputfile == '':
+		outputfile = MCMCfile+suffix
+	else:
+		outputfile = ipt_outputfile
+	print '(MCMC_cosmomc_fmt_convert) Open: \n\t', MCMCfile, '\nOutput to: \n\t', outputfile
+	f1 = open(MCMCfile, 'r')
+	f2 = open(outputfile, 'w')
+
+	### find out the minimal chisq
+	data = np.loadtxt(MCMCfile);
+	chisqs = Xfromdata(data, len(data[0])-1);
+	chisqmin = min(chisqs)
+
+	### generate the new file
+	nlines = 0
+	while True:
+		nowstr = f1.readline()
+		if nowstr == '':
+			break
+		A = str_to_numbers(nowstr)
+		chisq = A[len(A)-1]
+		B = [np.exp(-0.5*(chisq-chisqmin)), chisq/2.0] + A[0:len(A)-1]
+		f2.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
+		nlines += 1
+	print '	Finishing processing ', nlines, 'lines.'
+	return
+
+def MCMC_extension(MCMCfile, keyfun, fmtstr='', prefix = '', suffix = '.extended', ipt_outputfile = '', only_new_quan=True):
+	nlines = 0
+	if ipt_outputfile == '':
+		outputfile = prefix+MCMCfile
+	else:
+		outputfile = ipt_outputfile
+	f1 = open(MCMCfile, 'r')
+	f2 = open(outputfile, 'w')
+	print '(MCMC_extension) Open: \n\t', MCMCfile, '\nOutput to: \n\t', outputfile
+	while True:
+		nowstr = f1.readline()
+		if nowstr == '':
+			break
+		A = str_to_numbers(nowstr)
+		B = keyfun(A)
+		if only_new_quan:
+			f2.write(fmtstrlist([A[0],A[1]]+B, fmtstr=fmtstr)+'\n')		
+		else:
+			f2.write(nowstr[0:len(nowstr)-1]+' '+fmtstrlist(B, fmtstr=fmtstr)+'\n')
+		nlines += 1
+	print 'Finishing processing ', nlines, 'lines.'
+	return
+
+def COSMOMC_post_chisq(MCMCfile, 
+                       chisqfun, 
+                       rejectfun=None,
+                       suffix = '_post', CharSkip_of_Suffix=6, 
+                       ipt_outputfile = '', 
+                       fmtstr = '%20.10e'):
+    '''
+        Add an additional chisq value of the MCMC chain.
+        
+        ### This tests COSMOMC_post_chisq: post a x^2+y^2 to constant chisq...
+        import stdA; execfile(stdA.pyfile)
+        import Tpcftools; execfile(Tpcftools.pyfile)
+        import bossdatamock; execfile(bossdatamock.pyfile)
+        import copy
+        
+        if False:
+            MCMCfile = bossdatamock_cosmomcchaindir+'../const_chisq_1.txt'
+            nowf = open(MCMCfile, 'w')
+            for i in range(100000):
+                x, y = random.uniform(-3,3), random.uniform(-3,3)
+                nowf.write('1.0 1.0 '+str(x)+' '+str(y)+'\n')
+            nowf.close()
+
+            def chisqfun(Par):
+                return Par[0]**2.0 + Par[1]**2.0
+
+            COSMOMC_post_chisq(MCMCfile, chisqfun, suffix='_post_xsqysq')
+            print 'Please use COSMOMC to analyze the outputed file to check whether it is 2d standard gaussian!'
+
+    '''
+    if ipt_outputfile == '':
+        outputfile = MCMCfile[0:len(MCMCfile)-CharSkip_of_Suffix]+suffix \
+            +MCMCfile[len(MCMCfile)-CharSkip_of_Suffix:len(MCMCfile)]
+    else:
+        outputfile = ipt_outputfile
+        
+    print 'Open: \n\t', MCMCfile, '\nOutput to: \n\t', outputfile
+    f1 = open(MCMCfile, 'r')
+    f2 = open(outputfile, 'w')
+
+    ### Main loop
+    nlines = 0
+    nrejected = 0
+    while True:
+        
+        nowstr = f1.readline()
+        if nowstr == '':
+            break
+        nlines += 1
+        
+        ### Read in the numbers
+        A = str_to_numbers(nowstr)
+        Weight = A[0]
+        Par = A[2:len(A)]
+        Loglike = A[1]
+        
+        if rejectfun != None:
+            if rejectfun(Par):
+                nrejected += 1
+                continue
+        
+        ### Add the addtional chisq
+        AddChisq = chisqfun(Par)
+        Loglike += AddChisq / 2.0
+        Weight *= exp(  - AddChisq / 2.0)
+        B = [Weight, Loglike] + Par
+        f2.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
+        
+    print '	Finishing processing ', nlines, 'lines;     ', nrejected, ' rejected.'
+    return
+
+

@@ -30,8 +30,9 @@ Seconds_per_day = S1D = 3600*24# how many
 
 
 
-PLOT_COLOR_ARRAY = ['b', 'r', 'g', 'k', 'c', 'y', 'gray']
-PLOT_STYLE_ARRAY = ['-', '--', '-.', '..']
+PCA = PLOT_COLOR_ARRAY = ['k','b','c','g','m','r', 'y', 'gray']
+PSA = PLOT_STYLE_ARRAY = ['-', '--', '-.', '..']
+MA = MARKER_ARRAY = ['o', 'p', 's',  'D',  '^', '*', 'v', '1', '2', '3', '4']
 NUM_PLOT_COLOR = len(PLOT_COLOR_ARRAY)
 NUM_PLOT_STYLE = len(PLOT_STYLE_ARRAY)
 NOW_PLOT_COLOR = 0; 
@@ -530,6 +531,9 @@ def figax(figxsize=8, figysize=6, xlim=[], ylim=[], xlabel='', ylabel='', labelf
 			nowax.set_title(title, fontsize=titlefontsize)
 	return nowfig, nowax
 
+def xys_of_box(x1,x2,y1,y2):
+    return [[x1,y1],[x1,y2],[x2,y2],[x2,y1],[x1,y1]]
+
 def axtext(nowax, tl=0.5,tr=0.5,tx='', tha='center', tva='center', axtransform=True, 
 		fd={'style':'normal', 'weight':'bold', 'size':13, 'color':'c'}):
 	if tx != '':
@@ -595,11 +599,46 @@ def invert_ax(ax, axes='x'):
 ## Plot om-w contour
 def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                     ommin = 0.01, ommax = 0.6, wmin = -2.0, wmax = -0.0,  do_smooth=True, smsigma=0.5, 
-                    extratitle = '', titleftsize=15, notitle = False,
+                    extratitle = '', titleftsize=15, notitle = False, xylabelfs=26,
                     sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, 
-                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75,
+                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],
                     noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
 	            show_marg_rlt = True, scatter_WMAP5=True):
+    '''
+	Plot the contour. 
+	To get the boundary lines of the contour plot, using command e.g. 
+            X, Y = XYfromdata(CS.collections[0].get_paths()[0].vertices)
+
+	Here are some code for testing:
+	###
+		import stdA; execfile(stdA.pyfile)
+
+		def chisqfun(x, y):
+		    return (x*x + y*y)
+
+		fig, ax = figax()
+
+		omlist = np.linspace(-3, 3, 201)
+		wlist = np.linspace(-3, 3, 201)
+		chisqlist = [[chisqfun(om, w) for w in wlist]  for om in omlist]
+		ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
+
+		if False:
+			fmtstr = '%20.10e'
+			nowf = open( 'TestMCMCChain.txt', 'w')
+			for i in range(100000):
+			    om, w = random.uniform(ommin, ommax), random.uniform(wmin, wmax)
+			    chisq = chisqfun(om,w)
+			    chisqmin = 0.0
+			    B = [np.exp(-0.5*(chisq-chisqmin)), chisq/2.0] + [om, w]
+			    nowf.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
+
+		plot_contour(ax, omlist, wlist, chisqlist, ommin=ommin, ommax=ommax, wmin=wmin, wmax=wmax, scatter_WMAP5=False,  )
+		ax.scatter(0, np.sqrt(2.3))
+		ax.scatter(0, np.sqrt(6.17))
+		ax.grid()
+	###
+    '''
     if True:
         smsigma = smsigma
         if do_smooth:
@@ -621,16 +660,21 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
         numchisq = len(chisqs)
         X = [-100,-99]; Y=[0,0]
         if plotformat == 1:
-            colorlist = [str(x) for x in np.linspace(color2, color1, numchisq)]
+	    if colorlist == []:
+	            colorlist = [str(x) for x in np.linspace(color2, color1, numchisq)]
             for row in range(numchisq):
-                ax.contourf(omlist, wlist, Z, [0, chisqs[numchisq - row - 1]], colors = colorlist[row])
+                CS = ax.contourf(omlist, wlist, Z, [0, chisqs[numchisq - row - 1]], colors = colorlist[row])
             ax.plot(X,Y,c='0.55',lw=10,label=label)
         elif plotformat == 2:
-            ax.contour(omlist, wlist, Z, chisqs, colors='r', linewidths = 2, linestyles = 'dashed')
+            CS = ax.contour(omlist, wlist, Z, chisqs, colors='r', linewidths = 2, linestyles = 'dashed')
             ax.plot(X,Y,c='r',lw=3,ls='--',label=label)
         elif plotformat == 3:
-            ax.contour(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
+            CS = ax.contour(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
             ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
+	elif plotformat == 4:
+            CS = ax.contourf(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
+            ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
+
         if scatter_WMAP5:
 	        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
         
@@ -643,9 +687,9 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
         if not nolegend:
             ax.legend(loc='upper left',prop={'size':legftsize},frameon=False)
         if not nolabel and not noxticks:
-            ax.set_xlabel('$\Omega_m$', fontsize=26)
+            ax.set_xlabel('$\Omega_m$', fontsize=xylabelfs)
         if not nolabel and not noyticks:
-            ax.set_ylabel('$w$', fontsize=26)
+            ax.set_ylabel('$w$', fontsize=xylabelfs)
         if noyticks:
             for ylabel_i in ax.get_yticklabels():
                 ylabel_i.set_fontsize(0.0)
@@ -664,3 +708,4 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
             wtext = '$w=%.3f'%wbf+'^{+%.3f'%wuper+'}_{-%.3f'%wler+'}$'
             ax.text(0.02, 0.2,omtext,  transform=ax.transAxes, fontsize=legftsize)
             ax.text(0.02, 0.1,wtext, transform=ax.transAxes, fontsize=legftsize)
+	return CS

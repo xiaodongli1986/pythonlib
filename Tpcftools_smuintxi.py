@@ -484,7 +484,9 @@ def smu__inxi_RSDCor_Covmat(Sky = 'N',
 #smu__initsmusettings(smusettings_simulation_mock)
 #smu__initsmusettings(smusettings_observational_data)
 if not ('oms' in locals() or 'oms' in globals()): 
+#if not  ('oms' in globals()): 
 	oms, ws, omws, scanname =  None, None, None, None 
+#	global oms, ws, omws, scanname
 def smu__intxi_ChisqContour(Skylist=['N'], 
                             smu__intxi__settings_list = [smu__intxi__settings_std],
                             normedintxilist = [True],
@@ -862,7 +864,8 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                      chisq__calibrating_for_diff_omw = None, 
 			chisq__calibrating_for_diff_omw__dft_omw = [0.26,-1.0],
                      Plot_DP_chisq = True, labelfs = 8, legfs = 16, save_DP_chisq_curve = False, figfmt='pdf',
-                         DP_chisq_figxsize=16, DP_chisq_figysize=3.5, figtiltfs=18,
+                         DP_chisq_figxsize=16, DP_chisq_figysize=3.5, figtiltfs=18, 
+			 figname_contour=None, figname_DPcurve=None,
 		     do_DPfit_RandomWalk_search = None, given_SixBinRedshift=None,
                      plot_tot_fitted_chisq_contour = True, save_tot_contour = False, plot_fitted_rlt=True,
                      print_fittingrlt = False, only_print_f0sigchisq0 = True, 
@@ -1156,9 +1159,10 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                 #fig.tight_layout()
                 plt.show()
                 if save_DP_chisq_curve:
-                    figname = chisqfilename+'.'+DPname_txt+'.scatter_fit_curve.'+figfmt
-                    print 'Figure saved: ', figname
-                    fig.savefig(figname, fmt=figfmt)
+		    if figname_DPcurve == None:
+                    	figname_DPcurve = chisqfilename+'.'+DPname_txt+'.scatter_fit_curve.'+figfmt
+                    print 'Figure saved: ', figname_DPcurve
+                    fig.savefig(figname_DPcurve, fmt=figfmt)
                     
                     
             ################################################
@@ -1289,9 +1293,10 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                 fig.subplots_adjust(top=0.85)
                 print ; plt.show()
                 if save_tot_contour:
-                    figname = chisqfilename+'.'+DPname_txt+'.fitted_contour.'+figfmt
-                    print 'Figure saved: ', figname
-                    fig.savefig(figname, fmt=figfmt)
+		    if figname_contour == None:
+                    	figname_contour = chisqfilename+'.'+DPname_txt+'.fitted_contour.'+figfmt
+                    print 'Figure saved: ', figname_contour
+                    fig.savefig(figname_contour, fmt=figfmt)
 
             if RW_chisq < RW_chisq_min:
 		RW_chisq_min = RW_chisq
