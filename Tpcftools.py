@@ -889,6 +889,11 @@ execfile(pythonlibPATH+'/Tpcftools_smuintxi.py')
 execfile(pythonlibPATH+'/Tpcftools_plot.py')
 
 #py_Plot is the command to plot
+def smu_smids(s1,s2):
+ X = range(s1, s2+1)
+ X = [((X[row]**3.0+X[row+1]**3.0)/2.0)**(1.0/3.0) for row in range(len(X)-1)]
+ return X
+
 
 def smu_xis(filename, 
 	outputtofile = False, outputfilename=None,
@@ -939,10 +944,90 @@ def smu_xis(filename,
                         ax1.set_xlabel('$s\ [\\rm Mpc/h]$', fontsize=25)
                         ax1.set_ylabel('$s^{'+str(sfact)+'}\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
                         ax1.set_xlim(0,ismax)
-			ax1.set_title(filename)
+			ax1.set_title(separate_path_file(filename)[1])
 		        if savefig: 
 				if figname == None: figname = filename+'.png'
 				fig.savefig(figname, format = 'png')
 		        #plt.show()
 
   return packedxiasy
+
+def smu_xis_ilus(sfact = 1,
+                 s1=6,s2=50,
+                 binbins=2,
+                 ipt_omwlist = [(0.31,-1.0), (0.06,-1.0), (0.66,-1.0), (0.31,-2.0), (0.31,-0.3)],
+                 catname2s = ['HR3', 'J08', 'data'],
+                 bin_iplot12=False,
+                 savefig=True,
+                 imumin =0,
+                 fs=17):
+    X = range(s1, s2+1)
+    X = [((X[row]**3.0+X[row+1]**3.0)/2.0)**(1.0/3.0) for row in range(len(X)-1)]
+    smids = [x for x in X]
+    Xnew = [avgarray(X[row*binbins:(row+1)*(binbins)]) for row in range(len(X)/binbins)]; X=Xnew
+    if True:
+     print
+     print '################## sfact = ', sfact, '##########################'
+     print
+     for bin_iplot12 in [False]:
+      for catname2 in catname2s:
+       if catname2 == 'data': 
+             omwlist = ipt_omwlist
+       else: 
+             omwlist = [(0.26,-1.0)]
+       for omw in omwlist:
+        om, w = omw
+        fig = plt.figure(figsize=(16,10));
+        ax1 = fig.add_subplot(221);ax2 = fig.add_subplot(222);
+        ax3 = fig.add_subplot(223);ax4 = fig.add_subplot(224);
+        iplot = 0;
+        for catname in ['DR12v4-LOWZ', 'DR12v4-CMASS']:
+            for ibin in range(3):
+                if catname2 == 'data':
+                    filename = Tpcfrltfilename(cosmoconvertedfilename(
+                        binsplittedfilename(datafile(catname), ibin+1), om, w), 51, 51, 120)
+                    Y = smu_xis(filename, sfact=sfact, imumin=imumin, make_plot=False); Y = Y[s1:s2]
+                else:
+                    Ys = []
+                    for imock in range(4):
+                        filename = Tpcfrltfilename(binsplittedfilename(mockfile(catname, catname2, imock, 'RSD'), ibin+1), 150, 150, 120)
+                        Y = smu_xis(filename, sfact=sfact, imumin=imumin, make_plot=False); Y = Y[s1:s2]
+                        Ys.append([y for y in Y])
+                    Y = avgarray_2d(Ys)
+                binnumstr = str(ibin+1)
+                Ynew = [avgarray(Y[row*binbins:(row+1)*(binbins)]) for row in range(len(Y)/binbins)]; Y=Ynew
+                nowc = PLOT_COLOR_ARRAY[iplot]
+                Ynorm = normto1(Y);
+                if bin_iplot12:
+                    if iplot == 1:
+                        Ysave = [y for y in Y];
+                        Ynormsave = [y for y in Ynorm]
+                        iplot += 1
+                        continue
+                    elif iplot == 2:
+                        Y = [(Y[row]+Ysave[row])*0.5 for row in range(len(Y))]
+                        Ynorm = [(Ynorm[row]+Ynormsave[row])*0.5 for row in range(len(Ynorm))]
+                        binnumstr = '2,3'
+                legname = catname+'-bin'+binnumstr
+                ax1.plot(X, Y, label = legname, lw=2, c=nowc)
+                ax2.plot(X, Ynorm, label = legname, lw=2, c=nowc)
+                if iplot == 0: 
+                    refY = [y for y in Y]; refYnorm = [y for y in Ynorm]
+                else:
+                    difY = [Y[row]-refY[row] for row in range(len(Y))]
+                    difYnorm = [Ynorm[row]-refYnorm[row] for row in range(len(Ynorm))]
+                    ax3.plot(X, difY, label = legname + 'wrt bin1', lw=2, c=nowc)
+                    ax4.plot(X, difYnorm, label = legname + 'wrt bin1', lw=2, c=nowc)
+                iplot +=1;
+        for ax in [ax1,ax2,ax3,ax4]:
+                ax.grid();ax.set_xlabel('$s$ [Mpc/h]', fontsize=fs); 
+                ax.legend(loc='best', frameon=False)
+        ax1.set_ylabel('$s^{'+str(sfact)+'} \\xi(s)$', fontsize=fs);
+        ax2.set_ylabel('$\\hat s^{'+str(sfact)+'} \\xi(s)$', fontsize=fs);
+        ax3.set_ylabel('$\\delta s^{'+str(sfact)+'} \\xi(s)$', fontsize=fs);
+        ax4.set_ylabel('$\\delta \\hat s^{'+str(sfact)+'} \\xi(s)$', fontsize=fs);
+        fig.suptitle(catname2+'; Cosmology = '+str(om)+' '+str(w)+'; s = '+str(s1)+'-'+str(s2)+' Mpc/h; imumin='+str(imumin), fontsize=13)
+        ax4.set_ylim(-0.15,0.15)
+        if savefig:
+            fig.savefig('3.xis_'+catname2+'.'+omwstr(om,w)+'.sfact'+str(sfact)+'.imumin'+str(imumin)+'.binbins'+str(binbins)+'.png', format='png')
+        plt.show()
