@@ -887,3 +887,62 @@ execfile(pythonlibPATH+'/Tpcftools_smuintxi.py')
 ### Subroutins for plot
 
 execfile(pythonlibPATH+'/Tpcftools_plot.py')
+
+#py_Plot is the command to plot
+
+def smu_xis(filename, 
+	outputtofile = False, outputfilename=None,
+	smax=51, nummubin=120,
+	imumin = 0,
+	ismax = None,
+	is_sig_pi=False,
+	sfact = 1, 
+	make_plot = True, savefig=False, figname=None):
+  smusettings = {
+            'smin':0.0, 'smax':smax, 'numsbin':smax,
+#            'mumin':0.0, 'mumax':1.0, 'nummubin':50,
+            'mumin':0.0, 'mumax':1.0, 'nummubin':nummubin,
+            'deltas':0, 'deltamu':0, 'slist':[], 'mulist':[]
+               }
+  smu__initsmusettings(smusettings)
+
+  imumax = nummubin;
+  if outputfilename == None:  outputfilename = filename+'.xi_s'
+  if True:
+		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [4,5,6])
+		if ismax == None: ismax = smax -1
+		if make_plot: fig, ax1 = figax()
+
+                ### packed count of xi as a function of s
+                now_s = 0;
+                sasx = []; packedxiasy = [];
+
+                for now_s in range(ismax):
+                    nowx=((slist[now_s]**3.0+slist[now_s+1]**3.0)/2.0)**(1.0/3.0);   sasx.append(nowx)
+		    if is_sig_pi:
+			    	Y = []
+			    	for nowxig in range(ismax-1):
+				 nowpi = int(np.sqrt(nowx**2.0 - nowxig**2.0)) 
+				 nowpi = max(nowpi,0)
+				 Y.append(packedxi(DDlist,DRlist,RRlist,nowxig,nowxig+1,nowpi,nowpi+1))
+			    	nowy = nowx**sfact*sum(Y) / (len(Y)+0.0)
+				#nowy = np.log(np.abs(sum(Y)/len(Y)+0.0)) / np.log(10.0)
+			    	packedxiasy.append(nowy)
+		    else:
+                                packedxiasy.append(nowx**sfact*packedxi(DDlist, DRlist, RRlist, now_s, now_s, imumin, imumax))
+                    now_s += 1;
+                #print sasx
+  	        #print packedxiasy
+		if outputtofile: np.savetxt(filename+'.xis', packedxiasy)
+                if make_plot:
+                        ax1.plot(sasx, packedxiasy, marker='o', markersize=1)
+                        ax1.set_xlabel('$s\ [\\rm Mpc/h]$', fontsize=25)
+                        ax1.set_ylabel('$s^{'+str(sfact)+'}\\xi\ [\\rm Mpc/h]^2$', fontsize=25)
+                        ax1.set_xlim(0,ismax)
+			ax1.set_title(filename)
+		        if savefig: 
+				if figname == None: figname = filename+'.png'
+				fig.savefig(figname, format = 'png')
+		        #plt.show()
+
+  return packedxiasy
