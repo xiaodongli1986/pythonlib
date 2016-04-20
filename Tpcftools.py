@@ -896,6 +896,7 @@ def smu_smids(s1,s2):
 
 
 def smu_xis(filename, 
+	given_ipt_data = None,
 	outputtofile = False, outputfilename=None,
 	smax=51, nummubin=120,
 	imumin = 0,
@@ -914,16 +915,23 @@ def smu_xis(filename,
   imumax = nummubin;
   if outputfilename == None:  outputfilename = filename+'.xi_s'
   if True:
-		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [4,5,6])
-		if ismax == None: ismax = smax -1
+		if given_ipt_data == None:
+			data = smu__loadin(filename, smusettings)
+		else:
+			data = given_ipt_data
+		DDlist, DRlist, RRlist = Xsfrom2ddata(data, [4,5,6])
+		if ismax == None: ismax = smax
 		if make_plot: fig, ax1 = figax()
 
                 ### packed count of xi as a function of s
                 now_s = 0;
                 sasx = []; packedxiasy = [];
+		sedges = range(smax+1)
 
                 for now_s in range(ismax):
-                    nowx=((slist[now_s]**3.0+slist[now_s+1]**3.0)/2.0)**(1.0/3.0);   sasx.append(nowx)
+                    nowx=((sedges[now_s]**3.0+sedges[now_s+1]**3.0)/2.0)**(1.0/3.0);   #nowx = now_s+0.5
+		    sasx.append(nowx)
+		    #print now_s, nowx
 		    if is_sig_pi:
 			    	Y = []
 			    	for nowxig in range(ismax-1):

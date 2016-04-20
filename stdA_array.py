@@ -459,4 +459,21 @@ def merge_two_list_finitedigits(A,B, numdigit=7,sortlist=True):
 def check_interval(A):
     return min(abs(A[i]-A[i-1]) for i in range(len(A)))
 
-
+def array_fracbin(A, nbin=10, i1=None, i2=None):
+        if i1==None: i1=0
+        if i2==None: i2=len(A)
+        edges = np.linspace(i1,i2,nbin+1)
+        #print edges
+        B = range(nbin)
+        #print B
+        for i in range(nbin):
+                B[i] = 0
+                iA, iD = edges[i], edges[i+1]
+                iB, iC = int(iA)+1, int(iD)
+                if iC >= iB:
+                    B[i] = sum(A[iB:iC])
+                    if iB>0: B[i] += A[iB-1]*(iB-iA)
+                    if iC<len(A): B[i] += A[iC]*(iD-iC)
+                elif iC < iB:
+                    B[i] = A[iC]*(iD-iA)
+        return B
