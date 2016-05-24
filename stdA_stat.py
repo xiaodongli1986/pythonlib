@@ -1,5 +1,6 @@
 from scipy import stats
 
+
 def nsigofsigCL(sig):
 	if sig == sig1:
 		return 1
@@ -127,6 +128,7 @@ def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     p=len(X);
     npcov = np.mat(Cov);
     invcov = npcov.I;
+    #print invcov
     if Xbar == []:
         Xdiff = X
     else:
@@ -135,11 +137,12 @@ def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     #print 'covmat: ', npcov
     #print 'invcov:', invcov
     detcov = np.linalg.det(npcov);
+    #print detcov
     chisq = 0.0;
     for i in range(p):
         for j in range(p):
             chisq += Xdiff[i]*invcov[i,j]*Xdiff[j]
-    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * exp(-0.5 * (chisq-chisq0));
+    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * scipy.exp(-0.5 * (chisq-chisq0));
     return chisq, like
 
 def chisq_invcov_xbar(X, InvCov, Xbar = [], chisq0=0):
@@ -278,11 +281,11 @@ def list_find_CL_chisqcut(chisqlist, CLlist, chisq1 = 0, chisq2 = 30):
     for row in range(len(chisqlist)):
         chisq1d += chisqlist[row]
     chisqmin = min(chisq1d)
-    like1d = [exp(-(chisq1d[row]-chisqmin)/2.0) for row in range(len(chisq1d))]
+    like1d = [scipy.exp(-(chisq1d[row]-chisqmin)/2.0) for row in range(len(chisq1d))]
     chisqcutlist = []
     for CL in CLlist:
         cutlike = get_cut(like1d, CL)
-        chisqcut = chisqmin - 2.0 * log(cutlike)
+        chisqcut = chisqmin - 2.0 * np.log(cutlike)
         chisqcutlist.append(chisqcut)
     return chisqcutlist  
     
@@ -302,7 +305,7 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
             chisqmin= min(chisqmin, chisqlist[row1][row2])
     for row1 in range(numw):
         for row2 in range(numom):
-            nowlikelist[row1][row2] = exp(-0.5*(chisqlist[row1][row2]-chisqmin)) 
+            nowlikelist[row1][row2] = scipy.exp(-0.5*(chisqlist[row1][row2]-chisqmin)) 
     # Marginalized constraint on Omegam
     for iom in range(numom):
         margomlike[iom] = sum([nowlikelist[row][iom] for row in range(numw)])
@@ -560,7 +563,7 @@ def COSMOMC_post_chisq(MCMCfile,
         ### Add the addtional chisq
         AddChisq = chisqfun(Par)
         Loglike += AddChisq / 2.0
-        Weight *= exp(  - AddChisq / 2.0)
+        Weight *= scipy.exp(  - AddChisq / 2.0)
         B = [Weight, Loglike] + Par
         f2.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
         

@@ -12,8 +12,8 @@ pyfile=pythonlibPATH+'/'+'bossdatamock.py'
 # catname means DR12-CMASS-N, DR12-CMASS-S, ...
 # catname2 means HR3, L93, B08, ...
 
-catnameliststr = 'DR12v4-CMASS-N DR12v4-CMASS-S DR12v4-LOWZ-N DR12v4-LOWZ-S'
-catnamelist = ['DR12v4-CMASS-N', 'DR12v4-CMASS-S', 'DR12v4-LOWZ-N', 'DR12v4-LOWZ-S']
+catnameliststr = 'DR12v4-CMASS-N DR12v4-CMASS-S DR12v4-LOWZ-N DR12v4-LOWZ-S DR12v4-CMASS DR12v4-LOWZ'
+catnamelist = ['DR12v4-CMASS-N', 'DR12v4-CMASS-S', 'DR12v4-LOWZ-N', 'DR12v4-LOWZ-S', 'DR12v4-CMASS', 'DR12v4-LOWZ']
 
 catinfo_npatch = {
 			'DR12v4-CMASS-N' : 4,

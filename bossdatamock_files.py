@@ -8,6 +8,9 @@ datamockdir = '/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/'
 datamockdir_cluster = '/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/'
 datamockdir_local = '/home/xiaodongli/SparseFilaments/data/local_input/boss2pcf/data/'
 
+smu_xis_mockchisqsdir = datamockdir + '../xis/xis_mockchisqs/'
+smu_xis_covchisqdir= datamockdir + '/xis/cov_chisqs/'
+smu_xis_xisdir = datamockdir + '/xis_xis/'
 
 ### This means the directory is on local laptop
 datamockdir = datamockdir_local
