@@ -300,6 +300,7 @@ def smu__inxi_RSDCor_Covmat(Sky = 'N',
                             normedintxi=True,
                             use_omw_testfun=False, ## using a test function
                             refine_intxi = None,     
+			    given_nummock = None,
                             ):
     
     if Sky == 'N':
@@ -328,7 +329,10 @@ def smu__inxi_RSDCor_Covmat(Sky = 'N',
             if catname2 == 'data':
                 nummock = 1
             else:
-                nummock = catinfo_nummock(catname, catname2)
+		if given_nummock == None:
+	                nummock = catinfo_nummock(catname, catname2)
+		else:
+			nummock = given_nummock
             AllTpcfs.append([])
             labels.append(catname+'--'+str(ibin+1) +'-th bin')
             NowTpcfs = []
@@ -445,6 +449,8 @@ def smu__inxi_RSDCor_Covmat(Sky = 'N',
             	for icovmat in range(len(covmats)):
 		    nowfile = smu__intxi_covmatfilename(icovmat, Sky, catname2, RSDstr, smu__intxi__settings, refibin = refibin,
                 totbin=totbin, normedintxi=normedintxi, refine_intxi=refine_intxi)
+		    if given_nummock != None:
+			nowfile += '.nummock'+str(given_nummock)
 		    np.savetxt(nowfile, covmats[icovmat])
 		    print '\tfilesaved: ', nowfile
             return mus, avgdiffs, avgintxis, covmats
@@ -500,6 +506,7 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                             skip_calc_if_chisqfile_found = True,
 			    only_plot__no_calc = False,
                             refine_intxi = None,
+			    given_nummock = None,
 			    #oms=oms, ws=ws, omws=omws, scanname=scanname,
                             ):
 
@@ -536,7 +543,9 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                chisqfilename = smu__intxi_chisqfilename(Sky, catname2_RSDCor, 'RSD', smu__intxi__settings, 
                                                          refibin = refibin, totbin=totbin, 
                                                          numchisq=numchisq, prefix=scanname+'--',
-                                                         normedintxi=normedintxi, refine_intxi=refine_intxi)
+                                                         normedintxi=normedintxi, refine_intxi=refine_intxi,)
+               if given_nummock != None:
+                        chisqfilename += '.nummock'+str(given_nummock)
 
 	       if only_plot__no_calc:
 			if isfile(chisqfilename):
@@ -570,7 +579,8 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                                         refibin = refibin,
                                         normedintxi=normedintxi,
                                         use_omw_testfun=use_omw_testfun,
-					refine_intxi=refine_intxi)
+					refine_intxi=refine_intxi,
+					given_nummock=given_nummock)
 
                 else: # load in rather than do computation
                     covmats = []
@@ -582,7 +592,9 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                                     refibin = refibin,
                                     totbin = totbin,
                                     normedintxi = normedintxi,
-                                    refine_intxi=refine_intxi)
+                                    refine_intxi=refine_intxi,
+				    given_nummock=given_nummock)
+
 
 
                         print '\t\tload in covmat from:    ', separate_path_file(covmatfilename)[1]

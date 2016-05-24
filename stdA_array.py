@@ -11,6 +11,10 @@ def print_2dmat(X, fmt='%.5f', div = ' '):
             nowstr += div
         print nowstr
 
+# Transpose 2d array
+def transpose(A):
+    return [[A[i][j] for i in range(len(A))] for j in range(len(A[0]))]
+
 # Some manipulation
 def XmultY(X, Y, a=1,b=1,c=1):
 	if a==1 and b==1 and c==1:
