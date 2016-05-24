@@ -274,6 +274,9 @@ def normto1(X,wei=[],returnavg=False):
 		return [X[row]/avg for row in range(len(X))]
 	else:
 		return avg, [X[row]/avg for row in range(len(X))]
+def norm_power(X, deg=0.9):
+                        avg = sum([x**deg for x in X])**(1.0/deg) / float(len(X))
+                        return [x/avg for x in X]
 def arraysq(X):
 	return [x**2.0 for x in X]
 
