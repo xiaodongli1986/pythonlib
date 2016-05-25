@@ -177,7 +177,7 @@ def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np
 	if not return_XY: 
 		return fig, ax1, ax2
 	else:
-		return fig, ax1, ax2, [X1s, Y1s, X2s, Y2s]
+		return fig, ax1, ax2, [Xs1, Ys1, Xs2, Ys2]
 
 
 
