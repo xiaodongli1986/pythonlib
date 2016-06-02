@@ -1146,6 +1146,7 @@ def smu_xi_calcchisqs(
 		nowchisqstr += '.force_bestfit_as_'+omwstr(omsys,wsys)
         xisdir = smu_xis_covchisqdir
 	nowfile=outputdir+'/'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
+	print '    Check carefully whether systematic correctoni properly done!'; return
 	print '    Output chisq to file: ', nowfile
 	nowf.write('### imumin  omw   chisq_nosyscor  chisq_syscor   chisqs_nosyscor   chisqs_syscor\n')
 	### 6. Compute
