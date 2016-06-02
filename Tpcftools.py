@@ -1131,6 +1131,8 @@ def smu_xi_calcchisqs(
 	totbin = 3, delta_time = 100, nummubins = 120, 	normfun=norm_power, ### Other miscellous
 	outputdir = '/home/xiaodongli/software/', suffix = '',
 	use_omw_as_sys = False,
+	refbins = [0],
+	calcbins = [1,2,3,4,5],
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
 	omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
@@ -1167,7 +1169,7 @@ def smu_xi_calcchisqs(
 			i_redshiftbin = 0
 			for catname in ['DR12v4-LOWZ', 'DR12v4-CMASS', ]:
 				for ibin in range(totbin):
-					if i_redshiftbin in [0]:
+					if i_redshiftbin in refbins:
 						## A. picku up the xis
 						xidata_base = xis_data[catname][ibin][nowomwstr]
 						if not use_omw_as_sys:
@@ -1209,6 +1211,8 @@ def smu_xi_calcchisqs(
 						covmat = covmats[i_redshiftbin]
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(get_diffarray(dxidata,dxisys), covmat)
+						if i_redshiftbin not in calcbins:
+							chisq_nosyscor = chisq_syscor = 0.0
 						#if i_redshiftbin in [2,5]:
 						#	chisq_nosyscor, chisq_syscor = 0, 0
 						chisqs_nosyscor[nowomwstr].append(chisq_nosyscor)  
