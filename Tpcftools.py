@@ -1263,7 +1263,7 @@ def smu_ximu_calcchisqs(
 	#smu__intxi__settings = smu__intxi__settings_std,
 	smusettings_data = smusettings_smax51, 
 	smusettings_mock = { 'smin':0.0, 'smax':150.0, 'numsbin':150, 'mumin':0.0, 'mumax':1.0, 'nummubin':120, 'deltas':0, 'deltamu':0, 'slist':[], 'mulist':[] } , 
-	s1=6.0, s2=40, nummubin=21,   Smax = 51, Smax_mock = 150, ### 4. Things about s
+	s1=6.0, s2=40, NumMubin=21,   Smax = 51, Smax_mock = 150, ### 4. Things about s
 	cov_catname2='HR3', cov_RSDstr = 'noRSD', cov_nummock=72, ### 5. settings for covmat and systematic
 	xifunction = intxi_FractionalS,
 	sys_catname2= 'J08', sys_RSDstr ='RSD', 
@@ -1279,10 +1279,10 @@ def smu_ximu_calcchisqs(
 	#sarray = [ x**sfact for x in sarray ]
 	for mumin in mumins:
 		smu__intxi__settings = {
-            	'xifunction': xifunction, 'smin':s1, 'smax':s2, 'mumin':mumin, 'mumax':1.0, 'nummubin':nummubin # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
+            	'xifunction': xifunction, 'smin':s1, 'smax':s2, 'mumin':mumin, 'mumax':1.0, 'nummubin':NumMubin,# In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
          	      }
 		smu__intxi__settings_orig = {
-            	'xifunction': xifunction, 'smin':s1, 'smax':s2, 'mumin':mumin, 'mumax':1.0, 'nummubin':nummubin # In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
+            	'xifunction': xifunction, 'smin':s1, 'smax':s2, 'mumin':mumin, 'mumax':1.0, 'nummubin':NumMubin,## In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
          	      }
 		nowchisqstr = baseoutputfile+'_'+smu__intxi_str(smu__intxi__settings)
 		nowchisqstr += ('.NumCovMock'+str(cov_nummock))
