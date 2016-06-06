@@ -1126,7 +1126,7 @@ def smu_xi_calcchisqs(
 	imumins = range(20)+[30,40,50,60], ### 3. Range of imumin
 	s1=10, s2=50, sbins=5, sfact=1,    smax = 51, smax_mock = 150, ### 4. Things about s
 	cov_catname2='HR3', cov_RSDstr = 'RSD', ### 5. settings for covmat and systematic
-	sys_catname='DR12v4-CMASS-N', sys_catname2= 'J08', sys_RSDstr ='RSD',
+	sys_catname_suffix='-N', sys_catname2= 'J08', sys_RSDstr ='RSD',
 	make_plot=True, showfig=False, savefig=True, 
 	totbin = 3, delta_time = 100, nummubins = 120, 	normfun=norm_power, ### Other miscellous
 	outputdir = '/home/xiaodongli/software/', suffix = '',
@@ -1139,14 +1139,14 @@ def smu_xi_calcchisqs(
 	sarray = smu_smids(s1, s2)
 	sarray = [ x**sfact for x in sarray ]
 	nowchisqstr = smu_xi_str(
-        	baseoutputfile, s1, s2,sbins,sfact, cov_catname2, cov_RSDstr, sys_catname, sys_catname2, sys_RSDstr,
+        	baseoutputfile, s1, s2,sbins,sfact, cov_catname2, cov_RSDstr, sys_catname_suffix, sys_catname2, sys_RSDstr,
 		suffix = '.'+str(len(imumins))+'mus.'+str(len(omwlist))+'omws'+suffix )
 	if use_omw_as_sys !=False:
 		omsys, wsys = use_omw_as_sys
 		nowchisqstr += '.force_bestfit_as_'+omwstr(omsys,wsys)
         xisdir = smu_xis_covchisqdir
 	nowfile=outputdir+'/'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
-	print '    Check carefully whether systematic correctoni properly done!'; return
+	#print '    Check carefully whether systematic correctoni properly done!'; return
 	print '    Output chisq to file: ', nowfile
 	nowf.write('### imumin  omw   chisq_nosyscor  chisq_syscor   chisqs_nosyscor   chisqs_syscor\n')
 	### 6. Compute
@@ -1174,7 +1174,7 @@ def smu_xi_calcchisqs(
 						## A. picku up the xis
 						xidata_base = xis_data[catname][ibin][nowomwstr]
 						if not use_omw_as_sys:
-							xisys_base  = xis_mock[sys_catname][sys_catname2][sys_RSDstr][ibin]
+							xisys_base  = xis_mock[catname+sys_catname_suffix][sys_catname2][sys_RSDstr][ibin]
 						else:
 							omsys, wsys = use_omw_as_sys
 							xisys_base = [xis_data[catname][ibin][omwstr(omsys,wsys)]]
@@ -1188,9 +1188,8 @@ def smu_xi_calcchisqs(
 					else:
 						## A. picku up the xis
 						xidata = xis_data[catname][ibin][nowomwstr]
-						xisys  = xis_mock[sys_catname][sys_catname2][sys_RSDstr][ibin]
 						if not use_omw_as_sys:
-							xisys  = xis_mock[sys_catname][sys_catname2][sys_RSDstr][ibin]
+							xisys  = xis_mock[catname+sys_catname_suffix][sys_catname2][sys_RSDstr][ibin]
 						else:
 							omsys, wsys = use_omw_as_sys
 							xisys = [xis_data[catname][ibin][omwstr(omsys,wsys)]]
@@ -1266,7 +1265,7 @@ def smu_ximu_calcchisqs(
 	s1=6.0, s2=40, NumMubin=21,   Smax = 51, Smax_mock = 150, ### 4. Things about s
 	cov_catname2='HR3', cov_RSDstr = 'noRSD', cov_nummock=72, ### 5. settings for covmat and systematic
 	xifunction = intxi_FractionalS,
-	sys_catname2= 'J08', sys_RSDstr ='RSD', 
+	sys_catname2= 'J08', sys_RSDstr ='RSD', sys_catnamesuffix = '', syscor_imocks = range(4),
 	make_plot=True, showfig=False, savefig=True, 
 	totbin = 3, delta_time = 100, nummubins = 120, 	normfun=norm_OneSkip, ### Other miscellous
 	outputdir = '/home/xiaodongli/software/', suffix = '',
@@ -1285,6 +1284,7 @@ def smu_ximu_calcchisqs(
             	'xifunction': xifunction, 'smin':s1, 'smax':s2, 'mumin':mumin, 'mumax':1.0, 'nummubin':NumMubin,## In fact this name shall be 'nummuedge'; the actual number of bins is 1 smaller
          	      }
 		nowchisqstr = baseoutputfile+'_'+smu__intxi_str(smu__intxi__settings)
+
 		nowchisqstr += ('.NumCovMock'+str(cov_nummock))
 		if cosmo_rescaled_s != False:
 			CRbaseom, CRbasew = cosmo_rescaled_s
@@ -1292,6 +1292,16 @@ def smu_ximu_calcchisqs(
 		if use_omw_as_sys !=False:
 			omsys, wsys = use_omw_as_sys
 			nowchisqstr += '.force_bestfit_as_'+omwstr(omsys,wsys)
+		if sys_catname2 != 'J08' and use_omw_as_sys == False:
+			nowchisqstr += ('.SysCor' + sys_catname2)
+		if sys_catnamesuffix != '':
+			if sys_catnamesuffix == '-N':
+				nowchisqstr += '.SysCor_NGC'
+			elif sys_catnamesuffix == '-S':
+				nowchisqstr += '.SysCor_SGC'
+			else: 
+				nowchisqstr += ('.SysCor_'+sys_catnamesuffix)
+
 	        ximudir = smu_ximu_covchisqdir
 		#nowfile=outputdir+'/'+baseoutputfile+'_'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
 		nowfile=outputdir+'/'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
@@ -1353,18 +1363,21 @@ def smu_ximu_calcchisqs(
 									xicov_base.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
 								xihatcov_base  = [ normfun(X) for X in xicov_base]
 							covmats.append([])
+							xisys_base = []
 							if not use_omw_as_sys:
-								xisys_base = []
-								for imock in range(4):
-									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_mock,rmax=Smax_mock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+								for imock in syscor_imocks:
+									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_mock,rmax=Smax_mock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
 									if isfile(smu__intxi_file):
 										xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 									else:
 										xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
 							else:
 								omsys, wsys = use_omw_as_sys
-								print 'Error: Force bestfit not supported!'
-								return
+								smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+                                                		if isfile(smu__intxi_file):
+		                                                        xisys_base.append(smu__intxi_quickload(smu__intxi_file))
+		                                                else:
+                		                                        xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2])
 							dxisys_list.append([])
 					else:
 						## A. picku up the xis
@@ -1373,13 +1386,6 @@ def smu_ximu_calcchisqs(
 							xidata = smu__intxi_quickload(smu__intxi_file)
 						else:
 							xidata = smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2]
-						xisys = []
-						for imock in range(4):
-								smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_mock,rmax=Smax_mock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
-								if isfile(smu__intxi_file):
-									xisys.append(smu__intxi_quickload(smu__intxi_file))
-								else:
-									xisys.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
 						## B. normalize the amplitude
 						xihatdata =   normfun(xidata)
 						dxidata = get_diffarray(xihatdata_base, xihatdata)
@@ -1387,6 +1393,22 @@ def smu_ximu_calcchisqs(
 						#if om == 0.26 and w == -1.0:
 						#	print om,w, ':', ibin, xidata, xihatdata
 						if iomw == 0:
+							xisys = []
+	                                                if not use_omw_as_sys:
+								for imock in syscor_imocks:
+									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_mock,rmax=Smax_mock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+									if isfile(smu__intxi_file):
+										xisys.append(smu__intxi_quickload(smu__intxi_file))
+									else:
+										xisys.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
+	                                                else:
+        	                                                 omsys, wsys = use_omw_as_sys
+                	                                         smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+                        	                                 if isfile(smu__intxi_file):
+                                	                                xisys.append(smu__intxi_quickload(smu__intxi_file))
+                                        	                 else:
+                                                	                xisys.append(smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2])
+
 							polyfitdeg = 3
 							xihatsys_base  = [ normfun(X) for X in xisys_base]
 							xihatsys  = [ normfun(X) for X in xisys]
@@ -1412,7 +1434,7 @@ def smu_ximu_calcchisqs(
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
 						#chisq_syscor, like   = chisq_like_cov_xbar(get_diffarray(dxidata,dxisys_list[i_redshiftbin]), covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(XplusY(dxidata,dxisys_list[i_redshiftbin],b=-1), covmat)
-						#if i_redshiftbin in [2,5]:
+						#if i_redshiftbin in [5]:
 						#	chisq_nosyscor, chisq_syscor = 0, 0
 						chisqs_nosyscor[nowomwstr].append(chisq_nosyscor)  
 						chisqs_syscor[nowomwstr].append(chisq_syscor) 
