@@ -144,6 +144,8 @@ def numHR3mock(catname):
 def catinfo_nummock(catname, catname2):
 	if catname2 == 'HR3':
 		return numHR3mock(catname)
+	#elif catname2 == 'MD':
+	#	return 10
 	elif catname2 in catname2list:
 		return catinfo_npatch[catname]
 	else:
