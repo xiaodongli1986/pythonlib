@@ -25,6 +25,7 @@ def smu_ximu_calcchisqs(
 	outputdir = '/home/xiaodongli/software/', suffix = '',
         use_omw_as_sys = False,
 	cosmo_rescaled_s = False, z_of_each_bin = [0.2154098242, 0.3156545036, 0.3869159269, 0.4785988874, 0.5408209467, 0.6186561000],
+	consider_tilt_in_chisq = False,
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
 	omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
@@ -55,6 +56,8 @@ def smu_ximu_calcchisqs(
 				nowchisqstr += '.SysCor_SGC'
 			else: 
 				nowchisqstr += ('.SysCor_'+sys_catnamesuffix)
+		if consider_tilt_in_chisq != False:
+			nowchisqstr += '.Chisq_ConsiderTilt'
 		if polyfitdeg != 3:
 			nowchisqstr += ('.SysCor_poly'+str(polyfitdeg))
 
@@ -77,6 +80,7 @@ def smu_ximu_calcchisqs(
 		chisqs_nosyscor, chisqs_syscor = {}, {} # fmt: omwstr, ibin
 		iomw = 0
 		covmats = []
+		xisys_list = []
 		dxisys_list = []
 
 		t0 = time.clock(); t1 = t0; 
@@ -88,6 +92,7 @@ def smu_ximu_calcchisqs(
 				t1 = t2
 			om,w = omw; nowomwstr=omwstr(om,w); chisqs_nosyscor[nowomwstr], chisqs_syscor[nowomwstr] = [], []
 			i_redshiftbin = 0
+			xihatdata_now = []
 			for catname in ['DR12v4-LOWZ', 'DR12v4-CMASS', ]:
 				for ibin in range(totbin):
 					if cosmo_rescaled_s != False:
@@ -109,6 +114,7 @@ def smu_ximu_calcchisqs(
 							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2]
 						## B. normalize the amplitude
 						xihatdata_base =   normfun(xidata_base)
+						xihatdata_now.append([x for x in xihatdata_base])
 						if iomw == 0:
 							xicov_base = []
 							for imock in range(cov_nummock):
@@ -134,6 +140,7 @@ def smu_ximu_calcchisqs(
 		                                                        xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 		                                                else:
                 		                                        xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2])
+							xisys_list.append(get_avg_array([normfun(X) for X in xisys_base]))
 							dxisys_list.append([])
 					else:
 						## A. picku up the xis
@@ -144,6 +151,7 @@ def smu_ximu_calcchisqs(
 							xidata = smu__intxi_calcwrite(smufile, smusettings_data, smu__intxi__settings=smu__intxi__settings)[2]
 						## B. normalize the amplitude
 						xihatdata =   normfun(xidata)
+						xihatdata_now.append([x for x in xihatdata])
 						dxidata = get_diffarray(xihatdata_base, xihatdata)
 
 						#if om == 0.26 and w == -1.0:
@@ -170,6 +178,8 @@ def smu_ximu_calcchisqs(
 							xihatsys  = [ normfun(X) for X in xisys]
 							dxisys = get_diffarray(get_avg_array(xihatsys_base),get_avg_array(xihatsys))
 							dxisys = polyfitY(range(len(dxisys)), dxisys, deg=polyfitdeg)
+
+                                                        xisys_list.append(get_avg_array(xihatsys))
 							dxisys_list.append([x for x in dxisys])
 
                                                         xicov = []
@@ -190,6 +200,18 @@ def smu_ximu_calcchisqs(
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
 						#chisq_syscor, like   = chisq_like_cov_xbar(get_diffarray(dxidata,dxisys_list[i_redshiftbin]), covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(XplusY(dxidata,dxisys_list[i_redshiftbin],b=-1), covmat)
+						if consider_tilt_in_chisq:
+							 xisys_avg = get_avg_array(xisys_list)
+							 X = range(len(xisys_avg))
+							 slop_ref = polyfit(X,xisys_avg,1)[0]
+
+							 xidata_avg = get_avg_array(xihatdata_now)
+							 slop_now = polyfit(X,xidata_avg,1)[0]
+							 #print nowomwstr, slop_ref, slop_now
+
+							 chisq_rescale_fact = (slop_now / slop_ref)**2.0
+							 chisq_nosyscor /= chisq_rescale_fact
+							 chisq_syscor /= chisq_rescale_fact
 						#if i_redshiftbin in [5]:
 						#	chisq_nosyscor, chisq_syscor = 0, 0
 						chisqs_nosyscor[nowomwstr].append(chisq_nosyscor)  

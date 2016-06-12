@@ -965,6 +965,7 @@ def smu_xis_ilus(sfact = 1,
                  binbins=2,
                  ipt_omwlist = [(0.31,-1.0), (0.06,-1.0), (0.66,-1.0), (0.31,-2.0), (0.31,-0.3)],
                  catname2s = ['HR3', 'J08', 'data'],
+		 catnames = ['DR12v4-LOWZ', 'DR12v4-CMASS'],
                  bin_iplot12=False,
                  savefig=True,
                  imumin =0,
@@ -989,7 +990,7 @@ def smu_xis_ilus(sfact = 1,
         ax1 = fig.add_subplot(221);ax2 = fig.add_subplot(222);
         ax3 = fig.add_subplot(223);ax4 = fig.add_subplot(224);
         iplot = 0;
-        for catname in ['DR12v4-LOWZ', 'DR12v4-CMASS']:
+        for catname in catnames:
             for ibin in range(3):
                 if catname2 == 'data':
                     filename = Tpcfrltfilename(cosmoconvertedfilename(
@@ -1106,6 +1107,6 @@ def smu_xis_loaddatarlt(xis_data_file, totbin =3):
 
 
 execfile(pythonlibPATH+'/Tpcftools_smuxis.py')
-
 execfile(pythonlibPATH+'/Tpcftools_smuximu.py')
+execfile(pythonlibPATH+'/Tpcftools_ChisqContour.py')
 
