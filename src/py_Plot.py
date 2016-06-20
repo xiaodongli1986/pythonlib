@@ -16,6 +16,10 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\tOptions:'+\
 	'\n\t\t[-savefig savefig]  T or F; save the plot as an eps file;  '+\
 	'\n\t\t[-randrat randrat]  Randomly selecly a portion of file to plot; must be positive; can >1;'+\
+	'\n\t\t[-logX logX]  Plot logfun(X) rather than X; be True or False; '+\
+	'\n\t\t[-logY logY]  Plot logfun(Y) rather than Y; be True or False; '+\
+	'\n\t\t[-logZ logZ]  Plot logfun(Z) rather than Z; be True or False; '+\
+	'\n\t\t[-logfun log]  function for log: by default log; can be log10; '+\
 	'\n\t\t[-maxnlines_read/-maxlines/-ml maxnlines_read] maximal number of lines read in'+\
 	'\n\t\t[-figfmt figfmt]  format of figure; by default png'+\
 	'\n\t\t[-showfig showfig]  whether show the figure; by default True; set as False if creating many files'+\
@@ -27,6 +31,7 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-showleg/T,F]          if T, show legend'+\
 	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax]   set the range of x,y in figure'+\
 	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '+\
+	'\n\t\t[-cumulative]     cumulative hitogram '+\
 	'\n\n\t###############################'+\
 	'\n\t   An example'+\
         '\n\n\t\tpy_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -ml 10000 -savefig T -figfmt png -showfig F '+\
@@ -65,6 +70,10 @@ wcol = 4
 colors = ['k', 'b', 'g', 'y', 'r', 'c', 'gray', 'm' ]
 
 randrat = 1.1
+logX = False
+logY = False
+logZ = False
+logfun=np.log
 figfmt = 'png'
 titlefs = 18
 labelfs = 18
@@ -84,6 +93,7 @@ singleplot=False
 automaticcolor=False
 showleg=False
 histrange=None
+cumulative=False
 maxnlines_read=1.0e20
 
 xmin=None
@@ -144,6 +154,46 @@ if len(cmdargs) >=4:
 				ycol = int(opt2)
 			elif opt1 == '-zcol':
 				zcol = int(opt2)
+			elif opt1 == '-logX':
+				if opt2[0] == 'T':
+					logX = True
+				elif opt2[0] == 'F':
+					logX = False
+				else:
+					print 'ERROR (logX)!: must start with T or F: ', opt2
+					sys.exit()
+			elif opt1 == '-logY':
+				if opt2[0] == 'T':
+					logY = True
+				elif opt2[0] == 'F':
+					logY = False
+				else:
+					print 'ERROR (logY)!: must start with T or F: ', opt2
+					sys.exit()
+			elif opt1 == '-logZ':
+				if opt2[0] == 'T':
+					logZ = True
+				elif opt2[0] == 'F':
+					logZ = False
+				else:
+					print 'ERROR (logZ)!: must start with T or F: ', opt2
+					sys.exit()
+			elif opt1 == '-logfun':
+				if opt2 == 'log':
+					logfun = np.log
+				elif opt2 == 'log10':
+					logfun = np.log10
+				else:
+					print 'ERROR (logfun)! must be log or log10: ', opt2
+					sys.exit()
+			elif opt1 == '-cumulative':
+				if opt2[0] == 'T':
+					cumulative = True
+				elif opt2[0] == 'F':
+					cumulative=False
+				else:
+					print 'ERROR (cumulative)!: must start with T or F: ', opt2
+					sys.exit()
 			elif opt1 == '-savefig':
 				if opt2[0] == 'T':
 					savefig = True
@@ -276,14 +326,21 @@ for filename in filenames:
 	if plotfun == 'plot':
 		colstr = str(xcol)+'-'+str(ycol)
 		X, Y = stdA.XYfromdata(data, xcol-1, ycol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
 		ax.plot(X,Y,lw=linewidth,markersize=pointsize,c=linecolor,label=stdA.separate_path_file(filename)[1])
 	elif  plotfun == 'scatter':
 		colstr = str(xcol)+'-'+str(ycol)	
 		X, Y = stdA.XYfromdata(data, xcol-1, ycol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
 		ax.scatter(X,Y,lw=linewidth,s=pointsize,c=color,label=stdA.separate_path_file(filename)[1])
 	elif plotfun == 'scatterradec':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
+		if logX or logY: print 'Warning: computing ra, dec of log of x/y!'
 		RA, DEC, R = stdA.list_xyz_to_radecr(X, Y, Z)	
 		ax.scatter(RA,DEC,lw=linewidth,s=pointsize,c=color,label=stdA.separate_path_file(filename)[1])
 
@@ -294,13 +351,16 @@ for filename in filenames:
 			R = X
 		else:
 			R = [np.sqrt(X[row]**2.0 + Y[row]**2 + Z[row]**2) for row in range(len(X))]
+		if logX: 
+			R = [logfun(r) for r in R]
 		W = stdA.Xfromdata(data, wcol-1)
 		ax.scatter(R,W,lw=linewidth,s=pointsize,c=color,label=stdA.separate_path_file(filename)[1])
 
 	elif  plotfun == 'hist':
 		colstr = str(xcol)
 		X = stdA.Xfromdata(data, xcol-1)
-		ax.hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange)
+		if logX: X = [logfun(abs(x)) for x in X]
+		ax.hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
 	elif plotfun == 'histr':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
@@ -308,28 +368,42 @@ for filename in filenames:
 			R = X
 		else:
 			R = [np.sqrt(X[row]**2.0 + Y[row]**2 + Z[row]**2) for row in range(len(X))]
-		ax.hist(R,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange)
+		if logX: 
+			R = [logfun(r) for r in R]
+		ax.hist(R,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
 	elif plotfun == 'histrcube':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
+		if logX or logY or logZ:
+			print 'Error! logX/logY/logZ not supported for histrcube'
+			sys.exit()
 		if xcol == ycol == zcol:
 			R = X
 		else:
 			R = [(X[row]**2.0 + Y[row]**2 + Z[row]**2)**1.5 for row in range(len(X))]
-		ax.hist(R,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange)
+		ax.hist(R,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
 	elif  plotfun == 'errorbar':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
+		if logZ: Z = [logfun(abs(z)) for z in Z]
 		ax.errorbar(X,Y,Z,label=stdA.separate_path_file(filename)[1], range=histrange)
 	elif  plotfun == 'scatter3d':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
+		if logZ: Z = [logfun(abs(z)) for z in Z]
 		ax = fig.add_subplot(111, projection='3d')
 		ax.scatter(X,Y,Z,lw=linewidth,s=pointsize,c=color,label=stdA.separate_path_file(filename)[1])
 
 	elif  plotfun == 'plot3d':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)
+		if logX: X = [logfun(abs(x)) for x in X]
+		if logY: Y = [logfun(abs(y)) for y in Y]
+		if logZ: Z = [logfun(abs(z)) for z in Z]
 		ax = fig.add_subplot(111, projection='3d')
 		ax.plot(X,Y,Z,lw=linewidth,markersize=pointsize,c=linecolor,label=stdA.separate_path_file(filename)[1])
 
@@ -364,6 +438,11 @@ for filename in filenames:
 			figname = filename
 			if randrat <1:
 				figname += ('.randrat'+randratstr)
+			if logX: figname += '.logX'
+			if logY: figname += '.logY'
+			if logZ: figname += '.logZ'
+			if cumulative: figname += '.cumulativehist'
+			if logfun == 'log10': figname += '.log10'
 			figname += ('.col-'+colstr+'.'+plotfun+'.'+figfmt)
 			print '\tSaving figure to: ', figname,  '...'
 			fig.savefig(figname, format=figfmt)
@@ -375,6 +454,11 @@ if singleplot:
 		figname = filename+'.'+str(len(filenames))+'files'
 		if randrat <1:
 			figname += ('.randrat'+randratstr)
+		if logX: figname += '.logX'
+		if logY: figname += '.logY'
+		if logZ: figname += '.logZ'
+		if cumulative: figname += '.cumulativehist'
+		if logfun == 'log10': figname += '.log10'
 		figname += ('.col-'+colstr+'.'+plotfun+'.'+figfmt)
 		print '\tSaving figure to: ', figname,  '...'
 		fig.savefig(figname, format=figfmt)

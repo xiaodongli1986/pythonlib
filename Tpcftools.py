@@ -1048,7 +1048,8 @@ def smu_xis_loadmockrlt(imumin,
 			format: catname, catname2, RSDstr, ibin, imock'''
 	 	### 1. Load in xis from mock 
 		xis_mock = {}
-		xisfile = smu_xis_xisdir + 'MockResult.imumin%03i'%imumin+'.xis'
+		#xisfile = smu_xis_xisdir + 'MockResult.imumin%03i'%imumin+'.xis'
+		xisfile = smu_xis_xisdir + 'MockResult.MDincluded.imumin%03i'%imumin+'.xis'
 		for catname in catnamelist:
 		  xis_mock[catname] = {}
 		  for catname2 in catname2list:

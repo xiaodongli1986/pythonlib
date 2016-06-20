@@ -128,7 +128,7 @@ SixBinGalNums = [ 82746 +37841,82745+37838 ,82745+37844 , 188227+68966,188206+68
 
 HR4LCcatname2list = ['J08', 'LC93', 'M12', 'V13', 'B08',]
 HR4catname2list = ['HR4PSB',  'J08.dat.z_0', 'J08.dat.z_0.5', ] + HR4LCcatname2list
-catname2list = ['HR3'] + HR4catname2list
+catname2list = ['HR3', 'MD'] + HR4catname2list
 RSDstrlist = ['noRSD', 'RSD']
 
 def numHR3mock(catname):
@@ -144,8 +144,8 @@ def numHR3mock(catname):
 def catinfo_nummock(catname, catname2):
 	if catname2 == 'HR3':
 		return numHR3mock(catname)
-	#elif catname2 == 'MD':
-	#	return 10
+	elif catname2 == 'MD':
+		return 10
 	elif catname2 in catname2list:
 		return catinfo_npatch[catname]
 	else:
