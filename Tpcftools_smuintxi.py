@@ -507,6 +507,8 @@ def smu__intxi_ChisqContour(Skylist=['N'],
 			    only_plot__no_calc = False,
                             refine_intxi = None,
 			    given_nummock = None,
+			    use_omw_as_sys = False,
+			    polyfitdeg = 3,
 			    #oms=oms, ws=ws, omws=omws, scanname=scanname,
                             ):
 
@@ -547,6 +549,14 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                if given_nummock != None:
                         chisqfilename += '.nummock'+str(given_nummock)
 
+               if use_omw_as_sys !=False:
+                        omsys, wsys = use_omw_as_sys
+                        chisqfilename += ('.force_bestfit_as_'+omwstr(omsys,wsys))
+
+	       if polyfitdeg != 3:
+			chisqfilename += ('.poly_fit_deg'+str(polyfitdeg))
+	       
+	       print ' *** Result saving to : ', chisqfilename
 	       if only_plot__no_calc:
 			if isfile(chisqfilename):
 				print '\t\tSkip computation: using chisqs loaded from file: ', chisqfilename
@@ -623,11 +633,24 @@ def smu__intxi_ChisqContour(Skylist=['N'],
                                         use_omw_testfun=use_omw_testfun,
                                         refine_intxi=refine_intxi)
 
+                if use_omw_as_sys !=False:
+                	mus, avgdiffs_simulation_mock, avgintxis_simulation_mock = \
+				smu__inxi_RSDCor_Covmat(Sky, 'data', smu__intxi__settings, 
+                                        totbin = totbin,
+                                        cosmoconvertomw=[omsys, wsys],
+                                        smusettings=smusettings_observational_data, ## smusettings = observational_data
+                                        RSDstr='RSD', ## in fact it does not matter
+                                        makeplot=False,  savefig=False, 
+                                        docovmat=False,
+                                        refibin = refibin, 
+                                        normedintxi=normedintxi,
+                                        use_omw_testfun=use_omw_testfun,
+                                        refine_intxi=refine_intxi)
+		
                 ## Use 3-rd order polynomial to fit the RSD cor???
-
-                polyfitdeg = 3
-
+                polyfitdeg = polyfitdeg
                 avgdiffs_simulation_mock_polyfit = [polyfitY(mus, Y, polyfitdeg) for Y in avgdiffs_simulation_mock]
+
                 if plot_RSDcor:
                     fig, ax = figax(16,8, title='RSD correction (solid) and its '+str(polyfitdeg)+\
                                     '-rd polynomial fitted curve (dashed)')
@@ -786,6 +809,12 @@ def DistancePrior__DA_pro_H__rat(om, w, zcomp, zref):
     fref = DA_pro_H(om, w, 0.6, zref)
     return fcomp / fref
 
+def DistancePrior__DAsq_over_H__rat(om, w, zcomp, zref):
+    fcomp = DA(om, w, 0.6, zcomp)**2.0/Hz(om,w,0.6,zcomp)
+    fref = DA(om, w, 0.6, zref)**2.0/Hz(om,w,0.6,zref)
+    return fcomp / fref
+
+
 def DistancePrior__DA_pro_H__sqrat(om, w, zcomp, zref):
     fcomp = DA_pro_H(om, w, 0.6, zcomp)
     fref = DA_pro_H(om, w, 0.6, zref)
@@ -805,6 +834,24 @@ def DistancePrior__Hz__rat(om, w, zcomp, zref):
     fcomp = Hz(om, w, 0.6, zcomp)
     fref = Hz(om, w, 0.6, zref)
     return fcomp / fref
+def DistancePrior__test(om, w, zcomp, zref):
+    x = 1; y = 1
+    fcomp = DA(om, w, 0.6, zcomp)**x*Hz(om, w, 0.6, zcomp)**y
+    fref = DA(om, w, 0.6, zref)**y*Hz(om, w, 0.6, zref)**y
+    return fcomp / fref
+
+def DistancePrior__test0(om, w, zcomp, zref):
+    fcomp1 = DA_pro_H(om, w, 0.6, zcomp)/DA_pro_H(0.31, -1, 0.6, zcomp)
+    fref1 = DA_pro_H(om, w, 0.6, zref)/DA_pro_H(0.31, -1, 0.6, zref)
+    rat1 = fcomp1/fref1
+    fcomp2A = DA(om, w, 0.6, zcomp)**2.0/Hz(om,w,0.6,zcomp) 
+    fcomp2B = DA(0.31, -1, 0.6, zcomp)**2.0/Hz(0.31,-1,0.6,zcomp) 
+    fcomp2 = fcomp2A/fcomp2B
+    fref2A = DA(om, w, 0.6, zref)**2.0/Hz(om,w,0.6,zref) 
+    fref2B = DA(0.31, -1, 0.6, zref)**2.0/Hz(0.31,-1,0.6,zref) 
+    fref2 = fref2A/fref2B
+    rat2 = fcomp2/fref2
+    return rat2**2.0 #rat1**2.0 + rat2**2.0
 
 def DistancePrior_name(DP, zcomp, zref, zfmt = '%.3f', nametype='plot'):
     if DP == DistancePrior__DA_pro_H__rat:
@@ -837,6 +884,14 @@ def DistancePrior_name(DP, zcomp, zref, zfmt = '%.3f', nametype='plot'):
             return '${H('+zfmt%zcomp+')}\\ /\\ {H('+zfmt%zref+')}$'
         elif nametype == 'txt':
             return 'H__rat'
+    elif DP == DistancePrior__DAsq_over_H__rat:
+	if nametype == 'plot':
+		fname = 'D_A^2/H'
+            	return '${D_A^2/H('+zfmt%zcomp+')}$'
+	elif nametype == 'txt':
+		return 'DAsq_over_H__rat'
+    elif DP == DistancePrior__test:
+		return 'DP'
     else:
         return '$Distance Prior (zcomp='+zfmt%zcomp+', zref = '+zfmt%zref+')}$'
     
@@ -886,6 +941,7 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
                      saverlt = True,
                      EnhancedOmWGrid=[50,50],
 		     save_orig_chisq=True, # could be helpful when the orignal chisq come from many files
+		     select_polys = None,
                      ):
      DPname_txt = DistancePrior_name(DistancePrior, 0, 0, nametype='txt' )
      if (not multifiles) or print_all_filename:
@@ -1252,6 +1308,12 @@ def smu__intxi_DPfit(chisqfile, multifiles = False, print_all_filename=False,
             ################################################
             ## Step 5: Make a contour plot
             if plot_tot_fitted_chisq_contour:
+		print noRSDCorpoly_all
+		if select_polys != None:
+			noRSDCorpoly_all = [noRSDCorpoly_all[row] for row in select_polys]
+			print 'Values skiped result: \n\t',noRSDCorpoly_all
+			RSDCorpoly_all = [RSDCorpoly_all[row] for row in select_polys]
+			zcomps = [zcomps[row] for row in select_polys]
                 ################################################
                 ## Step 5.1: poly-fitted chisq vals
                 if EnhancedOmWGrid == None:

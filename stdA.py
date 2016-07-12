@@ -600,7 +600,7 @@ def invert_ax(ax, axes='x'):
 def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                     ommin = 0.01, ommax = 0.6, wmin = -2.0, wmax = -0.0,  do_smooth=True, smsigma=0.5, 
                     extratitle = '', titleftsize=15, notitle = False, xylabelfs=26,
-                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, 
+                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, return_chisqcuts=False,
                     nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],
                     noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
 	            show_marg_rlt = True, scatter_WMAP5=True):
@@ -708,4 +708,7 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
             wtext = '$w=%.3f'%wbf+'^{+%.3f'%wuper+'}_{-%.3f'%wler+'}$'
             ax.text(0.02, 0.2,omtext,  transform=ax.transAxes, fontsize=legftsize)
             ax.text(0.02, 0.1,wtext, transform=ax.transAxes, fontsize=legftsize)
-	return CS
+	if return_chisqcuts:
+		return chisqs, CS
+	else:
+		return CS

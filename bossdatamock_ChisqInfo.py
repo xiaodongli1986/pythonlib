@@ -18,7 +18,11 @@ def Dense12_2d_Interpolation(numomw=100,
                              conrange =  [0.1, 0.55, -1.9, -0.6], 
                              smsigma=0.0,
 			     cosmomcchaindir = bossdatamock_cosmomcchaindir,
-			     doplot=True):
+			     Dense1chisqfile = Dense1chisqfile, 
+			     Desne2chisqfile = Dense2chisqfile,
+			     doplot=True,
+			     Set_Dense2_as_Dense1=True,
+			     suffix = ''):
     '''
         Many quantities will be returned (1 means Dense1; 2 means Dense2; 3 is 2d interpolation of Dense2)
     
@@ -35,11 +39,15 @@ def Dense12_2d_Interpolation(numomw=100,
     ommin1, ommax1, wmin1, wmax1 = min(omlist1), max(omlist1), min(wlist1), max(wlist1)
     chisqlist1 = get_2darray_from_1d(Xfromdata(loadtxt(Dense1chisqfile),2), numw1, numom1)
 
-    ### Dense2 Info
-    omlist2, wlist2 = Dense2subscan_omlist, Dense2subscan_wlist
-    numom2, numw2 = len(omlist2), len(wlist2)
-    ommin2, ommax2, wmin2, wmax2 = min(omlist2), max(omlist2), min(wlist2), max(wlist2)
-    chisqlist2 = get_2darray_from_1d(Xfromdata(loadtxt(Dense2chisqfile),2), numw2, numom2)
+    if not Set_Dense2_as_Dense1:
+	    ### Dense2 Info
+	    omlist2, wlist2 = Dense2subscan_omlist, Dense2subscan_wlist
+	    numom2, numw2 = len(omlist2), len(wlist2)
+	    ommin2, ommax2, wmin2, wmax2 = min(omlist2), max(omlist2), min(wlist2), max(wlist2)
+	    chisqlist2 = get_2darray_from_1d(Xfromdata(loadtxt(Dense2chisqfile),2), numw2, numom2)
+    else:
+	    omlist2, wlist2, numom2, numw2, ommin2, ommax2, wmin2, wmax2, chisqlist2 = \
+			   omlist1, wlist1, numom1, numw1, ommin1, ommax1, wmin1, wmax1, chisqlist1
 
     ### Plot of the original contour from Dense1 and Dense2
     if False:
@@ -77,7 +85,7 @@ def Dense12_2d_Interpolation(numomw=100,
 
         if output_MCMC_file:
             ### Output chisqs to file
-            MCMCfile = bossdatamock_cosmomcchaindir+'Dense2_Interpolated_'+str(numom3)
+            MCMCfile = bossdatamock_cosmomcchaindir+'Dense2_Interpolated_'+str(numom3)+suffix
             nowf = open(MCMCfile, 'w')
             for row in range(len(X3)):
                 nowf.write(str(X3[row])+'\t'+str(Y3[row])+'\t'+str(chisqlist3_1d[row])+'\n')
