@@ -26,6 +26,7 @@ def smu_ximu_calcchisqs(
         use_omw_as_sys = False,
 	cosmo_rescaled_s = False, z_of_each_bin = [0.2154098242, 0.3156545036, 0.3869159269, 0.4785988874, 0.5408209467, 0.6186561000],
 	consider_tilt_in_chisq = False,
+	covmat_nondiag_rescale = False,
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
 	omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
@@ -60,6 +61,14 @@ def smu_ximu_calcchisqs(
 			nowchisqstr += '.Chisq_ConsiderTilt'
 		if polyfitdeg != 3:
 			nowchisqstr += ('.SysCor_poly'+str(polyfitdeg))
+		if covmat_nondiag_rescale != False:
+			nowchisqstr += ('.CovNDRescal%.3f'%covmat_nondiag_rescale)
+			def covmat_adjust(covmat):
+				for rowa in range(len(covmat)):
+					for rowb in range(len(covmat)):
+						if rowa != rowb:
+							covmat[rowa][rowb] *= covmat_nondiag_rescale
+				return covmat
 
 	        ximudir = smu_ximu_covchisqdir
 		#nowfile=outputdir+'/'+baseoutputfile+'_'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
@@ -85,6 +94,7 @@ def smu_ximu_calcchisqs(
 
 		t0 = time.clock(); t1 = t0; 
 		for omw in omwlist:
+			#print omw ## BOSSLi
 			t2 = time.clock();
 			if t2 - t1 > 10:
 				print t2-t0, 'sec ellapses.   iomw/numomw = ', iomw,'/', len(omwlist), \
@@ -194,9 +204,13 @@ def smu_ximu_calcchisqs(
 		
 							dxicov  = [ get_diffarray(xihatcov_base[row], xihatcov[row]) \
 								for row in range(len(xihatcov))]
-							covmats.append(get_covmat(transpose(dxicov)))
+							if covmat_nondiag_rescale == False:
+								covmats.append(get_covmat(transpose(dxicov)))
+							else:
+								covmats.append(covmat_adjust(get_covmat(transpose(dxicov))))
 							#print '\n\n ibin, covmat = ', ibin, get_covmat(transpose(dxicov))
 						covmat = covmats[i_redshiftbin]
+						#if iomw == 0: print np.mat(covmat).I # BOSSLi
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
 						#chisq_syscor, like   = chisq_like_cov_xbar(get_diffarray(dxidata,dxisys_list[i_redshiftbin]), covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(XplusY(dxidata,dxisys_list[i_redshiftbin],b=-1), covmat)
@@ -219,7 +233,7 @@ def smu_ximu_calcchisqs(
 					i_redshiftbin += 1
 			X1, X2 = chisqs_nosyscor[nowomwstr], chisqs_syscor[nowomwstr]
 			str1, str2, strA, strB = \
-				array_to_str(X1), array_to_str(X2), str(sum(chisq_nosyscor)), str(sum(chisq_syscor))
+				array_to_str(X1), array_to_str(X2), str(sum(X1)), str(sum(X2))
 			nowf.write(str(mumin)+' '+nowomwstr+'   '+strA+' '+strB+'  '+ str1+'   '+str2+'\n')
 			iomw += 1	
 			#print om, w, chisqs_nosyscor[nowomwstr], chisqs_syscor[nowomwstr]

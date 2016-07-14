@@ -14,7 +14,8 @@ def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None):
 			if nowstr == '': break
 			nowstrs = nowstr.split();
 			if nowstrs[0][0] == '#': continue
-			nowomwstr, nowchisq1, nowchisq2 = nowstrs[1], float(nowstrs[2]), float(nowstrs[3])
+			#nowomwstr, nowchisq1, nowchisq2 = nowstrs[1], float(nowstrs[2]), float(nowstrs[3])
+			nowomwstr, nowchisq1, nowchisq2 = nowstrs[1], sum([float(nowstrs[i]) for i in [4,5,6,7,8]]), sum([float(nowstrs[i]) for i in [9,10,11,12,13]])
 			chisqs_dict_NoCor[nowomwstr].append(nowchisq1)
 			chisqs_dict_Cor[nowomwstr].append(nowchisq2)
 		nowf.close()
@@ -56,6 +57,7 @@ def ChisqContour_Plot(omlist, wlist, chisqfile,
         nowf.close()
 	chisqlist_nosyscor = [[chisqs_dict_NoCor[omwstr(om,w)] for om in omlist] for w in wlist]
 	chisqlist_syscor = [[chisqs_dict_Cor[omwstr(om,w)] for om in omlist] for w in wlist]
+	#chisqlist_syscor = [[ ((om-0.26)/0.1)**2.0 + ((w+1)/0.1)**2.0  for om in omlist] for w in wlist]
 	if True:
                         fig = plt.figure(figsize=(16,6))
                         ax1 = fig.add_subplot(121)
