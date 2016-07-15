@@ -277,6 +277,17 @@ def normto1(X,wei=[],returnavg=False):
 def norm_power(X, deg=0.9):
                         avg = sum([x**deg for x in X])**(1.0/deg) / float(len(X))
                         return [x/avg for x in X]
+def norm_OneSkip(X, deg=1.0):
+                        avg = sum(X) / float(len(X))
+                        imid = len(X)/2 + 1
+                        Y = [X[row]/avg for row in range(imid)] + [X[row]/avg for row in range(imid+1,len(X))]
+                        return Y
+def norm_powerC(X, deg=1.0):
+                        avg = sum([x**deg for x in X])**(1.0/deg) / float(len(X))
+                        return [X[row]/avg for row in range(len(X)-2)]
+
+
+
 def arraysq(X):
 	return [x**2.0 for x in X]
 
