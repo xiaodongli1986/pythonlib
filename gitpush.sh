@@ -1,5 +1,6 @@
 git pull
 git add *.sh
+git add stdA.py
 git add *.py
 git add src/*.py
 git add src/Makefile
