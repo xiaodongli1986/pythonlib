@@ -90,4 +90,4 @@ def ChisqContour_Plot(omlist, wlist, chisqfile,
                         if showfig: plt.show()
 
 	if return_chisqlist:
-		reutrn chisqlist_nosyscor, chisqlist_syscor
+		return chisqlist_nosyscor, chisqlist_syscor
