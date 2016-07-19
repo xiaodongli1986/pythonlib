@@ -93,6 +93,7 @@ def get_avg_array2D(arraylists, furtherdivfac = 1.0):
             avgarray[i][j] /= divfac
     return avgarray
 def get_avg_array(arraylists, furtherdivfac = 1.0):
+    import copy
     avgarray = copy.deepcopy(arraylists[0])
     divfac   = float(len(arraylists)) * furtherdivfac
     nrow = len(arraylists[0])
