@@ -353,6 +353,83 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
 #ax.grid()
 
 
+
+########################################
+### 1d linear interpolations
+def LinearInterpolation(x1, y1,  x2, y2,  x3):
+    '''
+        Linear interpolation 
+        ################
+        ## As a test:
+            print 0.67*3.2 + 0.999
+            print 0.67*6.7 + 0.999
+            print 0.67*(-6700) + 0.999
+            LinearInterpolation(3.2, 3.143,  6.7, 5.488,  -6700)
+    '''
+    return (y2-y1)/(x2-x1)*(x3-x2) + y2
+
+def LinearInterpolation_IOA(X, Y, X3, check_order=True):
+            '''
+	      LinearInterpolation_IncreasingOrderedArray(X, Y, X3, check_order=True):
+                X: list of variables
+                Y: list of function values at X
+                X3: list of variables at which function value shall be computed
+                X, X3 must be increasing ordered array (next va)
+                ################
+                ## As a test:
+                def testfun(x):
+                    return x*0.67+90.8 
+
+                    X = range(20)  
+                    Y = [testfun(xx) for xx in X]
+                    X3 = np.linspace(30,35,30)
+                    Y3 = LinearInterpolation_IncreasingOrderedArray(X,Y,X3)
+
+                    for ix3 in range(len(X3)):
+                        print X3[ix3], testfun(X3[ix3]), '\t', Y3[ix3], ' \t  ', testfun(X3[ix3])/Y3[ix3]
+                
+            '''
+            if check_order:
+                for ii in range(len(X)-1):
+                    if X[ii+1]<X[ii]:
+                        print 'ERROR (LinearInterpolation_IncreasingOrderedArray)! Wrong order. ii, X[ii], X[ii+1] = ',\
+                            ii, X[ii], X[ii+1]
+                        return
+                for ii in range(len(X3)-1):
+                    if X3[ii+1]<X3[ii]:
+                        print 'ERROR (LinearInterpolation_IncreasingOrderedArray)! Wrong order. ii, X3[ii], X3[ii+1] = ',\
+                            ii, X3[ii], X3[ii+1]
+                        return
+            nx = len(X)
+            nx3 = len(X3);
+            Y3 = range(nx3);
+            ix = 0; 
+            for ix3 in range(nx3):
+                x3 = X3[ix3]
+                x1, x2 = X[ix], X[ix+1]
+                if ix < nx-2:
+                  while x3 > x2:
+                    ix += 1
+                    x1, x2 = X[ix], X[ix+1]
+                    if ix == nx-2:
+                        break
+                Y3[ix3] = LinearInterpolation(x1, Y[ix], x2, Y[ix+1], x3);
+            return Y3
+            #while True:
+            #    if ix > len(X)-2 or ix3 == nx3:
+            #        break
+            #    x1 = X[ix];
+            #    x2 = X[ix+1];
+            #    while x1 <= x3 <= x2:
+            #        Y3[ix3] = LinearInterpolation(x1, Y[ix], x2, Y[ix+1], x3);
+            #        ix3 +=1;
+            #        if ix3 == nx3:
+            #            break
+            #        x3 = X3[ix3];
+            #    ix +=1
+            #return Y3
+
+
 ########################################
 ### 2d linear interpolations
 def LinearInterpolation_2d(x1, y1,  x2, y2,  f_x1y1, f_x1y2, f_x2y1, f_x2y2,   x3, y3):
