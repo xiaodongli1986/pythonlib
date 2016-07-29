@@ -648,3 +648,18 @@ def COSMOMC_post_chisq(MCMCfile,
     return
 
 
+
+
+def Percival_covmat_scale(Ns,Nb,Npar):
+                '''
+                Corretion to covariance to account for errors in deriving covmat from simulations
+                Ns: number of simulations
+                Nb: number of 'bands' in power spectrum or 2pCF
+                Npar: nuber of parameters (in likelihood estimation)
+                '''
+                D = (Nb+1.0)/(Ns-1.0)
+                A = 2.0 / (Ns-Nb-1.0) / (Ns-Nb-4.0)
+                B = (Ns-Nb-2.0) / (Ns-Nb-1.0) / (Ns-Nb-4.0)
+                m1 = (1+B*(Nb-Npar)) / (1+A+B*(Npar+1))
+                m2 = 1.0/(1.0-D) * m1
+                return D, m1, m2
