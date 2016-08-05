@@ -153,7 +153,7 @@ def smu_chisq__getzref_zcomps(refibin, SixBinRedshift):
 ### Compute intxi
 
 def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__settings_std,
-                         mufmt='automatic', sfmt='%.2f', smudata=None):
+                         mufmt='automatic', sfmt='%.2f', smudata=None, writetofile=True):
     if smudata == None:  smudata = smu__loadin(smufile, smusettings)
     DDlist, DRlist, RRlist = Xsfrom2ddata(smudata, [4,5,6])
     smu__initsmusettings(smusettings)
@@ -170,10 +170,11 @@ def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__
     
     callsys('mkdir -p '+separate_path_file(smu__intxi_file)[0])
     
-    f0 = open(smu__intxi_file, 'w')
-    for intxi in intxis:
+    if writetofile:
+     f0 = open(smu__intxi_file, 'w')
+     for intxi in intxis:
         f0.write(str(intxi)+'\n')
-    f0.close()
+     f0.close()
     return smu__intxi_file, muedgemids, intxis
 
 def smu__intxi_calcwrite_list(smufilelist, smusettings = smusettings_sample, 
