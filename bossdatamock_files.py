@@ -43,8 +43,13 @@ def datafile(catname, suffix = ''):
 	return datamockdir+catname+'/data'+suffix
 def dataranfile(catname, suffix = ''):
 	return datamockdir+catname+'/dataran'+suffix
-def mockfile(catname, catname2, imock, RSDstr='RSD', suffix = ''):
-	return datamockdir+catname+'/'+catname2+'.'+RSDstr+'.%03i'%imock+suffix
+def mockfile(catname, catname2, imock, RSDstr='RSD', suffix = '', fmt=None):
+	if fmt == None:
+		if catname2 in ['PatchyV6C']:
+			fmt = '%04i'
+		else:
+			fmt = '%03i'
+	return datamockdir+catname+'/'+catname2+'.'+RSDstr+'.'+fmt%imock+suffix
 def mockranfile(catname, suffix = ''):
 	return datamockdir+catname+'/mockran'+suffix
 

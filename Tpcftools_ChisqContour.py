@@ -1,13 +1,16 @@
 
 
-def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, given_cols = False):
+def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, given_cols = False,
+	mult_facts = None, suffix=''):
 	chisqs_dict_NoCor = {}
 	chisqs_dict_Cor = {}
 	for om in omlist:
 		for w in wlist:
 			chisqs_dict_NoCor[omwstr(om,w)] = []
 			chisqs_dict_Cor[omwstr(om,w)] = []
+	ichisqfile = -1
 	for chisqfile in chisqfiles:
+		ichisqfile += 1
 		nowf = open(chisqfile, 'r')
 		while True:
 			nowstr = nowf.readline();
@@ -18,6 +21,9 @@ def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, giv
 				nowomwstr, nowchisq1, nowchisq2 = nowstrs[1], float(nowstrs[2]), float(nowstrs[3])
 			else:
 				nowomwstr, nowchisq1, nowchisq2 = nowstrs[1], sum([float(nowstrs[i]) for i in [4,5,6,7,8]]), sum([float(nowstrs[i]) for i in given_cols])
+			if mult_facts != None:
+				nowchisq1 *= mult_facts[ichisqfile]
+				nowchisq2 *= mult_facts[ichisqfile]
 			chisqs_dict_NoCor[nowomwstr].append(nowchisq1)
 			chisqs_dict_Cor[nowomwstr].append(nowchisq2)
 		nowf.close()
@@ -37,6 +43,7 @@ def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, giv
 			outputchisqfile+='.givencols'
 			for col in given_cols:
 				outputchisqfile += ('.'+str(col))
+		outputchisqfile += suffix
 	nowf = open(outputchisqfile, 'w')
 	for om in omlist:
 		for w in wlist:
