@@ -285,6 +285,8 @@ def norm_OneSkip(X, deg=1.0):
                         return Y
 def norm_SkipLast(X):
     return normto1(X)[0:len(X)-1]
+def norm_SkipFirst(X):
+    return normto1(X)[1:len(X)]
 def norm_powerC(X, deg=1.0):
                         avg = sum([x**deg for x in X])**(1.0/deg) / float(len(X))
                         return [X[row]/avg for row in range(len(X)-2)]

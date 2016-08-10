@@ -116,11 +116,12 @@ def smu__briefprint(smusettings):
 
 ### Load in 2pcf result of smu
 
-def smu__loadin(smufile, smusettings, icol=''):
+def smu__loadin(smufile, smusettings, icol='', skiprows=1):
     """		Load in 2pcf file in s, mu space
 			if icol=='', load in all columns; else only load in icol column
     """
-    data = np.loadtxt(smufile)
+    data = np.loadtxt(smufile, skiprows=skiprows)
+    #print smufile, len(data)
 
     if icol == '':
 	Tpcfrlt = [[data[smu__rowofsmu(i_s,i_mu,smusettings)] for i_mu in range(smusettings['nummubin'])] for i_s in range(smusettings['numsbin'])]
