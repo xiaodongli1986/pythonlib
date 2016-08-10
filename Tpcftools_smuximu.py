@@ -130,7 +130,7 @@ def smu_ximu_calcchisqs(
 							if not use_omw_as_sys:
 								for imock in syscor_imocks:
 									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
-									print 'smu__intxi_file', smu__intxi_file # HB
+									#print 'smu__intxi_file', smu__intxi_file # HB
 									if isfile(smu__intxi_file):
 										xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 									else:
@@ -164,7 +164,7 @@ def smu_ximu_calcchisqs(
 	                                                if not use_omw_as_sys:
 								for imock in syscor_imocks:
 									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
-									print 'smu__intxi_file', smu__intxi_file # HB
+									#print 'smu__intxi_file', smu__intxi_file # HB
 									if isfile(smu__intxi_file):
 										xisys.append(smu__intxi_quickload(smu__intxi_file))
 									else:
@@ -180,8 +180,8 @@ def smu_ximu_calcchisqs(
 							polyfitdeg = polyfitdeg
 							xihatsys_base  = [ normfun(X) for X in xisys_base]
 							xihatsys  = [ normfun(X) for X in xisys]
-							print get_avg_array(xisys)
-							print 'i_redshiftbin, xihatsys, xihatdata', i_redshiftbin, get_avg_array(xihatsys), xihatdata  # HB
+							#print get_avg_array(xisys)
+							#print 'i_redshiftbin, xihatsys, xihatdata', i_redshiftbin, get_avg_array(xihatsys), xihatdata  # HB
 							dxisys = get_diffarray(get_avg_array(xihatsys_base),get_avg_array(xihatsys))
 							dxisys = polyfitY(range(len(dxisys)), dxisys, deg=polyfitdeg)
 
@@ -232,8 +232,8 @@ def smu_ximu_calcchisqs(
 				array_to_str(X1), array_to_str(X2), str(sum(X1)), str(sum(X2))
 			nowf.write(str(mumin)+' '+nowomwstr+'   '+strA+' '+strB+'  '+ str1+'   '+str2+'\n')
 			iomw += 1	
-			if iomw == 2:
-				sys.exit()
+			#if iomw == 2:
+			#	sys.exit()
 			#print om, w, chisqs_nosyscor[nowomwstr], chisqs_syscor[nowomwstr]
 		#print chisqs_nosyscor.keys()
 		#sys.exit(' ')
