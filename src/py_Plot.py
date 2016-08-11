@@ -5,7 +5,7 @@ import sys
 import stdA
 
 
-plotfunlist = ['plot', 'scatter', 'hist', 'errorbar', 'scatter3d','plot3d','scatterradec', 'histr', 'histrcube', 'scatterrw']
+plotfunlist = ['plot', 'scatter', 'hist', 'errorbar', 'scatter3d','plot3d','scatterradec', 'histr', 'histrcube', 'scatterrw', 'contour']
 plotfun3dlist = ['scatter3d', 'plot3d']
 
 printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [options...]'+\
@@ -15,6 +15,7 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\txcol, ycol, zcol:  columns as x, y, z '+\
 	'\n\tOptions:'+\
 	'\n\t\t[-savefig savefig]  T or F; save the plot as an eps file;  '+\
+	'\n\t\t[-skiprow 1/2...]       numer of rows skipped when read in data; '+\
 	'\n\t\t[-randrat randrat]  Randomly selecly a portion of file to plot; must be positive; can >1;'+\
 	'\n\t\t[-logX logX]  Plot logfun(X) rather than X; be True or False; '+\
 	'\n\t\t[-logY logY]  Plot logfun(Y) rather than Y; be True or False; '+\
@@ -29,7 +30,8 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-singleplot/T,F]       if T, all files plotted in one plot'+\
 	'\n\t\t[-automaticcolor,autoc,autocolor,automaticc/T,F]   if T, automatically assign color'+\
 	'\n\t\t[-showleg/T,F]          if T, show legend'+\
-	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax]   set the range of x,y in figure'+\
+	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax]   set the range of x,y in figure or the contour plot'+\
+	'\n\t\t[-numx, -numy ]  number of x/y grid points in contour plot'+\
 	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '+\
 	'\n\t\t[-cumulative]     cumulative hitogram '+\
 	'\n\n\t###############################'+\
@@ -69,6 +71,7 @@ wcol = 4
 
 colors = ['k', 'b', 'g', 'y', 'r', 'c', 'gray', 'm' ]
 
+skiprow =0
 randrat = 1.1
 logX = False
 logY = False
@@ -284,6 +287,10 @@ if len(cmdargs) >=4:
 				ymin = float(opt2)
 			elif opt1 in ['-setymax', '-ymax']:
 				ymax = float(opt2)
+			elif opt1 == '-numx':
+				numx=int(opt2)
+			elif opt1 == '-numy':
+				numy=int(opt2)
 			elif opt1 == '-showleg':
 				if opt2[0] == 'T':
 					showleg = True
@@ -361,6 +368,26 @@ for filename in filenames:
 		X = stdA.Xfromdata(data, xcol-1)
 		if logX: X = [logfun(abs(x)) for x in X]
 		ax.hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
+        elif  plotfun == 'contour':
+                colstr = str(xcol)
+                X = stdA.Xfromdata(data, xcol-1)
+                if logX: X = [logfun(abs(x)) for x in X]
+		if xmin==None: xmin=-1
+		if xmax==None: xmax= 1
+		if ymin==None: ymin=-1
+		if ymax==None: ymax= 1
+		xlist = np.linspace(xmin,xmax,numx)
+		ylist = np.linspace(ymin,ymax,numy)
+		chisqlist = stdA.get_2darray_from_1d(X, numy, numx)
+		#chisqlist = stdA.get_2darray_from_1d(X, numy, numx)
+		stdA.plot_contour(ax, xlist, ylist, chisqlist, label='68.3%, 95.4%, 99.7%',
+                    ommin = xmin, ommax = xmax, wmin = ymin, wmax = ymax,  do_smooth=False, smsigma=0.5,
+                    extratitle = '', titleftsize=15, notitle = False, xylabelfs=26,
+                    sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, return_chisqcuts=False,
+                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],
+                    noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
+                    show_marg_rlt = True, scatter_WMAP5=False)
+                #ax.hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
 	elif plotfun == 'histr':
 		colstr = str(xcol)+'-'+str(ycol)+'-'+str(zcol)
 		X, Y, Z = stdA.XYZfromdata(data, xcol-1, ycol-1, zcol-1)

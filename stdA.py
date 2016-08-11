@@ -75,12 +75,19 @@ def isfile(filename, exit_if_not_exit=False):
 		else:
 			return True
 
-def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20):
+def float_try(x):
+	try:
+		return float(x)
+	except:
+		return x
+
+def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20, skiprow=0, tryfloat=True):
 	nowf = open(filename, 'r') 
 	rlt = []
 	nlines = 0
 	nlines_read = 0
 	while True:
+		if nlines < skiprow: continue
 		nowstr = nowf.readline()
 		if nowstr == '':
 			break
@@ -91,7 +98,10 @@ def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20):
 			if wordlist[0][0] == '#':
 				continue
 			else:
-				rlt.append([float(x) for x in wordlist])
+				if tryfloat:
+					rlt.append([float_try(x) for x in wordlist])
+				else:
+					rlt.append([float(x) for x in wordlist])
 				nlines_read += 1
 		if nlines_read >= maxnlines_read:
 			break
