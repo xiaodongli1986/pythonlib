@@ -29,8 +29,8 @@ Seconds_per_day = S1D = 3600*24# how many
 
 
 
-
 PCA = PLOT_COLOR_ARRAY = ['k','b','c','g','m','r', 'y', 'gray']
+PCA2 = PLOT_COLOR_ARRAY_2 = ['k','b','c','g','m','r']
 PSA = PLOT_STYLE_ARRAY = ['-', '--', '-.', '..']
 MA = MARKER_ARRAY = ['o', 'p', 's',  'D',  '^', '*', 'v', '1', '2', '3', '4']
 NUM_PLOT_COLOR = len(PLOT_COLOR_ARRAY)
@@ -436,6 +436,8 @@ def km_to_Mpctoh(v, h):
 
 def omwstr(om, w, fmt='%.4f', sep1='', sep2='_'):
     return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w
+def omwtex(om, w, fmt='%.2f'):
+    return '$\\Omega_m='+fmt%om+',\\ w='+fmt%w+'$'
 def cosmoconvertedfilename(filename, om, w): ### filename
 	return filename + '.cosmo-converted.' + omwstr(om,w)
 def omws_from_om_w(oms, ws, TwoDlist=True):
@@ -719,6 +721,11 @@ def invert_ax(ax, axes='x'):
 		ax.set_zlim(z2,z1)
 	else:
 		print 'ERROR (invert_ax): wrong axes (must be x,y,z)! ', axes
+
+def circle(r=1,x=0,y=None,npoint=100):
+    if y == None:
+        y = x
+    return [ [x + r*np.cos(theta), y+r*np.sin(theta)] for theta in np.linspace(0,2.0*np.pi*npoint/(npoint+1.0),npoint)  ]
 
 ## Plot om-w contour
 def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',

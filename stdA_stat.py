@@ -484,6 +484,7 @@ def LinearInterpolation_2d_UniformGrid(xmin, xmax, numx,   ymin, ymax, numy,   F
         ### x1,x2,y1,y2 and the fs
         x1,y1 = xmin+ix*deltax, ymin+iy*deltay
         x2,y2 = x1+deltax, y1+deltay
+	#print ix, ix+1,iy,iy+1
         f_x1y1, f_x1y2, f_x2y1, f_x2y2 = F_2d[iy][ix], F_2d[iy+1][ix], F_2d[iy][ix+1], F_2d[iy+1][ix+1]
         ### 
         f_xy = LinearInterpolation_2d(x1, y1,  x2, y2,  f_x1y1, f_x1y2, f_x2y1, f_x2y2,   x,y)         
