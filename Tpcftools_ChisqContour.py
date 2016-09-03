@@ -1,7 +1,7 @@
 
 
 def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, given_cols = False,
-	mult_facts = None, suffix=''):
+	mult_facts = None, output_corrected_files = True, suffix=''):
 	chisqs_dict_NoCor = {}
 	chisqs_dict_Cor = {}
 	for om in omlist:
@@ -45,12 +45,23 @@ def ChisqContour_avgfiles(omlist, wlist, chisqfiles, outputchisqfile = None, giv
 				outputchisqfile += ('.'+str(col))
 		outputchisqfile += suffix
 	nowf = open(outputchisqfile, 'w')
+		
 	for om in omlist:
 		for w in wlist:
 			nowomwstr = omwstr(om,w)
 			nowf.write(' 0.0000 '+nowomwstr+'  '+str(chisqavg_dict[nowomwstr][0])+' '+str(chisqavg_dict[nowomwstr][1])+' \n')
 	print ' (ChisqContour_avgfiles) Averaged result of ', len(chisqfiles),' files outputed to file:\n\t\t', outputchisqfile
 	nowf.close()
+	if output_corrected_files:
+	        nowf = open(outputchisqfile+'.Corrected', 'w')
+
+                for w in wlist:
+        		for om in omlist:
+                        	nowomwstr = omwstr(om,w)
+	                        nowf.write(str(om)+' '+str(w)+'  '+str(chisqavg_dict[nowomwstr][1])+' \n')
+        	print ' (ChisqContour_avgfiles) Averaged result of ', len(chisqfiles),' files outputed to file:\n\t\t', outputchisqfile+'.Corrected'
+
+	        nowf.close()
 	return outputchisqfile
 
 def ChisqContour_Plot(omlist, wlist, chisqfile,
