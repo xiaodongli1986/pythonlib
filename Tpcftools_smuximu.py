@@ -107,7 +107,7 @@ def smu_ximu_calcchisqs(
 						#print om, w, nowz, ': ', CRs1, CRs2
 					if i_redshiftbin in [0]:
 						## A. picku up the xis
-						smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),om,w), mubins=nummubins,nbins=Smax,rmax=Smax );	smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+						smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),om,w), mubins=nummubins,nbins=Smax,rmax=Smax );	smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
 						#print smu__intxi_file
 						if isfile(smu__intxi_file):
 							xidata_base = smu__intxi_quickload(smu__intxi_file)
@@ -119,7 +119,7 @@ def smu_ximu_calcchisqs(
 						if iomw == 0:
 							xicov_base = []
 							for imock in range(cov_nummock):
-								smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, cov_catname2, imock, cov_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_covmock,rmax=Smax_covmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+								smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, cov_catname2, imock, cov_RSDstr), ibin+1, totbin), mubins=nummubins,nbins=Smax_covmock,rmax=Smax_covmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
 								if isfile(smu__intxi_file):
 									xicov_base.append(smu__intxi_quickload(smu__intxi_file))
 								else:
@@ -129,7 +129,7 @@ def smu_ximu_calcchisqs(
 							xisys_base = []
 							if not use_omw_as_sys:
 								for imock in syscor_imocks:
-									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1, totbin), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
 									#print 'smu__intxi_file', smu__intxi_file # HB
 									if isfile(smu__intxi_file):
 										xisys_base.append(smu__intxi_quickload(smu__intxi_file))
@@ -137,7 +137,7 @@ def smu_ximu_calcchisqs(
 										xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
 							else:
 								omsys, wsys = use_omw_as_sys
-								smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+								smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
                                                 		if isfile(smu__intxi_file):
 		                                                        xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 		                                                else:
@@ -146,7 +146,7 @@ def smu_ximu_calcchisqs(
 							dxisys_list.append([])
 					else:
 						## A. picku up the xis
-						smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),om,w), mubins=nummubins,nbins=Smax,rmax=Smax );	smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+						smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),om,w), mubins=nummubins,nbins=Smax,rmax=Smax );	smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
 						#print smu__intxi_file; sys.exit()
 						if isfile(smu__intxi_file):
 							xidata = smu__intxi_quickload(smu__intxi_file)
@@ -163,7 +163,7 @@ def smu_ximu_calcchisqs(
 							xisys = []
 	                                                if not use_omw_as_sys:
 								for imock in syscor_imocks:
-									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+									smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname+sys_catnamesuffix, sys_catname2, imock, sys_RSDstr), ibin+1, totbin), mubins=nummubins,nbins=Smax_sysmock,rmax=Smax_sysmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
 									#print 'smu__intxi_file', smu__intxi_file # HB
 									if isfile(smu__intxi_file):
 										xisys.append(smu__intxi_quickload(smu__intxi_file))
@@ -171,7 +171,7 @@ def smu_ximu_calcchisqs(
 										xisys.append(smu__intxi_calcwrite(smufile, smusettings_mock, smu__intxi__settings=smu__intxi__settings_orig)[2])
 	                                                else:
         	                                                 omsys, wsys = use_omw_as_sys
-                	                                         smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
+                	                                         smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
                         	                                 if isfile(smu__intxi_file):
                                 	                                xisys.append(smu__intxi_quickload(smu__intxi_file))
                                         	                 else:
@@ -190,7 +190,7 @@ def smu_ximu_calcchisqs(
 
                                                         xicov = []
                                                         for imock in range(cov_nummock):
-                                                                smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, cov_catname2, imock, cov_RSDstr), ibin+1), mubins=nummubins,nbins=Smax_covmock,rmax=Smax_covmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
+                                                                smufile = Tpcfrltfilename(binsplittedfilename(mockfile(catname, cov_catname2, imock, cov_RSDstr), ibin+1, totbin), mubins=nummubins,nbins=Smax_covmock,rmax=Smax_covmock ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings_orig)
 								if isfile(smu__intxi_file):
                                                                 	xicov.append(smu__intxi_quickload(smu__intxi_file))
 								else:
