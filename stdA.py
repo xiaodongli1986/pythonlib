@@ -610,8 +610,6 @@ def separate_path_file(path):
 ### CLs of 1-7 sigma
 sig1=0.683;sig2=0.954;sig3=0.9973;sig4=0.999937;sig5=0.99999943;sig6=0.999999998;sig7=0.9999999999974
 
-
-
 # Get the mean & variance, with errors
 def get_stat_from_list(x,getvarer = False):
     n = len(x)
@@ -623,6 +621,15 @@ def get_stat_from_list(x,getvarer = False):
         return x_av, x_var, x_av_er, x_var_er
     else:
         return x_av, x_var, x_av_er
+
+def get_stat_from_list_weighted(x,wei,getvarer = False):
+    n = len(x)
+    xwei = [x[row]*wei[row] for row in range(len(x))]
+    sumwei = sum(wei)
+    x_av    = ( sum(x[row]      * wei[row] for row in range(n)) / sumwei )
+    x_var   = ( sum(x[row]**2.0 * wei[row] for row in range(n)) - sumwei * x_av**2.0 ) / sumwei  #correct the bias using n-1
+    return x_av, x_var
+
 
 ### Advanced statistics
 
