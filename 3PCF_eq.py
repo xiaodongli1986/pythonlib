@@ -4,7 +4,7 @@ execfile('/home/xiaodongli/software/pythonlib/stdA.py')
 
 ### Definitions
 def TriCF(ddd, ddr, drr, rrr):
-	return (ddd-ddr+drr-rrr)/rrr
+	return (ddd-3*ddr+3*drr-rrr)/rrr
 
 
 ### Read in data
@@ -16,9 +16,9 @@ def TriCFeq_readin(outfile, nmu=12, nbins=40, printinfo=False):
 	for imu1 in range(nmu):
 		for imu2 in range(nmu):
 			nowstrs = nowf.readline().split()
-			ddd, ddr, drr, rrr = [float(xx) for xx in nowstrs[6:10]]
+			ddd, ddr, drr, rrr, zeta1, zeta2 = [float(xx) for xx in nowstrs[6:12]]
 			#print ir, imu1, imu2
-			data[ir][imu1][imu2] = [ddd,ddr,drr,rrr]
+			data[ir][imu1][imu2] = [ddd,ddr,drr,rrr, zeta1, zeta2]
 			#print data[ir][imu1][imu2]
 			numline += 1
  if printinfo: print 'TriCFeq_readin: Finishing read in ', numline, 'lines'
