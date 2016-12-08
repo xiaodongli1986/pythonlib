@@ -92,6 +92,10 @@ def get_avg_array2D(arraylists, furtherdivfac = 1.0):
                 avgarray[i][j] += arraylists[iarray][i][j]
             avgarray[i][j] /= divfac
     return avgarray
+def get_std_array2D(arraylists, furtherdivfac = 1.0):
+    import copy
+    return [[ get_stat_from_list([ arraylists[row][row1][row2]  for row in range(len(arraylists))])[2] \
+                for row2 in range(len(arraylists[0][0]))  ] for row1 in range(len(arraylists[0]))]	
 def get_avg_array(arraylists, furtherdivfac = 1.0):
     import copy
     avgarray = copy.deepcopy(arraylists[0])
@@ -249,6 +253,13 @@ def get_divarray(X,Y):
 def get_divarray_2d(X,Y):
 	return [[X[row1][row2]/Y[row1][row2] for row2 in range(len(Y[row1]))] for row1 in range(len(Y))]
 
+def get_diffarray_3darray(X,Y,misplace=None):
+	if misplace==None:
+		return [[[ Y[row1][row2][row3] - X[row1][row2][row3] for row3 in range(len(X[row1][row2]))] \
+			for row2 in range(len(X[row1]))] for row1 in range(len(X))]
+	else:
+		return [[[ Y[row1][row2][row3] - X[row1-misplace][row2][row3] for row3 in range(len(X[row1][row2]))] \
+			for row2 in range(len(X[row1]))] for row1 in range(len(X))]
 ### functions that normalize an array
 # averaged value of X
 def avgarray(X,wei=[]):
@@ -275,6 +286,19 @@ def normto1(X,wei=[],returnavg=False):
 		return [X[row]/avg for row in range(len(X))]
 	else:
 		return avg, [X[row]/avg for row in range(len(X))]
+def normto1_2darray(X,wei=[],returnavg=False):
+	sumX = 0; numX = 0
+	for xx in X:
+		for xxx in xx:
+			sumX  += xxx
+			numX +=1
+	numX += 0.0
+	avgX = sumX / numX
+	normedX = [[xxx/avgX for xxx in xx] for xx in X ]
+	if not returnavg:
+		return normedX
+	else:
+		return avgX, normedX
 def norm_power(X, deg=0.9):
                         avg = sum([x**deg for x in X])**(1.0/deg) / float(len(X))
                         return [x/avg for x in X]

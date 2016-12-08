@@ -4,7 +4,9 @@ execfile('/home/xiaodongli/software/pythonlib/stdA.py')
 
 ### Definitions
 def TriCF(ddd, ddr, drr, rrr):
-	return (ddd-3*ddr+3*drr-rrr)/rrr
+	#return (ddd-3*ddr+3*drr-rrr)/rrr
+	### to match Cris' code we remove the factor of 3
+	return (ddd-ddr+drr-rrr)/rrr
 
 
 ### Read in data
