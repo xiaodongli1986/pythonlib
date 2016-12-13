@@ -249,6 +249,8 @@ def smu__xifunname(xifunction):
 	name =  'int--s-xi_normed'
     elif xifunction ==  intxi_FractionalS:
 	name = 'int--xi'
+    elif xifunction ==  int_Numcounts:
+	name = 'int--Numcounts'
     else:
 	name = 'int--xi'
     return name
@@ -337,6 +339,40 @@ def intxi_FractionalS(DDlist, DRlist, RRlist, ismin_float, ismax_float, i_mumin,
         #print 'nowis = ', ismax+1
         sumxi += (calc_xils(dd, dr, rr) * smax_tail)
     return sumxi 
+
+# ismin_float=0.3, ismax_float=105, i_mumin=1, i_mumax=2)
+## integral of xi, allowing use of a fraction of s
+def int_Numcounts(DDlist, DRlist, RRlist, ismin_float, ismax_float, i_mumin, i_mumax):
+    sumdd = 0; sumrr = 0
+    ## boundary as integer ...
+    ismin = int(ismin_float+1.0); ismax = int(ismax_float-1.0);
+    smin_tail = ismin - ismin_float; smax_tail = ismax_float - 1.0 - ismax  ## two tails (at minimal and maximal s)
+    i_mumin = max(i_mumin,0); i_mumax = min(i_mumax, nummubin-1)
+    ismin = max(ismin,0); ismax = min(ismax, numsbin-1)
+    #print 'ismin, ismax, ismin_float, ismax_float = ',ismin,ismax,ismin_float,ismax_float,\
+    #    '; smin_tail, smax_tail=',smin_tail,smax_tail
+    if i_mumin > i_mumax:
+        return 0
+    for nowis in range(ismin, ismax+1):
+        dd = packed_count(DDlist, nowis, nowis, i_mumin, i_mumax)
+        rr = packed_count(RRlist, nowis, nowis, i_mumin, i_mumax)
+        #print 'nowis = ', nowis
+        sumdd += dd
+        sumrr += rr
+    ## considering small s tail
+    dd = packed_count(DDlist, ismin-1, ismin-1, i_mumin, i_mumax)
+    rr = packed_count(RRlist, ismin-1, ismin-1, i_mumin, i_mumax)
+    #print 'nowis = ', ismin-1
+    sumdd += (dd * smin_tail)
+    sumrr += (rr * smin_tail)
+    ## considering large s tail
+    if not (ismax+1 >= numsbin):
+        dd = packed_count(DDlist, ismax+1, ismax+1, i_mumin, i_mumax)
+        rr = packed_count(RRlist, ismax+1, ismax+1, i_mumin, i_mumax)
+        #print 'nowis = ', ismax+1
+        sumdd += (dd * smax_tail)
+        sumrr += (rr * smax_tail)
+    return sumdd - sumrr
 
 
 #intxi_FractionalS(DDlist1s[0][0][0], DRlist1s[0][0][0], RRlist1s[0][0][0], 
@@ -706,6 +742,8 @@ def filename_2pcfcovmat(nowsmin=5, nowsmax=100, nownummubin=2, nowminmucut=0.1, 
 	nowstr += '.intxi_FractionalS_normed__by_full_mu_range.minimalmuge1'
     elif xifunction == int_s_xi_normed__by_full_mu_range:
 	nowstr += '.int_s_xi_normed__by_full_mu_range'
+    elif xifunction == int_Numcounts:
+	nowstr += '.int_Numcounts'
     elif xifunction != intxi and xifunction != intxi_FractionalS:
 	print 'Error!!!! Unkonwn quantity!'
 	nowstr += '.unkown-quantity'

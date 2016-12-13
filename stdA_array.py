@@ -286,11 +286,30 @@ def normto1(X,wei=[],returnavg=False):
 		return [X[row]/avg for row in range(len(X))]
 	else:
 		return avg, [X[row]/avg for row in range(len(X))]
-def normto1_2darray(X,wei=[],returnavg=False):
+def normto1_2darray(X,Skip_element=[],wei=[],returnavg=False):
+	'''
+        Skip_element = [str(xx[0])+'_'+str(xx[1]) for xx in Skip_element]
+        sumX = 0; numX = 0
+        for row1 in range(len(X)):
+                for row2  in range(len(X[0])):
+                        nowrowstr = str(row1)+'_'+str(row2)
+                        if nowrowstr in Skip_element: continue
+                        sumX  += X[row1][row2]
+                        numX +=1
+        numX += 0.0
+        avgX = sumX / numX
+        normedX = [[xxx/avgX for xxx in xx] for xx in X ]
+        if not returnavg:
+                return normedX
+        else:
+                return avgX, normedX'''
+	Skip_element = [str(xx[0])+'_'+str(xx[1]) for xx in Skip_element]
 	sumX = 0; numX = 0
-	for xx in X:
-		for xxx in xx:
-			sumX  += xxx
+	for row1 in range(len(X)):
+		for row2  in range(len(X[0])):
+			nowrowstr = str(row1)+'_'+str(row2)
+			if nowrowstr in Skip_element: continue
+			sumX  += X[row1][row2]
 			numX +=1
 	numX += 0.0
 	avgX = sumX / numX
