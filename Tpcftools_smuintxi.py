@@ -153,8 +153,10 @@ def smu_chisq__getzref_zcomps(refibin, SixBinRedshift):
 ### Compute intxi
 
 def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__settings_std,
-                         mufmt='automatic', sfmt='%.2f', smudata=None, writetofile=False):
-    if smudata == None:  smudata = smu__loadin(smufile, smusettings)
+                         mufmt='automatic', sfmt='%.2f', smudata=None, writetofile=False, allowloaddata=True):
+    if smudata == None:  
+	#print 'load in smudata!'
+	smudata = smu__loadin(smufile, smusettings)
     DDlist, DRlist, RRlist = Xsfrom2ddata(smudata, [4,5,6])
     smu__initsmusettings(smusettings)
     muedges = np.linspace(smu__intxi__settings['mumin'], smu__intxi__settings['mumax'], smu__intxi__settings['nummubin'])
@@ -168,9 +170,8 @@ def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__
     smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings, 
                                           mufmt=mufmt, sfmt=sfmt)
     
-    callsys('mkdir -p '+separate_path_file(smu__intxi_file)[0])
-    
     if writetofile:
+     callsys('mkdir -p '+separate_path_file(smu__intxi_file)[0])
      f0 = open(smu__intxi_file, 'w')
      for intxi in intxis:
         f0.write(str(intxi)+'\n')
