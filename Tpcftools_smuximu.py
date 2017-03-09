@@ -43,8 +43,8 @@ def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, de
 	#	row3 = 9
                 smutab2[row1][row2][row3] = \
                     LinearInterpolation_2d(x1,y1,x2,y2, 
-                                   smutabstd[x1][y1][row3],smutabstd[x1][y1][row3],smutabstd[x1][y1][row3],\
-                                   smutabstd[x1][y1][row3],smax2, anglemax2)
+                                   smutabstd[x1][y1][row3],smutabstd[x1][y2][row3],smutabstd[x2][y1][row3],\
+                                   smutabstd[x2][y2][row3],smax2, anglemax2)
     return smutab2
 
 def smu_ximu_calcchisqs(
@@ -155,6 +155,7 @@ def smu_ximu_calcchisqs(
 					    zmedian = SixBinRedshift_NS[ibin]
 				          elif  catname == 'DR12v4-CMASS':
 					    zmedian = SixBinRedshift_NS[ibin+3]
+					  print 'ibin / zmedian =   ', ibin, zmedian
     				          DAstd, Hstd = DA(omstd, wstd, 0.7, zmedian), Hz(omstd, wstd, 0.7, zmedian)
     				          DAnew, Hnew = DA(om,    w,    0.7, zmedian), Hz(om,    w,    0.7, zmedian)
 					if iomw == 0 and usingmapping_for_nonstd_omw:
