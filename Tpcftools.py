@@ -127,7 +127,7 @@ def smu__loadin(smufile, smusettings, icol='', skiprows=1):
 	Tpcfrlt = [[data[smu__rowofsmu(i_s,i_mu,smusettings)] for i_mu in range(smusettings['nummubin'])] for i_s in range(smusettings['numsbin'])]
     else:
 	Tpcfrlt = [[data[smu__rowofsmu(i_s,i_mu,smusettings)][icol] for i_mu in range(smusettings['nummubin'])] for i_s in range(smusettings['numsbin'])]
-
+    #Tpcfrlt = np.asarray(Tpcfrlt)
     return Tpcfrlt
 
 def smu__contour(ax,mulist,slist,xilist,xlabel='$\\mu$',ylabel='$s$',labelfs=18,srange=(5,30),title='',tiltfs=15,levels=[], lw=2, ls='-'):
