@@ -153,19 +153,27 @@ def smu_chisq__getzref_zcomps(refibin, SixBinRedshift):
 ### Compute intxi
 
 def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__settings_std,
-                         mufmt='automatic', sfmt='%.2f', smudata=None, writetofile=False, allowloaddata=True):
+                         mufmt='automatic', sfmt='%.2f', smudata=None, writetofile=False, allowloaddata=True, rebinxi=False):
     if smudata == None:  
 	#print 'load in smudata!'
 	smudata = smu__loadin(smufile, smusettings)
-    DDlist, DRlist, RRlist = Xsfrom2ddata(smudata, [4,5,6])
+    if not rebinxi:
+    	DDlist, DRlist, RRlist = Xsfrom2ddata(smudata, [4,5,6])
     smu__initsmusettings(smusettings)
     muedges = np.linspace(smu__intxi__settings['mumin'], smu__intxi__settings['mumax'], smu__intxi__settings['nummubin'])
     i_muedges = smu__get_imuedges(muedges,smusettings);
     muedgemids = smu__get_muedgemids(i_muedges, smusettings);
-    intxis = [smu__intxi__settings['xifunction'](DDlist, DRlist, RRlist,  
+    nowsrange1 = int(smu__intxi__settings['smin']+0.5)
+    nowsrange2 = int(smu__intxi__settings['smax']+1.5)
+    if not rebinxi:
+	    intxis = [smu__intxi__settings['xifunction'](DDlist, DRlist, RRlist,  
                         smu__intxi__settings['smin'], smu__intxi__settings['smax'], 
                          i_muedges[imubin][0], i_muedges[imubin][1]) 
                           for imubin in range(len(i_muedges))]
+    else:
+	ximu = [ sum([smudata[row2][row][9] for row2 in range(nowsrange1,nowsrange2)]) for row in range(0,len(smudata[0]))]
+	intxis = array_fracbin(ximu, smu__intxi__settings['nummubin']-1, i1=smu__intxi__settings['mumin']*(smusettings['nummubin']))
+	
     
     smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings, 
                                           mufmt=mufmt, sfmt=sfmt)

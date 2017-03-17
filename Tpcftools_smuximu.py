@@ -13,7 +13,7 @@ def smu__CosmoConvert(s,mu,DA1,DA2,H1,H2):
 #DA1, H1 = DA(0.26, -1, 0.7, 0.5), Hz(0.26, -1, 0.7, 0.5); DA2, H2 = DA(0.21, -1, 0.7, 0.5), Hz(0.21, -1, 0.7, 0.5); 
 #print smu__CosmoConvert(20, 0.5, DA1,DA2,H1,H2)
 
-def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, deltamu=1.0/120.0, 
+def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, deltamu=1.0/120.0, simple_replacement=False, max_mubin=120,
                                          smin_mapping=1,smax_mapping=51):
     ''' mapping: so far only mapping the last coordinate!! '''
     smutab2 = copy.deepcopy(smutabstd)
@@ -33,19 +33,24 @@ def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, de
                 smax2, mumin2 = smid2+0.5, mumid2-deltamu*0.5
                 #print smid, mumid, smid2, mumid2, smax2, mumin2
             anglemax2 = (1 - mumin2)/deltamu
-            x1, y1 = int(smax2), int(anglemax2)
-            #if x1 <=5: x1 +=1
-            if y1 == 119: y1=y1-1
-            x2, y2 = x1 + 1, y1 + 1
-            #x3, y3 = x2 + 1, y2 + 1
-            #print smax, anglemax, smax2, anglemax2
-            for row3 in range(len(smutabstd[row1][row2])):            
-	    #if True:
-	#	row3 = 9
+	    if not simple_replacement:
+             x1, y1 = int(smax2), int(anglemax2)
+             #if x1 <=5: x1 +=1
+             if y1 == max_mubin-1: y1=y1-1
+             x2, y2 = x1 + 1, y1 + 1
+             #x3, y3 = x2 + 1, y2 + 1
+             #print smax, anglemax, smax2, anglemax2
+             for row3 in range(len(smutabstd[row1][row2])):            
+	     #if True:
+	     #	row3 = 9
                 smutab2[row1][row2][row3] = \
                     LinearInterpolation_2d(x1,y1,x2,y2, 
                                    smutabstd[x1][y1][row3],smutabstd[x1][y2][row3],smutabstd[x2][y1][row3],\
                                    smutabstd[x2][y2][row3],smax2, anglemax2)
+	    else:
+             x1, y1 = int(smax2+0.5), int(anglemax2+0.5)
+             for row3 in range(len(smutabstd[row1][row2])):            
+              smutab2[row1][row2][row3] = smutabstd[x1][y1][row3]
     return smutab2
 
 def smu_ximu_calcchisqs(
@@ -67,9 +72,13 @@ def smu_ximu_calcchisqs(
 	consider_tilt_in_chisq = False,
 	covmat_nondiag_rescale = False,
         usingmapping_for_nonstd_omw = False, basepar_for_smu_mapping = [0.26,-1],
+	rebinxi=False, # In early settings we re-bin the values of DD/DR/RR
+	polyfit_dxi = None,
+	simple_replacement=False,
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
-	omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
+	#omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
+	omwlist = [[0.31,-1.5]]+sumlist([[[om,w] for om in omlist] for w in wlist]) #DEBUG
 	#sarray = smu_smids(s1, s2)
 	#sarray = [ x**sfact for x in sarray ]
 	for mumin in mumins:
@@ -111,6 +120,12 @@ def smu_ximu_calcchisqs(
 				return covmat
 		if usingmapping_for_nonstd_omw == True:
 			nowchisqstr += '.SMU_Mapping'
+			if simple_replacement:
+				nowchisqstr += '.simple_replacement'
+		if rebinxi == True:
+			nowchisqstr += '.rebinxi'
+		if polyfit_dxi!= None:
+			nowchisqstr += '.polyfit_dxi_deg'+str(polyfit_dxi)
 
 	        ximudir = smu_ximu_covchisqdir
 		#nowfile=outputdir+'/'+baseoutputfile+'_'+nowchisqstr+'.txt'; nowf = open(nowfile,'w')
@@ -156,7 +171,7 @@ def smu_ximu_calcchisqs(
 					    zmedian = SixBinRedshift_NS[ibin]
 				          elif  catname == 'DR12v4-CMASS':
 					    zmedian = SixBinRedshift_NS[ibin+3]
-					  print 'ibin / zmedian =   ', ibin, zmedian
+					  #print 'ibin / zmedian =   ', ibin, zmedian
     				          DAstd, Hstd = DA(omstd, wstd, 0.7, zmedian), Hz(omstd, wstd, 0.7, zmedian)
     				          DAnew, Hnew = DA(om,    w,    0.7, zmedian), Hz(om,    w,    0.7, zmedian)
 					if iomw == 0 and usingmapping_for_nonstd_omw:
@@ -184,14 +199,19 @@ def smu_ximu_calcchisqs(
 						else:
 						  if not usingmapping_for_nonstd_omw:
 							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data,\
-								writetofile=False, smu__intxi__settings=smu__intxi__settings)[2]
+								writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						  else:
 							smudata = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], DAstd, DAnew, Hstd, Hnew, \
-								deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51 )         
+								deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,simple_replacement=simple_replacement )         
 							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data, \
-								writetofile=False, smudata=smudata, smu__intxi__settings=smu__intxi__settings)[2]
+							writetofile=False, smudata=smudata, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						## B. normalize the amplitude
-						xihatdata_base =   normfun(xidata_base)
+						if polyfit_dxi== None:
+						  xihatdata_base =   normfun(xidata_base)
+						else:
+						  xihatdata_base =   normfun(polyfitY(range(len(xidata_base)),xidata_base,polyfit_dxi))
+							
+						
 						xihatdata_now.append([x for x in xihatdata_base])
 						if iomw == 0:
 							xicov_base = []
@@ -201,8 +221,12 @@ def smu_ximu_calcchisqs(
 									xicov_base.append(smu__intxi_quickload(smu__intxi_file))
 								else:
 									xicov_base.append(smu__intxi_calcwrite(smufile, smusettings_mock,\
-										writetofile=False, smu__intxi__settings=smu__intxi__settings_orig)[2])
+								writetofile=False, smu__intxi__settings=smu__intxi__settings_orig,rebinxi=rebinxi)[2])
 								xihatcov_base  = [ normfun(X) for X in xicov_base]
+								#if polyfit_dxi== None:
+								# xihatcov_base  = [ normfun(X) for X in xicov_base]
+								#else:
+								# xihatcov_base  = [ normfun(polyfitY(range(len(X)),X,polyfit_dxi)) for X in xicov_base]
 							covmats.append([])
 							xisys_base = []
 							if not use_omw_as_sys:
@@ -213,14 +237,14 @@ def smu_ximu_calcchisqs(
 										xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 									else:
 										xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_mock,\
-										  writetofile=False, smu__intxi__settings=smu__intxi__settings_orig)[2])
+										  writetofile=False, smu__intxi__settings=smu__intxi__settings_orig,rebinxi=rebinxi)[2])
 							else:
 								omsys, wsys = use_omw_as_sys
 								smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
                                                 		if isfile(smu__intxi_file):
 		                                                        xisys_base.append(smu__intxi_quickload(smu__intxi_file))
 		                                                else:
-                		                                        xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings)[2])
+                		                                        xisys_base.append(smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2])
 							xisys_list.append(get_avg_array([normfun(X) for X in xisys_base]))
 							dxisys_list.append([])
 					else:
@@ -232,16 +256,20 @@ def smu_ximu_calcchisqs(
 							xidata = smu__intxi_quickload(smu__intxi_file)
 						else:
                                                   if not usingmapping_for_nonstd_omw:
-                                                        xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings)[2]
+                                                        xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
                                                   else:
                                                         smudata2 = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], DAstd, DAnew, Hstd, Hnew, \
-                                                                deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51 )
+                                                                deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,simple_replacement=simple_replacement )
 							#print  'smutabstd_list[i_redshiftbin][10][10][9], smudata[10][10][9] = ', smutabstd_list[i_redshiftbin][10][10][9], smudata[10][10][9]
                                                         xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, \
-                                                                smudata=smudata2, smu__intxi__settings=smu__intxi__settings)[2]
-							#print 'om, w, i_redshiftbin, xidata = ', om, w, i_redshiftbin, xidata
+                                                                smudata=smudata2, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
+						#print 'om, w, i_redshiftbin, normto1(xidata) = ', om, w, i_redshiftbin, normto1(xidata) #DEBUG
 						## B. normalize the amplitude
-						xihatdata =   normfun(xidata)
+						#xihatdata =   normfun(xidata)
+						if polyfit_dxi== None:
+						 xihatdata =   normfun(xidata)
+						else:
+						 xihatdata =   normfun(polyfitY(range(len(xidata)),xidata,polyfit_dxi))
 						xihatdata_now.append([x for x in xihatdata])
 						dxidata = get_diffarray(xihatdata_base, xihatdata)
 
@@ -256,14 +284,14 @@ def smu_ximu_calcchisqs(
 									if isfile(smu__intxi_file):
 										xisys.append(smu__intxi_quickload(smu__intxi_file))
 									else:
-										xisys.append(smu__intxi_calcwrite(smufile, smusettings_mock, writetofile=False, smu__intxi__settings=smu__intxi__settings_orig)[2])
+										xisys.append(smu__intxi_calcwrite(smufile, smusettings_mock, writetofile=False, smu__intxi__settings=smu__intxi__settings_orig,rebinxi=rebinxi)[2])
 	                                                else:
         	                                                 omsys, wsys = use_omw_as_sys
                 	                                         smufile = Tpcfrltfilename(cosmoconvertedfilename(binsplittedfilename(datafile(catname), ibin+1, totbin),omsys,wsys), mubins=nummubins,nbins=Smax,rmax=Smax ); smu__intxi_file = smu__intxi_filename(smufile, smu__intxi__settings=smu__intxi__settings)
                         	                                 if isfile(smu__intxi_file):
                                 	                                xisys.append(smu__intxi_quickload(smu__intxi_file))
                                         	                 else:
-                                                	                xisys.append(smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings)[2])
+                                                	                xisys.append(smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2])
 
 							polyfitdeg = polyfitdeg
 							xihatsys_base  = [ normfun(X) for X in xisys_base]
@@ -282,10 +310,14 @@ def smu_ximu_calcchisqs(
 								if isfile(smu__intxi_file):
                                                                 	xicov.append(smu__intxi_quickload(smu__intxi_file))
 								else:
-									xicov.append(smu__intxi_calcwrite(smufile, smusettings_mock, writetofile=False, smu__intxi__settings=smu__intxi__settings_orig)[2])
+									xicov.append(smu__intxi_calcwrite(smufile, smusettings_mock, writetofile=False, smu__intxi__settings=smu__intxi__settings_orig,rebinxi=rebinxi)[2])
 
                                                                 xihatcov  = [ normfun(X) for X in xicov]
-		
+								#if polyfit_dxi== None:
+                                                                # xihatcov  = [ normfun(X) for X in xicov]
+								#else:
+                                                                # xihatcov  = [ normfun(polyfitY(range(len(X)),X,polyfit_dxi)) for X in xicov]
+							X0=range(len(xihatcov[0]))
 							dxicov  = [ get_diffarray(xihatcov_base[row], xihatcov[row]) \
 								for row in range(len(xihatcov))]
 							if covmat_nondiag_rescale == False:
@@ -296,8 +328,9 @@ def smu_ximu_calcchisqs(
 						covmat = covmats[i_redshiftbin]
 						#if iomw == 0: print np.mat(covmat).I # BOSSLi
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
-						#chisq_syscor, like   = chisq_like_cov_xbar(get_diffarray(dxidata,dxisys_list[i_redshiftbin]), covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(XplusY(dxidata,dxisys_list[i_redshiftbin],b=-1), covmat)
+						 
+						print nowomwstr, '/ redshiftbin=', i_redshiftbin, '/ dxi = ', dxidata, chisq_nosyscor, chisq_syscor
 						if consider_tilt_in_chisq:
 							 xisys_avg = get_avg_array(xisys_list)
 							 X = range(len(xisys_avg))
