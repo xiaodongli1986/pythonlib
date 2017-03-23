@@ -53,6 +53,163 @@ def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, de
               smutab2[row1][row2][row3] = smutabstd[x1][y1][row3]
     return smutab2
 
+def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, Hstd, Hnew, 
+        deltas1=0.2, deltamu1=1.0/600.0, deltas2=1.0, deltamu2=1.0/120.0, smin_mapping=1,smax_mapping=51, 
+        compute_rows=[4,5,6,9], save_counts_row=0, div_counts_rows=[], method='simple_bin'):
+        #compute_rows=[4,5,6,9], save_counts_row=0, div_counts_rows=[9]):
+    ''' method can be simple_bin or divided_pixel'''
+    nummu1 = int(1.0/deltamu1 + 0.5)
+    sbound1, mubound1 = smu__CosmoConvert(smax_mapping,0,DAnew,DAstd,Hnew,Hstd)
+    sbound2, mubound2 = smu__CosmoConvert(smax_mapping,1,DAnew,DAstd,Hnew,Hstd)
+    sbound = max(sbound1, sbound2); nums1 = int(sbound / deltas1 + 0.5)
+    
+    sbound1, mubound1 = smu__CosmoConvert(smin_mapping,0,DAnew,DAstd,Hnew,Hstd)
+    sbound2, mubound2 = smu__CosmoConvert(smin_mapping,1,DAnew,DAstd,Hnew,Hstd)
+    sbound = min(sbound1, sbound2); mins1 = int(sbound / deltas1)
+    
+    nums2, nummu2 = int(smax_mapping / deltas2 + 0.5), int(1.0/deltamu2 + 0.5)
+    numrow3=len(smutabstd[0][0])
+    smutab2 = [[[0 for row3 in range(numrow3+1)] for row2 in range(nummu2)] for row1 in range(nums2)]
+    
+    #print mins1, nums1, nummu1, nums2, nummu2
+    if method == 'divided_pixel':
+        smutab1_centers = [[0 for row2 in range(nummu1)] for row1 in range(nums1)]
+    for is1 in range(mins1, nums1):
+        for iangle1 in range(nummu1):
+            scenter, anglecenter = (is1+0.5)*deltas1, (iangle1+0.5)*deltamu1
+            mucenter = 1.0 - anglecenter
+            scenter2, mucenter2 = smu__CosmoConvert(scenter,mucenter,DAstd,DAnew,Hstd,Hnew,)
+            anglecenter2 = 1.0 - mucenter2
+            is2 = int(scenter2  / deltas2  )
+            iangle2 = int(anglecenter2 / deltamu2)
+            if method == 'simple_bin':
+                if is2 < nums2 and iangle2 < nummu2:
+                    for row3 in compute_rows:
+                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]
+                    if save_counts_row != None:
+                        smutab2[is2][iangle2][save_counts_row] += 1
+            elif method == 'divided_pixel':
+                smutab1_centers[is1][iangle1] = [scenter2, anglecenter2, is2, iangle2]
+                
+    if method == 'divided_pixel':
+        for is1 in range(mins1, nums1):
+            for iangle1 in range(nummu1):
+                scenter2, anglecenter2, is2, iangle2 = smutab1_centers[is1][iangle1]
+                if not (is2 < nums2 and iangle2 < nummu2):
+                    continue
+                    
+                ### firstly, check boundary:
+                sboundflag, muboundflag = False, False
+                for is1_nearby in [max(is1-1,mins1), min(is1+1,nums1-1)]:
+                    is2_b, iangle2_b = smutab1_centers[is1_nearby][iangle1][2], smutab1_centers[is1_nearby][iangle1][3]
+                    if is2_b != is2:
+                        sboundflag=True; is1_bound = is1_nearby; is2_bound = is2_b; 
+                        scenter2_bound = smutab1_centers[is1_nearby][iangle1][1]
+                for iangle1_nearby in [max(iangle1-1,0), min(iangle1+1,nummu1-1)]:
+                    is2_b, iangle2_b = smutab1_centers[is1][iangle1_nearby][2], smutab1_centers[is1][iangle1_nearby][3]
+                    if iangle2_b != iangle2:
+                        muboundflag=True; iangle1_bound = iangle1_nearby; iangle2_bound = iangle2_b
+                        anglecenter2_bound = smutab1_centers[is1][iangle1_nearby][2]
+                
+                ### Then, treat them case by case...
+                ## s, mu are all not near the boundary of tab 2
+                if ((not sboundflag)and(not muboundflag)):
+                    for row3 in compute_rows:
+                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]
+                    if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += 1
+                            
+                ## s is near the boundary of tab2
+                if sboundflag and (not muboundflag):
+                    s = (is2 + is2_bound) * 0.5 * deltas2
+                    if False:
+                        rat = (s-scenter2) / (scenter2_bound-scenter2)
+                    else:
+                        scenter3=(scenter2+scenter2_bound) * 0.5
+                        ds = scenter3-scenter2
+                        d1 = s-scenter2+ds
+                        rat = d1 / (2*ds)
+                        rat = min(rat, 1)
+                        
+                    rat_bound = 1-rat
+                    for row3 in compute_rows:
+                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat
+                    if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat
+                    if is2_bound < nums2:
+                      for row3 in compute_rows:
+                        smutab2[is2_bound][iangle2][row3] += smutab1[is1][iangle1][row3]*rat_bound
+                      if save_counts_row != None: smutab2[is2_bound][iangle2][save_counts_row] += rat_bound
+                            
+                ## mu is near the boundary of tab2
+                if muboundflag and (not sboundflag):
+                    angle = (iangle2 + iangle2_bound) * 0.5 * deltamu2
+                    if False:
+                        rat = (angle-anglecenter2) / (anglecenter2_bound-anglecenter2)
+                    else:
+                        anglecenter3=(anglecenter2+anglecenter2_bound) * 0.5
+                        dangle = anglecenter3-anglecenter2
+                        d1 = angle-anglecenter2+dangle
+                        rat = d1 / (2*dangle)
+                        rat = min(rat, 1)
+                        
+                    rat_bound = 1-rat
+                    for row3 in compute_rows:
+                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat
+                    if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat
+                    if iangle2_bound < nummu2:
+                      for row3 in compute_rows:
+                        smutab2[is2][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat_bound
+                      if save_counts_row != None: smutab2[is2][iangle2_bound][save_counts_row] += rat_bound
+                
+                ## both s, mu are near the boundy...
+                if muboundflag and sboundflag:
+                    s = (is2 + is2_bound) * 0.5 * deltas2
+                    angle = (iangle2 + iangle2_bound) * 0.5 * deltamu2
+                    if False:
+                        rats = (s-scenter2) / (scenter2_bound-scenter2)
+                        ratangle = (angle-anglecenter2) / (anglecenter2_bound-anglecenter2)
+                    else:
+                        scenter3=(scenter2+scenter2_bound) * 0.5
+                        ds = scenter3-scenter2
+                        d1 = s-scenter2+ds
+                        rats = d1 / (2*ds)
+                        rats = min(rats, 1)
+                        
+                        anglecenter3=(anglecenter2+anglecenter2_bound) * 0.5
+                        dangle = anglecenter3-anglecenter2
+                        d1 = angle-anglecenter2+dangle
+                        ratangle = d1 / (2*dangle)
+                        ratangle = min(ratangle, 1)
+                    # original pixel
+                    rat1 = rats*ratangle
+                    for row3 in compute_rows:
+                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat1
+                    if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat1
+                    # diff s
+                    rat2 = (1-rats)*ratangle
+                    if is2_bound < nums2:
+                      for row3 in compute_rows:
+                        smutab2[is2_bound][iangle2][row3] += smutab1[is1][iangle1][row3]*rat2
+                      if save_counts_row != None: smutab2[is2_bound][iangle2][save_counts_row] += rat2
+                    # diff angle
+                    rat3 = rats*(1-ratangle)
+                    if iangle2_bound < nummu2:
+                      for row3 in compute_rows:
+                        smutab2[is2][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat3
+                      if save_counts_row != None: smutab2[is2][iangle2_bound][save_counts_row] += rat3
+                    # diff s and diff angle
+                    rat4 = (1-rats)*(1-ratangle)
+                    if iangle2_bound < nummu2 and is2_bound < nums2:
+                      for row3 in compute_rows:
+                        smutab2[is2_bound][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat4
+                      if save_counts_row != None: smutab2[is2_bound][iangle2_bound][save_counts_row] += rat4
+                            
+    if div_counts_rows != [] and save_counts_row != None:
+        for is2 in range(nums2):
+            for iangle2 in range(nummu2):
+                for row3 in div_counts_rows:
+                    smutab2[is2][iangle2][row3] /= smutab2[is2][iangle2][save_counts_row]
+    return smutab2
+
 def smu_ximu_calcchisqs(
 	omlist, wlist,### 1. List of omegam, w
 	baseoutputfile, ### 2. Basic name of outputfile
