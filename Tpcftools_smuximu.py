@@ -286,7 +286,7 @@ def smu_ximu_calcchisqs(
 					'nummubin': DM_nummubin,'numsbin': DM_nbins,'slist': [], 'smax': DM_smax,'smin': 0.0};
 				smu__initsmusettings(DM_smusettings)
 				smu__initsmusettings(smusettings_data)
-				print DM_smusettings, smusettings_data
+				#print DM_smusettings, smusettings_data
 		if rebinxi == True:
 			nowchisqstr += '.rebinxi'
 		if polyfit_dxi!= None:
