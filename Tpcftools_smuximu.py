@@ -73,7 +73,7 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
     
     #print mins1, nums1, nummu1, nums2, nummu2
     if method == 'divided_pixel':
-        smutab1_centers = [[0 for row2 in range(nummu1)] for row1 in range(nums1)]
+        smutabstd_centers = [[0 for row2 in range(nummu1)] for row1 in range(nums1)]
     for is1 in range(mins1, nums1):
         for iangle1 in range(nummu1):
             scenter, anglecenter = (is1+0.5)*deltas1, (iangle1+0.5)*deltamu1
@@ -85,37 +85,37 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
             if method == 'simple_bin':
                 if is2 < nums2 and iangle2 < nummu2:
                     for row3 in compute_rows:
-                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]
+                        smutab2[is2][iangle2][row3] += smutabstd[is1][iangle1][row3]
                     if save_counts_row != None:
                         smutab2[is2][iangle2][save_counts_row] += 1
             elif method == 'divided_pixel':
-                smutab1_centers[is1][iangle1] = [scenter2, anglecenter2, is2, iangle2]
+                smutabstd_centers[is1][iangle1] = [scenter2, anglecenter2, is2, iangle2]
                 
     if method == 'divided_pixel':
         for is1 in range(mins1, nums1):
             for iangle1 in range(nummu1):
-                scenter2, anglecenter2, is2, iangle2 = smutab1_centers[is1][iangle1]
+                scenter2, anglecenter2, is2, iangle2 = smutabstd_centers[is1][iangle1]
                 if not (is2 < nums2 and iangle2 < nummu2):
                     continue
                     
                 ### firstly, check boundary:
                 sboundflag, muboundflag = False, False
                 for is1_nearby in [max(is1-1,mins1), min(is1+1,nums1-1)]:
-                    is2_b, iangle2_b = smutab1_centers[is1_nearby][iangle1][2], smutab1_centers[is1_nearby][iangle1][3]
+                    is2_b, iangle2_b = smutabstd_centers[is1_nearby][iangle1][2], smutabstd_centers[is1_nearby][iangle1][3]
                     if is2_b != is2:
                         sboundflag=True; is1_bound = is1_nearby; is2_bound = is2_b; 
-                        scenter2_bound = smutab1_centers[is1_nearby][iangle1][1]
+                        scenter2_bound = smutabstd_centers[is1_nearby][iangle1][1]
                 for iangle1_nearby in [max(iangle1-1,0), min(iangle1+1,nummu1-1)]:
-                    is2_b, iangle2_b = smutab1_centers[is1][iangle1_nearby][2], smutab1_centers[is1][iangle1_nearby][3]
+                    is2_b, iangle2_b = smutabstd_centers[is1][iangle1_nearby][2], smutabstd_centers[is1][iangle1_nearby][3]
                     if iangle2_b != iangle2:
                         muboundflag=True; iangle1_bound = iangle1_nearby; iangle2_bound = iangle2_b
-                        anglecenter2_bound = smutab1_centers[is1][iangle1_nearby][2]
+                        anglecenter2_bound = smutabstd_centers[is1][iangle1_nearby][2]
                 
                 ### Then, treat them case by case...
                 ## s, mu are all not near the boundary of tab 2
                 if ((not sboundflag)and(not muboundflag)):
                     for row3 in compute_rows:
-                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]
+                        smutab2[is2][iangle2][row3] += smutabstd[is1][iangle1][row3]
                     if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += 1
                             
                 ## s is near the boundary of tab2
@@ -132,11 +132,11 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
                         
                     rat_bound = 1-rat
                     for row3 in compute_rows:
-                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat
+                        smutab2[is2][iangle2][row3] += smutabstd[is1][iangle1][row3]*rat
                     if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat
                     if is2_bound < nums2:
                       for row3 in compute_rows:
-                        smutab2[is2_bound][iangle2][row3] += smutab1[is1][iangle1][row3]*rat_bound
+                        smutab2[is2_bound][iangle2][row3] += smutabstd[is1][iangle1][row3]*rat_bound
                       if save_counts_row != None: smutab2[is2_bound][iangle2][save_counts_row] += rat_bound
                             
                 ## mu is near the boundary of tab2
@@ -153,11 +153,11 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
                         
                     rat_bound = 1-rat
                     for row3 in compute_rows:
-                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat
+                        smutab2[is2][iangle2][row3] += smutabstd[is1][iangle1][row3]*rat
                     if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat
                     if iangle2_bound < nummu2:
                       for row3 in compute_rows:
-                        smutab2[is2][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat_bound
+                        smutab2[is2][iangle2_bound][row3] += smutabstd[is1][iangle1][row3]*rat_bound
                       if save_counts_row != None: smutab2[is2][iangle2_bound][save_counts_row] += rat_bound
                 
                 ## both s, mu are near the boundy...
@@ -182,25 +182,25 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
                     # original pixel
                     rat1 = rats*ratangle
                     for row3 in compute_rows:
-                        smutab2[is2][iangle2][row3] += smutab1[is1][iangle1][row3]*rat1
+                        smutab2[is2][iangle2][row3] += smutabstd[is1][iangle1][row3]*rat1
                     if save_counts_row != None: smutab2[is2][iangle2][save_counts_row] += rat1
                     # diff s
                     rat2 = (1-rats)*ratangle
                     if is2_bound < nums2:
                       for row3 in compute_rows:
-                        smutab2[is2_bound][iangle2][row3] += smutab1[is1][iangle1][row3]*rat2
+                        smutab2[is2_bound][iangle2][row3] += smutabstd[is1][iangle1][row3]*rat2
                       if save_counts_row != None: smutab2[is2_bound][iangle2][save_counts_row] += rat2
                     # diff angle
                     rat3 = rats*(1-ratangle)
                     if iangle2_bound < nummu2:
                       for row3 in compute_rows:
-                        smutab2[is2][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat3
+                        smutab2[is2][iangle2_bound][row3] += smutabstd[is1][iangle1][row3]*rat3
                       if save_counts_row != None: smutab2[is2][iangle2_bound][save_counts_row] += rat3
                     # diff s and diff angle
                     rat4 = (1-rats)*(1-ratangle)
                     if iangle2_bound < nummu2 and is2_bound < nums2:
                       for row3 in compute_rows:
-                        smutab2[is2_bound][iangle2_bound][row3] += smutab1[is1][iangle1][row3]*rat4
+                        smutab2[is2_bound][iangle2_bound][row3] += smutabstd[is1][iangle1][row3]*rat4
                       if save_counts_row != None: smutab2[is2_bound][iangle2_bound][save_counts_row] += rat4
                             
     if div_counts_rows != [] and save_counts_row != None:
@@ -232,7 +232,7 @@ def smu_ximu_calcchisqs(
 	rebinxi=False, # In early settings we re-bin the values of DD/DR/RR
 	polyfit_dxi = None,
 	simple_replacement=False,
-	use_DenseMapping=False, DM_nbins=750, DM_mubins=600, DM_smax=150, method2str='divided_pixel',
+	use_DenseMapping=False, DM_nbins=750, DM_nummubin=600, DM_smax=150, method2str='divided_pixel',
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
 	#omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
@@ -283,8 +283,10 @@ def smu_ximu_calcchisqs(
 			if use_DenseMapping: 
 				nowchisqstr += ('.DenseMapping.'+method2str)
 				DM_smusettings = {'deltamu': 0,'deltas': 0,'mulist': [],'mumax': 1.0,'mumin': 0.0,\
-					'nummubin': DM_nummubins,'numsbin': DM_nbins,'slist': [], 'smax': DM_smax,'smin': 0.0};
+					'nummubin': DM_nummubin,'numsbin': DM_nbins,'slist': [], 'smax': DM_smax,'smin': 0.0};
 				smu__initsmusettings(DM_smusettings)
+				smu__initsmusettings(smusettings_data)
+				print DM_smusettings, smusettings_data
 		if rebinxi == True:
 			nowchisqstr += '.rebinxi'
 		if polyfit_dxi!= None:
@@ -346,7 +348,7 @@ def smu_ximu_calcchisqs(
 						else:
 							smufile = Tpcfrltfilename(cosmoconvertedfilename(\
 	 						 	binsplittedfilename(datafile(catname), ibin+1, totbin),omstd,wstd), \
-							 	mubins=DM_nummubins,nbins=DM_nbins,rmax=DM_smax );
+							 	mubins=DM_nummubin,nbins=DM_nbins,rmax=DM_smax );
 							smutabstd_list.append(smu__loadin(smufile,DM_smusettings ))
 							
 						#print 'smax of the smutabstd_list: ', len(smu__loadin(smufile,smusettings_data ))
@@ -379,7 +381,7 @@ def smu_ximu_calcchisqs(
 							writetofile=False, smudata=smudata, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						  else:
 							smudata = mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd_list[i_redshiftbin], \
-								DAstd, DAnew, Hstd, Hnew, \ 
+								DAstd, DAnew, Hstd, Hnew, \
 								method=method2str,\
 								smin_mapping=1, smax_mapping=51,\
                     						deltas1=DM_smusettings['deltas'],  deltamu1=DM_smusettings['deltamu'],\
@@ -448,7 +450,7 @@ def smu_ximu_calcchisqs(
                                                                 smudata=smudata2, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						  else: 
                                                         smudata2 = mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd_list[i_redshiftbin], \
-								DAstd, DAnew, Hstd, Hnew, \ 
+								DAstd, DAnew, Hstd, Hnew, \
 								method=method2str,\
                                                                 smin_mapping=1, smax_mapping=51,\
                     						deltas1=DM_smusettings['deltas'],  deltamu1=DM_smusettings['deltamu'],\
