@@ -232,6 +232,7 @@ def smu_ximu_calcchisqs(
 	rebinxi=False, # In early settings we re-bin the values of DD/DR/RR
 	polyfit_dxi = None,
 	simple_replacement=False,
+	use_DenseMapping=False, DM_nbins=750, DM_mubins=600, DM_smax=150, method2str='divided_pixel',
 		):
 	ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
 	#omwlist = sumlist([[[om,w] for om in omlist] for w in wlist])
@@ -279,6 +280,11 @@ def smu_ximu_calcchisqs(
 			nowchisqstr += '.SMU_Mapping'
 			if simple_replacement:
 				nowchisqstr += '.simple_replacement'
+			if use_DenseMapping: 
+				nowchisqstr += ('.DenseMapping.'+method2str)
+				DM_smusettings = {'deltamu': 0,'deltas': 0,'mulist': [],'mumax': 1.0,'mumin': 0.0,\
+					'nummubin': DM_nummubins,'numsbin': DM_nbins,'slist': [], 'smax': DM_smax,'smin': 0.0};
+				smu__initsmusettings(DM_smusettings)
 		if rebinxi == True:
 			nowchisqstr += '.rebinxi'
 		if polyfit_dxi!= None:
@@ -332,10 +338,17 @@ def smu_ximu_calcchisqs(
     				          DAstd, Hstd = DA(omstd, wstd, 0.7, zmedian), Hz(omstd, wstd, 0.7, zmedian)
     				          DAnew, Hnew = DA(om,    w,    0.7, zmedian), Hz(om,    w,    0.7, zmedian)
 					if iomw == 0 and usingmapping_for_nonstd_omw:
-						smufile = Tpcfrltfilename(cosmoconvertedfilename(\
-							binsplittedfilename(datafile(catname), ibin+1, totbin),omstd,wstd), \
-							mubins=nummubins,nbins=Smax,rmax=Smax );
-						smutabstd_list.append(smu__loadin(smufile,smusettings_data ))
+						if not use_DenseMapping:
+							smufile = Tpcfrltfilename(cosmoconvertedfilename(\
+	 						 	binsplittedfilename(datafile(catname), ibin+1, totbin),omstd,wstd), \
+							 	mubins=nummubins,nbins=Smax,rmax=Smax );
+							smutabstd_list.append(smu__loadin(smufile,smusettings_data ))
+						else:
+							smufile = Tpcfrltfilename(cosmoconvertedfilename(\
+	 						 	binsplittedfilename(datafile(catname), ibin+1, totbin),omstd,wstd), \
+							 	mubins=DM_nummubins,nbins=DM_nbins,rmax=DM_smax );
+							smutabstd_list.append(smu__loadin(smufile,DM_smusettings ))
+							
 						#print 'smax of the smutabstd_list: ', len(smu__loadin(smufile,smusettings_data ))
 						#print smusettings_data
 					if cosmo_rescaled_s != False:
@@ -357,9 +370,20 @@ def smu_ximu_calcchisqs(
 						  if not usingmapping_for_nonstd_omw:
 							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data,\
 								writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
+						  elif not use_DenseMapping:
+							smudata = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], \
+								DAstd, DAnew, Hstd, Hnew, \
+								deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,\
+								simple_replacement=simple_replacement )         
+							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data, \
+							writetofile=False, smudata=smudata, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						  else:
-							smudata = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], DAstd, DAnew, Hstd, Hnew, \
-								deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,simple_replacement=simple_replacement )         
+							smudata = mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd_list[i_redshiftbin], \
+								DAstd, DAnew, Hstd, Hnew, \ 
+								method=method2str,\
+								smin_mapping=1, smax_mapping=51,\
+                    						deltas1=DM_smusettings['deltas'],  deltamu1=DM_smusettings['deltamu'],\
+					                    	deltas2=smusettings_data['deltas'],deltamu2=smusettings_data['deltamu'])
 							xidata_base = smu__intxi_calcwrite(smufile, smusettings_data, \
 							writetofile=False, smudata=smudata, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						## B. normalize the amplitude
@@ -414,10 +438,21 @@ def smu_ximu_calcchisqs(
 						else:
                                                   if not usingmapping_for_nonstd_omw:
                                                         xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
-                                                  else:
-                                                        smudata2 = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], DAstd, DAnew, Hstd, Hnew, \
-                                                                deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,simple_replacement=simple_replacement )
+                                                  elif not use_DenseMapping:
+                                                        smudata2 = mapping_smudata_to_another_cosmology(smutabstd_list[i_redshiftbin], \
+								DAstd, DAnew, Hstd, Hnew, \
+                                                                deltamu=1.0/120.0, smin_mapping=1, smax_mapping=51,\
+								simple_replacement=simple_replacement )
 							#print  'smutabstd_list[i_redshiftbin][10][10][9], smudata[10][10][9] = ', smutabstd_list[i_redshiftbin][10][10][9], smudata[10][10][9]
+                                                        xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, \
+                                                                smudata=smudata2, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
+						  else: 
+                                                        smudata2 = mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd_list[i_redshiftbin], \
+								DAstd, DAnew, Hstd, Hnew, \ 
+								method=method2str,\
+                                                                smin_mapping=1, smax_mapping=51,\
+                    						deltas1=DM_smusettings['deltas'],  deltamu1=DM_smusettings['deltamu'],\
+					                    	deltas2=smusettings_data['deltas'],deltamu2=smusettings_data['deltamu'])
                                                         xidata = smu__intxi_calcwrite(smufile, smusettings_data, writetofile=False, \
                                                                 smudata=smudata2, smu__intxi__settings=smu__intxi__settings,rebinxi=rebinxi)[2]
 						#print 'om, w, i_redshiftbin, normto1(xidata) = ', om, w, i_redshiftbin, normto1(xidata) #DEBUG
