@@ -524,7 +524,7 @@ def smu_ximu_calcchisqs(
 						chisq_nosyscor, like = chisq_like_cov_xbar(dxidata, covmat)
 						chisq_syscor, like   = chisq_like_cov_xbar(XplusY(dxidata,dxisys_list[i_redshiftbin],b=-1), covmat)
 						 
-						print nowomwstr, '/ redshiftbin=', i_redshiftbin, '/ dxi = ', dxidata, chisq_nosyscor, chisq_syscor
+						#print nowomwstr, '/ redshiftbin=', i_redshiftbin, '/ dxi = ', dxidata, chisq_nosyscor, chisq_syscor
 						if consider_tilt_in_chisq:
 							 xisys_avg = get_avg_array(xisys_list)
 							 X = range(len(xisys_avg))
