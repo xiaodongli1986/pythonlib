@@ -11,7 +11,7 @@ def smu_ximu_calcchisqs2(
 	cov_catname2='HR3', cov_RSDstr = 'noRSD', cov_nummock=72, ### 5. settings for covmat and systematic
 	xifunction = intxi_FractionalS,
 	sys_catname2= 'J08', sys_RSDstr ='RSD', sys_catnamesuffix = '', syscor_imocks = range(4), polyfitdeg=3,
-	make_plot=True, showfig=False, savefig=True, 
+	make_plot=False, showfig=False, savefig=True, 
 	totbin = 3, delta_time = 100, nummubins = 120, 	normfun=norm_OneSkip, ### Other miscellous
 	outputdir = '/home/xiaodongli/software/', suffix = '',
         use_omw_as_sys = False,
