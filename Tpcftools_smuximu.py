@@ -573,3 +573,4 @@ def smu_ximu_calcchisqs(
 				print '   Figure saved: ', figname
 				plt.savefig(figname, fmt='png')
 			if showfig: plt.show()
+

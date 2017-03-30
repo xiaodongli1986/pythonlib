@@ -1148,5 +1148,6 @@ def smu_xis_loaddatarlt(xis_data_file, totbin =3):
 
 execfile(pythonlibPATH+'/Tpcftools_smuxis.py')
 execfile(pythonlibPATH+'/Tpcftools_smuximu.py')
+execfile(pythonlibPATH+'/Tpcftools_smuximu_calcximus.py')
 execfile(pythonlibPATH+'/Tpcftools_ChisqContour.py')
 
