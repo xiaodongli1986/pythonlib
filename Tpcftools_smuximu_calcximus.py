@@ -372,7 +372,7 @@ def smu_ximu_calcchisqs2(
                                                 covmat = [[covmats[row1][row2][i_redshiftbin] for row2 in range(len(mumins))] for row1 in range(len(NumMubins))]
                                                 #if iomw == 0: print np.mat(covmat).I # BOSSLi
                                                 chisq_nosyscor = [[ chisq_like_cov_xbar(dxidata[row1][row2], covmat[row1][row2])[0] for row2 in range(len(mumins))] for row1 in range(len(NumMubins))]
-                                                chisq_syscor   = [[ chisq_like_cov_xbar(XplusY(dxidata[row1][row2],dxisys_list[row1][row2][i_redshiftbin],b=-1), covmat[row1][row2]) for row2 in range(len(mumins))] for row1 in range(len(NumMubins))]
+                                                chisq_syscor   = [[ chisq_like_cov_xbar(XplusY(dxidata[row1][row2],dxisys_list[row1][row2][i_redshiftbin],b=-1), covmat[row1][row2])[0] for row2 in range(len(mumins))] for row1 in range(len(NumMubins))]
 
                                                 #print nowomwstr, '/ redshiftbin=', i_redshiftbin, '/ dxi = ', dxidata, chisq_nosyscor, chisq_syscor
 						for row2 in range(len(mumins)):
