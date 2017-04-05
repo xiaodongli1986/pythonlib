@@ -1,7 +1,6 @@
 #!/home/xiaodongli/software/anaconda/bin/python
 # Filename: stdA.py 
 
-
 import commands
 import matplotlib.pyplot as plt
 import numpy as np
