@@ -14,6 +14,9 @@ def print_2dmat(X, fmt='%.5f', div = ' '):
 # Transpose 2d array
 def transpose(A):
     return [[A[i][j] for i in range(len(A))] for j in range(len(A[0]))]
+# Reverse 1d array
+def reverse_1darray(A):
+    return [A[i] for i in range(len(A)-1,-1,-1)]
 
 # Some manipulation
 def XmultY(X, Y, a=1,b=1,c=1):
