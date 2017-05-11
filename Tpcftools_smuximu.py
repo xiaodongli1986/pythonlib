@@ -681,6 +681,7 @@ def smu_ximu_calcchisqs(
 								for row in range(len(xihatcov))]
 							if covmat_nondiag_rescale == False:
 								covmats.append(get_covmat(transpose(dxicov)))
+								#np.savetxt('covmat'+str(i_redshiftbin+1),get_covmat(transpose(dxicov))) ! covmat output for debug
 							else:
 								covmats.append(covmat_adjust(get_covmat(transpose(dxicov))))
 							#print '\n\n ibin, covmat = ', ibin, get_covmat(transpose(dxicov))

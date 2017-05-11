@@ -27,6 +27,25 @@ def TriCFeq_readin(outfile, nmu=12, nbins=40, printinfo=False):
  nowf.close()
  return data
 
+def TriCFall_readin(outfile, nmu=12, nbins=40, printinfo=False):
+ data = [[[[[ 0 for imu2 in range(nmu)] for imu1 in range(nmu)] for ir1 in range(nbins)] for ir2 in range(nbins)] for ir3 in range(nbins)]
+ nowf = open(outfile, 'r')
+ numline = 0
+ for ir1 in range(nbins):
+   for ir2 in range(nbins):
+     for ir3 in range(nbins):
+        for imu1 in range(nmu):
+                for imu2 in range(nmu):
+                        nowstrs = nowf.readline().split()
+                        ddd, ddr, drr, rrr, zeta1, zeta2 = [float(xx) for xx in nowstrs[10:16]]
+                        #print ir, imu1, imu2
+                        data[ir1][ir2][ir3][imu1][imu2] = [ddd,ddr,drr,rrr, zeta1, zeta2]
+                        #print data[ir][imu1][imu2]
+                        numline += 1
+ if printinfo: print 'TriCFall_readin: Finishing read in ', numline, 'lines'
+ nowf.close()
+ return data
+
 def TriCFeq_plot_funr(outfile, savefig=True, figname = None):
  data = TriCFeq_readin(outfile)
 
