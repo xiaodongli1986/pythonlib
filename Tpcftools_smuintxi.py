@@ -165,7 +165,11 @@ def smu__intxi_calcwrite(smufile, smusettings, smu__intxi__settings=smu__intxi__
     muedgemids = smu__get_muedgemids(i_muedges, smusettings);
     nowsrange1 = int(smu__intxi__settings['smin']+0.5)
     nowsrange2 = int(smu__intxi__settings['smax']+1.5)
+    #print 'muedges=',muedges #TMPTEST
+    #print nowsrange1, nowsrange2 #TMPTEST
+    #print i_muedges #TMPTEST
     if not rebinxi:
+            #print 'not rebinxi' #TMPTEST
 	    intxis = [smu__intxi__settings['xifunction'](DDlist, DRlist, RRlist,  
                         smu__intxi__settings['smin'], smu__intxi__settings['smax'], 
                          i_muedges[imubin][0], i_muedges[imubin][1]) 
