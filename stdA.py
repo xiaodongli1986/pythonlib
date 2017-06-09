@@ -818,6 +818,9 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
 	elif plotformat == 6:
             CS = ax.contour(omlist, wlist, Z, chisqs, colors='c', linewidths = 2)
             ax.plot(X,Y,c='c',lw=3,ls='-',label=label)
+        elif plotformat == 0:
+	    CS = ax.contourf(omlist, wlist, Z, chisqs, colors=colorlist)
+            ax.plot(X,Y,c=colorlist[0],lw=10,label=label)
 
         if scatter_WMAP5:
 	        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
