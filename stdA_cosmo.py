@@ -3,7 +3,7 @@ def Hz_CPL(omegam, w0, wa, h, z):
 
 def comov_r_CPL(omegam, w0,wa, h, z):
      x, y = scipy.integrate.quad(lambda x: 1.0/Hz_CPL(omegam, w0, wa, h, x), 0, z)
-     return const_c * x * h 
+     return CONST_C* x * h 
 
 def lcdm_qz(omegam, z=0):
     Hz = np.sqrt(omegam*(1.0+z)**3.0 + 1-omegam)

@@ -58,6 +58,13 @@ def meanY(Y): ### mean value of an array
 def meanPartY(Y,i1,i2): ### mean value of an array
     return sum(Y[i1:i2+1])/float((i2-i1+1))
 
+def randpart(A, randrat = 1.0):
+    B = []
+    for X in A:
+        if random.uniform(0,1) < randrat:
+            B.append([x for x in X])
+    return B
+
 # Something about index; random selection from an array;...
 def Xs(X, index, deepcopy=False):
 	if not deepcopy:
