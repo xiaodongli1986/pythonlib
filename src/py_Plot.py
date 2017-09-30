@@ -15,7 +15,8 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\txcol, ycol, zcol:  columns as x, y, z '+\
 	'\n\tOptions:'+\
 	'\n\t\t[-savefig savefig]  T or F; save the plot as an eps file;  '+\
-	'\n\t\t[-skiprow 1/2...]       numer of rows skipped when read in data; '+\
+	'\n\t\t[-skiprow 1,2,3,...]       numer of rows skipped when read in data; '+\
+	'\n\t\t[-delimiter None, , ;, ...]       delimiter separating numbers; by default (delimiter=None), taken as any white space'+\
 	'\n\t\t[-randrat randrat]  Randomly selecly a portion of file to plot; must be positive; can >1;'+\
 	'\n\t\t[-logX logX]  Plot logfun(X) rather than X; be True or False; '+\
 	'\n\t\t[-logY logY]  Plot logfun(Y) rather than Y; be True or False; '+\
@@ -72,6 +73,7 @@ wcol = 4
 colors = ['k', 'b', 'g', 'y', 'r', 'c', 'gray', 'm' ]
 
 skiprow =0
+delimiter=None
 randrat = 1.1
 logX = False
 logY = False
@@ -221,6 +223,10 @@ if len(cmdargs) >=4:
 				else:
 					print 'ERROR (PlotIJ)!: wrong showfig; must start with T or F: ', opt2
 					sys.exit()
+			elif opt1 in ['-skiprow']:
+				skiprow = int(opt2)
+			elif opt1 in ['-delimiter']:
+				delimiter = opt2
 			elif opt1 in ['-titlefs', '-titlefontsize']:
 				titlefs=int(opt2)
 			elif opt1 in ['-labelfs', '-labelfontsize']:
@@ -325,7 +331,7 @@ for filename in filenames:
 #		data = np.loadtxt(filename)
 #	else:
 #		data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
-	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read)
+	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read,skiprow=skiprow,delimiter=delimiter)
 
 #	if singlecolfile:
 #		data = [[x] for x in data]

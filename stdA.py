@@ -81,34 +81,43 @@ def float_try(x):
 	except:
 		return x
 
-def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20, skiprow=0, tryfloat=True):
-	nowf = open(filename, 'r') 
-	rlt = []
-	nlines = 0
-	nlines_read = 0
-	while True:
-		if nlines < skiprow: continue
-		nowstr = nowf.readline()
-		if nowstr == '':
-			break
-		nlines += 1
-		x = random.uniform(0,1)
-		if x <= rat:
-			wordlist = nowstr.split()
-			if wordlist[0][0] == '#':
-				continue
-			else:
-				if tryfloat:
-					rlt.append([float_try(x) for x in wordlist])
-				else:
-					rlt.append([float(x) for x in wordlist])
-				nlines_read += 1
-		if nlines_read >= maxnlines_read:
-			break
-	nowf.close()
-	if printinfo:
-		print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
-	return rlt
+
+def loadtxt_rand(filename, rat=1.1, printinfo=False, 
+                 maxnlines_read = 1.0e20, skiprow=0, tryfloat=True, 
+                 delimiter=None):
+        nowf = open(filename, 'r')
+        rlt = []
+        nlines = 0
+        nlines_read = 0
+        while True:
+                nowstr = nowf.readline()
+                if nowstr == '':
+                        break
+                elif nlines < skiprow: 
+                        nlines += 1
+                        continue
+                else:
+                    nlines += 1
+                x = random.uniform(0,1)
+                if x <= rat:
+                        if delimiter==None:
+                            wordlist = nowstr.split()
+                        else:
+                            wordlist = nowstr.split(delimiter)
+                        if wordlist[0][0] == '#':
+                                continue
+                        else:
+                                if tryfloat:
+                                        rlt.append([float_try(x) for x in wordlist])
+                                else:
+                                        rlt.append([float(x) for x in wordlist])
+                                nlines_read += 1
+                if nlines_read >= maxnlines_read:
+                        break
+        nowf.close()
+        if printinfo:
+                print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
+        return rlt
 
 def quickload_1col(nowfile):
 	return [float(nowstr) for nowstr in (open(nowfile,'r').readlines())]
