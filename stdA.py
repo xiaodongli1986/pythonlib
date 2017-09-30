@@ -436,6 +436,8 @@ def km_to_Mpctoh(v, h):
 
 def omwstr(om, w, fmt='%.4f', sep1='', sep2='_'):
     return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w
+def CPLstr(om, w, wa, fmt='%.4f', sep1='', sep2='_'):
+    return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w+sep2+'wa'+sep1+str(fmt)%wa
 def omwtex(om, w, fmt='%.2f'):
     return '$\\Omega_m='+fmt%om+',\\ w='+fmt%w+'$'
 def cosmoconvertedfilename(filename, om, w): ### filename
