@@ -31,15 +31,15 @@ print  len(completed_ids), 'completed jobs:\n\t', completed_ids
 
 
 nowf2=open(outputfile,'w')
-time0 = time.clock()
+time0 = time.time()
 numid = 0
 for nowid in completed_ids:
 	numid += 1
-	time1 = time.clock()
+	time1 = time.time()
 	print 'Downloding ', nowid, ':       ',numid, 'of', len(completed_ids)
 	nowf2.write('Downloding '+str(nowid)+'...\n')
 	os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile)
-	time2 = time.clock()
+	time2 = time.time()
 	print '   Time consumed:   this_job/all_jobs = ', time2-time1, time2-time0
 	nowf2.write('   Time consumed:   this_job/all_jobs = '+str(time2-time1)+'/'+str(time2-time0))
 nowf2.close()

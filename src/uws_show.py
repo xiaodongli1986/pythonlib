@@ -25,7 +25,7 @@ rlts = []
 
 for nowid in allids:
 	nowrlt = commands.getoutput('uws $cstr job show '+str(nowid))
-	print nowrlt
+	#print nowrlt
 
 	nowstrs = nowrlt.split()
 	for i in range(len(nowstrs)):
