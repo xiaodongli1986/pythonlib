@@ -30,12 +30,12 @@ for nowid in allids:
 	nowstrs = nowrlt.split()
 	for i in range(len(nowstrs)):
 		if nowstrs[i] == 'Phase':
-			rlts.append([nowid, nowstrs[i+1]])
+			rlts.append([nowid, nowstrs[i+1], nowstrs[i-4]])
+			print nowid, nowstrs[i+1], nowstrs[i-4]
 			break
 			
 for rlt in rlts:
-	print rlt[0], rlt[1]	
-	nowf2.write(rlt[0]+' '+rlt[1]+'\n')
+	nowf2.write(rlt[0]+' '+rlt[1]+' '+rlt[2]+'\n')
 nowf2.close()
 print 'Results written to ', outputfile
 
