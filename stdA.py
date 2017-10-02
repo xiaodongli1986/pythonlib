@@ -81,34 +81,43 @@ def float_try(x):
 	except:
 		return x
 
-def loadtxt_rand(filename, rat=1.1, printinfo=False, maxnlines_read = 1.0e20, skiprow=0, tryfloat=True):
-	nowf = open(filename, 'r') 
-	rlt = []
-	nlines = 0
-	nlines_read = 0
-	while True:
-		if nlines < skiprow: continue
-		nowstr = nowf.readline()
-		if nowstr == '':
-			break
-		nlines += 1
-		x = random.uniform(0,1)
-		if x <= rat:
-			wordlist = nowstr.split()
-			if wordlist[0][0] == '#':
-				continue
-			else:
-				if tryfloat:
-					rlt.append([float_try(x) for x in wordlist])
-				else:
-					rlt.append([float(x) for x in wordlist])
-				nlines_read += 1
-		if nlines_read >= maxnlines_read:
-			break
-	nowf.close()
-	if printinfo:
-		print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
-	return rlt
+
+def loadtxt_rand(filename, rat=1.1, printinfo=False, 
+                 maxnlines_read = 1.0e20, skiprow=0, tryfloat=True, 
+                 delimiter=None):
+        nowf = open(filename, 'r')
+        rlt = []
+        nlines = 0
+        nlines_read = 0
+        while True:
+                nowstr = nowf.readline()
+                if nowstr == '':
+                        break
+                elif nlines < skiprow: 
+                        nlines += 1
+                        continue
+                else:
+                    nlines += 1
+                x = random.uniform(0,1)
+                if x <= rat:
+                        if delimiter==None:
+                            wordlist = nowstr.split()
+                        else:
+                            wordlist = nowstr.split(delimiter)
+                        if wordlist[0][0] == '#':
+                                continue
+                        else:
+                                if tryfloat:
+                                        rlt.append([float_try(x) for x in wordlist])
+                                else:
+                                        rlt.append([float(x) for x in wordlist])
+                                nlines_read += 1
+                if nlines_read >= maxnlines_read:
+                        break
+        nowf.close()
+        if printinfo:
+                print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
+        return rlt
 
 def quickload_1col(nowfile):
 	return [float(nowstr) for nowstr in (open(nowfile,'r').readlines())]
@@ -436,6 +445,8 @@ def km_to_Mpctoh(v, h):
 
 def omwstr(om, w, fmt='%.4f', sep1='', sep2='_'):
     return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w
+def CPLstr(om, w, wa, fmt='%.4f', sep1='', sep2='_'):
+    return 'om'+sep1+str(fmt)%om+sep2+'w'+sep1+str(fmt)%w+sep2+'wa'+sep1+str(fmt)%wa
 def omwtex(om, w, fmt='%.2f'):
     return '$\\Omega_m='+fmt%om+',\\ w='+fmt%w+'$'
 def cosmoconvertedfilename(filename, om, w): ### filename
@@ -818,6 +829,9 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
 	elif plotformat == 6:
             CS = ax.contour(omlist, wlist, Z, chisqs, colors='c', linewidths = 2)
             ax.plot(X,Y,c='c',lw=3,ls='-',label=label)
+        elif plotformat == 0:
+	    CS = ax.contourf(omlist, wlist, Z, chisqs, colors=colorlist)
+            ax.plot(X,Y,c=colorlist[0],lw=10,label=label)
 
         if scatter_WMAP5:
 	        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
