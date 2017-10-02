@@ -8,6 +8,8 @@ usagestr = 'Usage: EXE inputfile [options...]\n'+\
 	'   Input file format (line by line): jobid, job_status (will be donwloaded if completed), outputfile (optional) \n'+\
 	'    [-output/-outputfile  name of output file]\n'+\
 	'    [-skip_existed/-skipexisted  True/true/T/t/False/false/F/f] skip existed file and do not download it (requring "outputfile" in the input file)\n'+\
+	'    [-parallel  True/true/T/t/False/false/F/f] downloading files in a parallel manner\n'+\
+	'    [-timeinterval True/true/T/t/False/false/F/f] when using parallel, gap time among start time of jobs\n'+\
 	''
 
 cmdargs = sys.argv
@@ -21,6 +23,8 @@ nowfile=cmdargs[1]
 
 outputfile = nowfile+'.downloadinfo'
 skipexisted = True
+sleepstr = str(100)
+parallel = True
 if len(cmdargs) > 3:
 	i1 = 2
 	while i1 <= len(cmdargs) -1:
@@ -31,6 +35,8 @@ if len(cmdargs) > 3:
 			sys.exit
 		if cmdargs[i1] in ['-outputfile', '-output']:
 			outputfile = cmdargs[i2]
+		elif cmdargs[i1] in ['-timeinterval']:
+			sleepstr = cmdargs[i2]
 		elif cmdargs[i1] in ['-skip_existed', '-skipexisted']:
 			nowstr = cmdargs[i2]
 			if nowstr[0] in ['t', 'T']:
@@ -39,6 +45,15 @@ if len(cmdargs) > 3:
 				skipexisted = False		
 			else:
 				print 'Wrong skipexisted: must start with t/T/f/F, we get ', nowstr
+				sys.exit()
+		elif cmdargs[i1] in [ '-parallel']:
+			nowstr = cmdargs[i2]
+			if nowstr[0] in ['t', 'T']:
+				parallel = True
+			elif nowstr[0] in ['f', 'F']:
+				parallel = False		
+			else:
+				print 'Wrong parallel: must start with t/T/f/F, we get ', nowstr
 				sys.exit()
 		else:
 			print 'Wrong arg!', cmdargs[i1]
@@ -85,7 +100,12 @@ for nowid_file in dl_id_files:
 		continue
 	print 'Downloding ', nowid, '   ', nowfile, ':       ',numid, 'of', len(dl_id_files)
 	nowf2.write('Downloding '+str(nowid)+'...\n')
-	os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile)
+	if parallel:
+		os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile+' &')
+		print 'Start next job after ', sleepstr, 'seconds...'
+		os.system('sleep '+sleepstr)
+	else:
+		os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile)
 	time2 = time.time()
 	print '   Time consumed:   this_job/all_jobs = ', time2-time1, time2-time0
 	nowf2.write('   Time consumed:   this_job/all_jobs = '+str(time2-time1)+'/'+str(time2-time0))

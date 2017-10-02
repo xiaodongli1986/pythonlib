@@ -14,7 +14,6 @@ print 'Load in ids:   \n\t', nowfile
 print 'showing rlt:   \n\t', outputfile
 numjob = 0
 allids = []
-nowf2=open(outputfile,'w')
 for nowstr in open(nowfile,'r').readlines():
 		for nowstr2 in nowstr.split():
 			allids.append(nowstr2)
@@ -34,6 +33,7 @@ for nowid in allids:
 			print nowid, nowstrs[i+1], nowstrs[i-4]
 			break
 			
+nowf2=open(outputfile,'w')
 for rlt in rlts:
 	nowf2.write(rlt[0]+' '+rlt[1]+' '+rlt[2]+'\n')
 nowf2.close()
