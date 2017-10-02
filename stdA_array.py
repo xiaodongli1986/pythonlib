@@ -34,6 +34,50 @@ def XplusY(X, Y, a=1,b=1):
 def product(iterable):
     return reduce(operator.mul, iterable, 1)
 
+def sumarray(X,dim=1):
+	rlt = 0
+	if dim == 1:
+		rlt = sum(X)
+	elif dim == 2:
+		rlt = sum([sum(xx) for xx in X])
+	elif dim == 3:
+		rlt = sum([sum([sum(xx) for xx in xxx]) for xxx in X])
+	elif dim == 4:
+		rlt = sum([sum([sum([sum(xx) for xx in xxx]) for xxx in xxxx]) for xxxx in X])
+	elif dim == 5:
+		rlt = sum([sum([sum([sum([sum(xx) for xx in xxx]) for xxx in xxxx]) for xxxx in xxxxx]) for xxxxx in X])
+	return rlt
+
+def subarray_4from5(X,idim=0):
+	len1, len2, len3, len4, len5 = len(X), len(X[0]), len(X[0][0]), len(X[0][0][0]), len(X[0][0][0][0])
+	if idim ==0:
+		return [[[[[X[row][row1][row2][row3][row4] for row1 in range(len2)] for row2 in range(len3)] for row3 in range(len4)] for row4 in range(len5)] for row in range(len1)]
+	elif idim ==1:
+		return [[[[[X[row1][row][row2][row3][row4] for row1 in range(len1)] for row2 in range(len3)] for row3 in range(len4)] for row4 in range(len5)] for row in range(len2)]
+	elif idim ==2:
+		return [[[[[X[row1][row2][row][row3][row4] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len4)] for row4 in range(len5)] for row in range(len3)]
+	elif idim ==3:
+		return [[[[[X[row1][row2][row3][row][row4] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len3)] for row4 in range(len5)] for row in range(len4)]
+	elif idim ==4:
+		return [[[[[X[row1][row2][row3][row4][row] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len3)] for row4 in range(len4)] for row in range(len5)]
+
+def sum4of5darray(X,idim=0):
+	len1, len2, len3, len4, len5 = len(X), len(X[0]), len(X[0][0]), len(X[0][0][0]), len(X[0][0][0][0])
+	#print
+	#print len1, len2, len3, len4, len5
+	if idim ==0:
+		return [sumarray(XX,4) for XX in X]
+	elif idim ==1:
+		return [sumarray([[[[X[row1][row][row2][row3][row4] for row1 in range(len1)] for row2 in range(len3)] for row3 in range(len4)] for row4 in range(len5)],4) for row in range(len2)]
+	elif idim ==2:
+		return [sumarray([[[[X[row1][row2][row][row3][row4] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len4)] for row4 in range(len5)],4) for row in range(len3)]
+		#return [sumarray(X[0:len1][0:len2][row][0:len4][0:len5],4) for row in range(len3)]
+	elif idim ==3:
+		return [sumarray([[[[X[row1][row2][row3][row][row4] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len3)] for row4 in range(len5)],4) for row in range(len4)]
+		#return [sumarray(X[0:len1][0:len2][0:len3][row][0:len5],4) for row in range(len4)]
+	elif idim ==4:
+		return [sumarray([[[[X[row1][row2][row3][row4][row] for row1 in range(len1)] for row2 in range(len2)] for row3 in range(len3)] for row4 in range(len4)],4) for row in range(len5)]
+		#return [sumarray(X[0:len1][0:len2][0:len3][0:len4][row],4) for row in range(len5)]
 # Selecting columns from multi dim arrau
 def Xfromdata(data, i=0):
     return [data[row][i] for row in range(len(data))]
