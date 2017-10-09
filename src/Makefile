@@ -1,5 +1,5 @@
 pythonbin = \#!/home/xiaodongli/software/anaconda/bin/python
-EXEs = ../bin/py_helloworld  ../bin/py_Plot  ../bin/uws_download ../bin/uws_id  ../bin/uws_show  ../bin/uws_submit
+EXEs = ../bin/py_helloworld  ../bin/py_Plot  ../bin/uws_download ../bin/uws_id  ../bin/uws_show  ../bin/uws_submit ../bin/uws_mergefiles
 
 all: $(EXEs)
 default: $(EXEs)
