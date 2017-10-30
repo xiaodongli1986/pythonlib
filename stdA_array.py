@@ -20,6 +20,7 @@ def reverse_1darray(A):
 
 # Some manipulation
 def XmultY(X, Y, a=1,b=1,c=1):
+	''' (X[row]**a)*(Y[row]**b)*c for row in range(len(X)) '''
 	if a==1 and b==1 and c==1:
 		return [X[row]*Y[row] for row in range(len(X))]
 	else:
