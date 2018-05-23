@@ -533,7 +533,9 @@ def smu__intxi_ChisqContour(Skylist=['N'],
         numw=len(ws); numom = len(oms)
         omws = sumlist( [[[om,w] for om in oms] for w in ws])
     else:
-	global oms, ws, omws, scanname
+	### global oms, ws, omws, scanname ### Xiaodong: if want to use, 
+	print 'ERROR! Uncomment the above sentence before using it!!! (will report something when execute this file after uncomment them. That is why I close it'
+	return
         numw=len(ws); numom = len(oms)
 
     for refibin in refibinlist:

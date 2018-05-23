@@ -404,6 +404,15 @@ def area_from_radec(ramin, ramax, decmin, decmax, degreefac = np.pi/180.0):
 def Hz(omegam, w, h, z):
     return 100*h*np.sqrt(omegam*(1.0+z)**3.0 + (1.0-omegam)*(1.0+z)**(3.0*(1+w)))
 
+def omegamz(om0, z):
+    '''compute ratio of matter component at redshift z; assume lambda cdm
+	H = Hz(om0, -1, 0.7, z);
+	om = om0 * (1.0+z)**3
+	return om/H**2.0*10000*0.7**2'''
+    H = Hz(om0, -1, 0.7, z);
+    om = om0 * (1.0+z)**3
+    return om/H**2.0*10000*0.7**2
+
 def Hz_Mpc_to_h(omegam, w, h, z):
     return 100*np.sqrt(omegam*(1.0+z)**3.0 + (1.0-omegam)*(1.0+z)**(3.0*(1+w)))
 
@@ -747,47 +756,50 @@ def circle(r=1,x=0,y=None,npoint=100):
 
 ## Plot om-w contour
 def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
-                    ommin = 0.01, ommax = 0.6, wmin = -2.0, wmax = -0.0,  do_smooth=True, smsigma=0.5, 
+                    ommin = None, ommax = None, wmin = None, wmax = None,  do_smooth=True, smsigma=0.5, 
                     extratitle = '', titleftsize=15, notitle = False, xylabelfs=26,
                     sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, return_chisqcuts=False,
                     nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],
                     noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
-	            show_marg_rlt = True, scatter_WMAP5=True):
+	            show_marg_rlt = True, scatter_WMAP5=False, scatter_point=None):
     '''
 	Plot the contour. 
 	To get the boundary lines of the contour plot, using command e.g. 
             X, Y = XYfromdata(CS.collections[0].get_paths()[0].vertices)
 
-	Here are some code for testing:
-	###
-		import stdA; execfile(stdA.pyfile)
-
-		def chisqfun(x, y):
-		    return (x*x + y*y)
-
-		fig, ax = figax()
-
-		omlist = np.linspace(-3, 3, 201)
-		wlist = np.linspace(-3, 3, 201)
-		chisqlist = [[chisqfun(om, w) for w in wlist]  for om in omlist]
-		ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
-
-		if False:
-			fmtstr = '%20.10e'
-			nowf = open( 'TestMCMCChain.txt', 'w')
-			for i in range(100000):
-			    om, w = random.uniform(ommin, ommax), random.uniform(wmin, wmax)
-			    chisq = chisqfun(om,w)
-			    chisqmin = 0.0
-			    B = [np.exp(-0.5*(chisq-chisqmin)), chisq/2.0] + [om, w]
-			    nowf.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
-
-		plot_contour(ax, omlist, wlist, chisqlist, ommin=ommin, ommax=ommax, wmin=wmin, wmax=wmax, scatter_WMAP5=False,  )
-		ax.scatter(0, np.sqrt(2.3))
-		ax.scatter(0, np.sqrt(6.17))
-		ax.grid()
-	###
     '''
+#       Here are some code for testing:
+#       ###
+#               import stdA; execfile(stdA.pyfile)
+#
+#               def chisqfun(x, y):
+#                   return (x*x + y*y)
+#
+#               fig, ax = figax()
+#
+#               omlist = np.linspace(-3, 3, 201)
+#               wlist = np.linspace(-3, 3, 201)
+#               chisqlist = [[chisqfun(om, w) for w in wlist]  for om in omlist]
+#               ommin, ommax, wmin, wmax = min(omlist), max(omlist), min(wlist), max(wlist)
+#
+#               if False:
+#                       fmtstr = '%20.10e'
+#                       nowf = open( 'TestMCMCChain.txt', 'w')
+#                       for i in range(100000):
+#                           om, w = random.uniform(ommin, ommax), random.uniform(wmin, wmax)
+#                           chisq = chisqfun(om,w)
+#                           chisqmin = 0.0
+#                           B = [np.exp(-0.5*(chisq-chisqmin)), chisq/2.0] + [om, w]
+#                           nowf.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
+#
+#               plot_contour(ax, omlist, wlist, chisqlist, ommin=ommin, ommax=ommax, wmin=wmin, wmax=wmax, scatter_WMAP5=False,  )
+#               ax.scatter(0, np.sqrt(2.3))
+#               ax.scatter(0, np.sqrt(6.17))
+#               ax.grid()
+    if ommin == None: ommin = min(omlist)
+    if ommax == None: ommax = max(omlist)
+    if wmin == None: wmin = min(wlist)
+    if wmax == None: wmax = max(wlist)
     if True:
         smsigma = smsigma
         if do_smooth:
@@ -835,6 +847,8 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
 
         if scatter_WMAP5:
 	        ax.scatter([0.26], [-1], marker = '+', c = 'g', s = 200, lw=2)        
+        if scatter_point != None:
+	        ax.scatter([scatter_point[0]], [scatter_point[1]], marker = '+', c = 'g', s = 200, lw=2)        
         
         ax.set_xlim(ommin,ommax);   ax.set_ylim(wmin, wmax)
         if showgrid:
@@ -870,3 +884,99 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
 		return chisqs, CS
 	else:
 		return CS
+
+def getdist_readmarg(key1, key2, nowdir='/home/xiaodongli/software/cosmomc/outputs/',printinfo=True):
+    '''key1: modelname; key2: parametername; 
+    nowfile = nowdir + key1 + '.margestats'  
+    return mean, std, low1, up1, low2, up2'''
+    nowfile = nowdir+key1+'.margestats'
+    nowf = open(nowfile,'r')
+    while True:
+        nowstr = nowf.readline();
+        if nowstr == '': break
+        nowstrs = nowstr.split()
+        #print nowstrs
+        if nowstrs == []: continue
+        if nowstrs[0] == key2 or nowstrs[0] == key2+'*':
+            #parameter        mean           sddev          lower1         upper1         limit1 lower2         upper2 
+            mean, std, low1, up1, low2, up2 = [float(nowstrs[row]) for row in [1,2,3,4,6,7]]
+    er1u, er1d, er2u, er2d = up1-mean, mean-low1, up2-mean, mean-low2
+    #print '### model = ', key1
+    #print '\tw = %.4f'%mean+' \pm %.4f'%std 
+    if printinfo:
+        print '\t'+key2+' \t= %.4f'%mean+'^{+%.4f'%er1u+'}_{-%.4f'%er1d+\
+            '} ^{+%.4f'%er2u+'}_{-%.4f'%er2d+'}  ('+key1+')'
+    commands.getoutput('cp '+nowfile+' '+nowfile+'.save')
+    return mean, std, low1, up1, low2, up2
+
+def erstr(mean,low,up,fmt='%.3f'):
+    str0 = '%.3f'%mean
+    str1 = '%.3f'%(up-mean)
+    str2 = '%.3f'%(mean-low)
+    if str1 == str2:
+        return '$'+str0+'\\pm'+str1+'$'
+    else:
+        return '$'+str0+'^{+'+str1+'}_{-'+str2+'}$'
+
+def getdist_pp(basename,p1,p2, 
+               makeplot=True, figaxs=None, nowlab='', marg=None, 
+               p1xlim=None,Likeylim=None,p2xlim=None,p1lab=None,p2lab=None,labfs=16,**kwargs):
+    '''
+    1d Like:
+        file1 = basename+'_p_'+p1+'.dat'
+        file2 = basename+'_p_'+p2+'.dat'
+    2d con:
+        file2d = basename+'_2D_'+p1+'_'+p2
+    margstat:
+        marg+ '.margstats'
+    '''
+    if p1lab == None: p1lab = p1
+    if p2lab == None: p2lab = p2
+    if makeplot:
+        if figaxs==None:
+            fig = plt.figure(figsize=(16,6)); 
+            ax1, ax2, ax3 = fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133)
+        else:
+            fig, ax1, ax2, ax3 = figaxs
+    ### 1d like
+    file1 = basename+'_p_'+p1+'.dat'
+    file2 = basename+'_p_'+p2+'.dat'
+    LikeX1, LikeY1 = XYfromdata(np.loadtxt(file1))
+    LikeX2, LikeY2 = XYfromdata(np.loadtxt(file2))
+    nowlab1 = nowlab2 = nowlab; 
+    if marg != None: 
+        mean1, std1, low1s1, up1s1, low2s1, up2s1 = getdist_readmarg(marg, p1, nowdir='', printinfo=False)
+        mean2, std2, low1s2, up1s2, low2s2, up2s2 = getdist_readmarg(marg, p2, nowdir='', printinfo=False)
+        nowlab1=nowlab1+' '+p1lab+'='+erstr(mean1,low1s1,up1s1)
+        nowlab2=nowlab2+' '+p2lab+'='+erstr(mean2,low1s2,up1s2)
+
+def getdist_like(modelname, pname):
+	'''
+	return XYfromdata(np.loadtxt(modelname+'_p_'+pname+'.dat'))
+	'''
+	return XYfromdata(np.loadtxt(modelname+'_p_'+pname+'.dat'))
+
+def getdist_con(modelname, p1name, p2name):
+    '''
+    filex = modelname+'_2D_'+p1name+'_'+p2name+'_x'
+    filey = modelname+'_2D_'+p1name+'_'+p2name+'_y'
+    filecont = modelname+'_2D_'+p1name+'_'+p2name+'_cont'
+    filez = modelname+'_2D_'+p1name+'_'+p2name
+    return:
+        X, Y, Con, Z
+    How to plot:
+        ax.contourf(X, Y, Z, [Con[1],Con[2],1000],colors=[(1,0.5,0.5),(1,0,0)], alpha=0.5, antialiased=True)
+    '''
+    filex = modelname+'_2D_'+p1name+'_'+p2name+'_x'
+    filey = modelname+'_2D_'+p1name+'_'+p2name+'_y'
+    filecont = modelname+'_2D_'+p1name+'_'+p2name+'_cont'
+    filez = modelname+'_2D_'+p1name+'_'+p2name
+    Y, X, Con, Z = np.loadtxt(filex), np.loadtxt(filey), np.loadtxt(filecont), np.loadtxt(filez)
+    ndat = len(Z)
+    Condata = [[0 for row1 in range(ndat)] for row2 in range(ndat)]
+    # I don't know why, but have to invert the matrix...
+    for row1 in range(ndat):
+        for row2 in range(ndat):
+            Condata[row1][row2] =  Z[row2][row1]
+    return X, Y, reverse_1darray(Con), Condata
+

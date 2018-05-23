@@ -68,22 +68,25 @@ def binned_quan(X, Y, nbin, Xrange=''): ## binned quantities
     return Xs, Ys
 
 ### covariance matrix
-def get_covmat(Xs):
+def get_covmat(Xs, weis=[]):
 	n = len(Xs)
 	Xibars = [0 for row in range(n)]
 	XiXjbars = [ [0 for row1 in range(n)] for row2 in range(n)]
 	covmat = [ [0 for row1 in range(n)] for row2 in range(n)]
 	ndat = len(Xs[0])
+        if weis == []: weis = [1. for row in range(ndat)]
+        sumwei = sum(weis)
+        sumweisq = sum([wei**2.0 for wei in weis])
 	for i in range(n):
 		## \bar Xi
 		for idat in range(ndat):
-			Xibars[i] += Xs[i][idat]
-		Xibars[i] /= float(ndat)
+			Xibars[i] += Xs[i][idat]*weis[idat]
+		Xibars[i] /= sumwei
 		## \bar (XiXj)
 		for j in range(i,n):
 			for idat in range(ndat):
-				XiXjbars[i][j] += (Xs[i][idat] * Xs[j][idat])
-			XiXjbars[i][j] /= float(ndat)
+				XiXjbars[i][j] += (Xs[i][idat] * Xs[j][idat]) * weis[idat]
+			XiXjbars[i][j] /= sumwei
 	for i in range(n):
 		for j in range(i,n):
 			XiXjbars[j][i] = XiXjbars[i][j]
@@ -123,6 +126,10 @@ def get_covmat(Xs):
 						    #M = Table[{X0[[i, 1]], X1[[i, 1]], X2[[i, 1]]}, {i, 1, Length[X0]}];
 						    #Covariance[M] // MatrixForm    
 
+def invmat(A):
+    Amat = np.mat(A);
+    invA = Amat.I;
+    return invA
 
 def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     p=len(X);
@@ -144,6 +151,12 @@ def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
             chisq += Xdiff[i]*invcov[i,j]*Xdiff[j]
     like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * scipy.exp(-0.5 * (chisq-chisq0));
     return chisq, like
+
+def chisqs_to_likes(chisqs):
+	''' like = Exp(-(chisq-chisqmin)/2.0) '''
+	chisqmin = min(chisqs)
+	return [ np.exp( -0.5*(chisq-chisqmin)) for chisq in chisqs]
+	
 
 def chisq_invcov_xbar(X, InvCov, Xbar = [], chisq0=0):
     p=len(X);
@@ -664,3 +677,29 @@ def Percival_covmat_scale(Ns,Nb,Npar):
                 m1 = (1+B*(Nb-Npar)) / (1+A+B*(Npar+1))
                 m2 = 1.0/(1.0-D) * m1
                 return D, m1, m2
+
+
+def linefit(X,Y,printinfo=True):
+    ''' fit curve y = a + b *x; get a, b; 
+    compute correlation coefficient gama;
+    return : a, b, gamma'''
+    rows = range(len(X))
+    def mean(X):
+        return sum(X) / float(len(X))
+    xbar = mean(X) 
+    ybar = mean(Y)
+    XY = [X[row]*Y[row] for row in rows]
+    Xsq = [X[row]*X[row] for row in rows]
+    Ysq = [Y[row]*Y[row] for row in rows]
+    xybar = mean(XY)
+    xsqbar = mean(Xsq)
+    ysqbar = mean(Ysq)
+    
+    b = (xbar*ybar - xybar) / (xbar**2.0 - xsqbar)
+    a = ybar - b * xbar
+    if printinfo: print 'y = a+bx:    a, b = ', a, b
+    
+    gamma = xybar - xbar * ybar
+    gamma = gamma / ( (xsqbar-xbar**2.0)*(ysqbar-ybar**2.0) )**0.5
+    if printinfo: print 'coeffecient: gamma= ', gamma
+    return a, b, gamma

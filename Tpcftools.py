@@ -1145,6 +1145,91 @@ def smu_xis_loaddatarlt(xis_data_file, totbin =3):
                         xis_data[catname][ibin][nowomwstr] = [x for x in xis]
 		return xis_data
 
+#def xismu(data, sbin=150, mubin=120, s1=6, s2=40, DDicol=4, DRicol=5, RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, nmubin = None):
+#    xis = [0 for row in range(sbin)]
+#    ximu = [0 for row in range(mubin)]
+#    xismu = [[0 for rowsub in range(mubin)] for rows in range(sbin)]
+    
+#    DDs, DRs, RRs = [0 for row in range(sbin)], [0 for row in range(sbin)], [0 for row in range(sbin)]
+#    DDmu, DRmu, RRmu = [0 for row in range(mubin)], [0 for row in range(mubin)], [0 for row in range(mubin)]
+#    for rows in range(sbin):
+#        for rowmu in range(mubin):
+#            irow = rows*mubin+rowmu
+#            DD, DR, RR = data[irow][DDicol]/DDnorm, data[irow][DRicol]/DRnorm, data[irow][RRicol]/RRnorm
+#            DDs[rows] += DD; DRs[rows] += DR; RRs[rows] += RR
+#            DDmu[rowmu] += DD; DRmu[rowmu] += DR; RRmu[rowmu] += RR
+#            xismu[rows][rowmu] = xi_LS(DD, DR, RR)
+#    xis = [xi_LS(DDs[row], DRs[row], RRs[row]) for row in range(sbin)]
+#    ximu = [xi_LS(DDmu[row], DRmu[row], RRmu[row]) for row in range(mubin)]
+#    intximu = [ sum([xismu[rows][rowmu] for rows in range(s1,s2)]) for rowmu in range(mubin)]
+#    return xis, ximu, intximu
+
+def xismu(data, sbin=150, mubin=120, s1=6, s2=40, DDicol=4, DRicol=5, RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, 
+          nmubin = None, imu1=None):
+    ''' xi(s), xi(mu), AND \int xi(s,mu) ds as a function of mu
+	nowfile='/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/DR12v4-CMASS/xyzw.binsplitted/J08.RSD.000.xyzw.3of3.rmax150.150rbins.120mubins.2pcf';
+	data = np.loadtxt(nowfile)
+	nmubin = 15
+	imu1 = 1
+	xis, ximu, intximu = xismu(data, nr, nmu, 6, 40, 
+                DDicol=4,DRicol=5,RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, nmubin=nmubin, imu1=imu1);
+
+	rs, mus = get_mid_array1d(range(nr+1)), get_mid_array1d(np.linspace(0,1,nmubin+1))
+
+	fig = plt.figure(figsize=(14,6));
+	ax1, ax2, ax3 = fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133), 
+	ax1.plot(rs, xis)
+	ax2.plot(mus, ximu)
+	ax3.plot(mus, intximu)'''
+
+    if nmubin == None:
+        xis = [0 for row in range(sbin)]
+        ximu = [0 for row in range(mubin)]
+        xismu = [[0 for rowsub in range(mubin)] for rows in range(sbin)]
+        
+        DDs, DRs, RRs = [0 for row in range(sbin)], [0 for row in range(sbin)], [0 for row in range(sbin)]
+        DDmu, DRmu, RRmu = [0 for row in range(mubin)], [0 for row in range(mubin)], [0 for row in range(mubin)]
+        for rows in range(sbin):
+            for rowmu in range(mubin):
+                irow = rows*mubin+rowmu
+                DD, DR, RR = data[irow][DDicol]/DDnorm, data[irow][DRicol]/DRnorm, data[irow][RRicol]/RRnorm
+                DDs[rows] += DD; DRs[rows] += DR; RRs[rows] += RR
+                DDmu[rowmu] += DD; DRmu[rowmu] += DR; RRmu[rowmu] += RR
+                xismu[rows][rowmu] = xi_LS(DD, DR, RR)
+        xis = [xi_LS(DDs[row], DRs[row], RRs[row]) for row in range(sbin)]
+        ximu = [xi_LS(DDmu[row], DRmu[row], RRmu[row]) for row in range(mubin)]
+        intximu = [ sum([xismu[rows][rowmu] for rows in range(s1,s2)]) for rowmu in range(mubin)]
+    else:
+        xis = [0 for row in range(sbin)]
+        ximu = [0 for row in range(nmubin)]
+        xismu = [[0 for rowsub in range(nmubin)] for rows in range(sbin)]
+
+        DDs, DRs, RRs = [0 for row in range(sbin)], [0 for row in range(sbin)], [0 for row in range(sbin)]
+        DDmu, DRmu, RRmu = [0 for row in range(nmubin)], [0 for row in range(nmubin)], [0 for row in range(nmubin)]
+        for rows in range(sbin):
+            rowmu=0; irow1 = rows*mubin+rowmu
+            rowmu=mubin-1; irow2 = rows*mubin+rowmu
+            #print irow1, irow2
+            DD, DR, RR = array_fracbin([data[row][DDicol]/DDnorm for row in range(irow1,irow2+1)], nmubin, imu1),\
+                         array_fracbin([data[row][DRicol]/DRnorm for row in range(irow1,irow2+1)], nmubin, imu1),\
+                         array_fracbin([data[row][RRicol]/RRnorm for row in range(irow1,irow2+1)], nmubin, imu1),
+            #print len(DD)
+            #return
+            
+            DDs[rows] += sum(DD); DRs[rows] += sum(DR); RRs[rows] += sum(RR);
+            DDmu  = XplusY(DDmu, DD);
+            DRmu  = XplusY(DRmu, DR);
+            RRmu  = XplusY(RRmu, RR);
+            #DRmu = DR; RRmu[rowmu] += RR
+            for rowmu in range(nmubin):
+                xismu[rows][rowmu] = xi_LS(DD[rowmu], DR[rowmu], RR[rowmu])
+        xis = [xi_LS(DDs[row], DRs[row], RRs[row]) for row in range(sbin)]
+        ximu = [xi_LS(DDmu[row], DRmu[row], RRmu[row]) for row in range(nmubin)]
+        intximu = [ sum([xismu[rows][rowmu] for rows in range(s1,s2)]) for rowmu in range(nmubin)]
+    return xis, ximu, intximu
+
+
+
 
 execfile(pythonlibPATH+'/Tpcftools_smuxis.py')
 execfile(pythonlibPATH+'/Tpcftools_smuximu.py')

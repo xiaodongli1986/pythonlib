@@ -26,6 +26,20 @@ def XmultY(X, Y, a=1,b=1,c=1):
 	else:
 		return [(X[row]**a)*(Y[row]**b)*c for row in range(len(X))]
 
+def Xmulty(X, y, a=1,b=1,c=1):
+        ''' (X[row]**a)*(y**b)*c for row in range(len(X)) '''
+        if a==1 and b==1 and c==1:
+                return [X[row]*y for row in range(len(X))]
+        else:
+                return [(X[row]**a)*(y**b)*c for row in range(len(X))]
+
+
+def Xdivy(X, y):
+        ''' (X[row]**a)/y for row in range(len(X)) '''
+        return [X[row]/y for row in range(len(X))]
+
+
+
 def XplusY(X, Y, a=1,b=1):
 	if a==1 and b==1:
 		return [X[row]+Y[row] for row in range(len(X))]
@@ -95,6 +109,7 @@ def Xsfrom2ddata(data, ilist):
 
 def Xfrom2ddata(data, i=0):
     return [[ data[row1][row2][i] for row2 in range(len(data[row1]))] for row1 in range(len(data))]
+
 
     
 ####
@@ -341,6 +356,18 @@ def normto1(X,wei=[],returnavg=False):
 		return [X[row]/avg for row in range(len(X))]
 	else:
 		return avg, [X[row]/avg for row in range(len(X))]
+def normtolike(X, xmin=None):
+	''' Normalize a chisq-array to a likelihood array
+	if xmin == None: xmin = min(X)
+	return [exp(-0.5*(xx-xmin) for xx in X]'''
+	if xmin == None: xmin = min(X)
+	return [exp(-0.5*(xx-xmin)) for xx in X]
+def norm2dcovmat(A):
+    ''' normalize covariance matrix so that diagnal elements equal to 1'''
+    nA = len(A)
+    diag = [A[row][row] for row in range(nA)]
+    B = [[A[i][j]/np.sqrt(diag[i]*diag[j]) for j in range(nA)] for i in range(nA)]
+    return B
 def normto1_2darray(X,Skip_element=[],wei=[],returnavg=False):
 	'''
         Skip_element = [str(xx[0])+'_'+str(xx[1]) for xx in Skip_element]
@@ -564,8 +591,12 @@ def index_of_max(X):
 def convert_loaded2Ddata_to_array(data):
 	return [[data[row1][row2] for row2 in range(len(data[0]))] for row1 in range(len(data))]
 	
-def get_mid_array1d(data):
-	return [(data[row]+data[row+1])*0.5 for row in range(len(data)-1)]
+def get_mid_array1d(data, deg=1):
+	if deg == 1:
+		X = [(data[row]+data[row+1])*0.5 for row in range(len(data)-1)]
+	else:
+		X = [((data[row]**deg+data[row+1]**deg)*0.5)**(1.0/deg) for row in range(len(data)-1)]
+	return X
 	
 def get_mid_array2d(data):
 	return [[(data[row1][row2]+data[row1][row2+1]+data[row1+1][row2]+data[row1+1][row2+1])*0.25 for row2 in range(len(data[row1])-1)] for row1 in range(len(data)-1)]
@@ -598,3 +629,34 @@ def array_fracbin(A, nbin=10, i1=None, i2=None):
                 elif iC < iB:
                     B[i] = A[iC]*(iD-iA)
         return B
+def array_intbin(A, nbin=10, i1=None, i2=None):
+	'''Split an array into nbin bins; keep int bins (will not split one element and assign to different bins)'''
+        if i1==None: i1=0
+        if i2==None: i2=len(A)
+        edges = np.linspace(i1,i2,nbin+1)
+        edges = [int(edge+0.5) for edge in edges]
+        #print edges
+        B = range(nbin)
+        for i in range(nbin):
+                B[i] = 0
+                iA, iB = edges[i], edges[i+1]
+                #print A[iA:iB]; 
+                B[i] = sum(A[iA:iB])
+        #print sum(A), sum(B)
+        return B
+	''' For test
+	A = range(1000)
+	nbin = 100
+	for i1 in range(2000):
+	    B = array_intbin(A, nbin, i1)	
+	    if abs(sum(A[i1:]) - sum(B)) != 0:
+	        print i1, sum(A[i1:]), sum(B)
+	        break'''
+
+
+def drop_duplicate(duplicate):
+    final_list = []
+    for num in duplicate:
+        if num not in final_list:
+            final_list.append(num)
+    return final_list
