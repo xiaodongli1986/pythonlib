@@ -918,9 +918,10 @@ def erstr(mean,low,up,fmt='%.3f'):
     else:
         return '$'+str0+'^{+'+str1+'}_{-'+str2+'}$'
 
+
 def getdist_pp(basename,p1,p2, 
                makeplot=True, figaxs=None, nowlab='', marg=None, 
-               p1xlim=None,Likeylim=None,p2xlim=None,p1lab=None,p2lab=None,labfs=16,**kwargs):
+               p1xlim=None,Likeylim=None,p2xlim=None,p1lab=None,p2lab=None,**kwargs):
     '''
     1d Like:
         file1 = basename+'_p_'+p1+'.dat'
@@ -930,6 +931,7 @@ def getdist_pp(basename,p1,p2,
     margstat:
         marg+ '.margstats'
     '''
+    p1, p2 = 'omegam', 'w'
     if p1lab == None: p1lab = p1
     if p2lab == None: p2lab = p2
     if makeplot:
@@ -949,6 +951,46 @@ def getdist_pp(basename,p1,p2,
         mean2, std2, low1s2, up1s2, low2s2, up2s2 = getdist_readmarg(marg, p2, nowdir='', printinfo=False)
         nowlab1=nowlab1+' '+p1lab+'='+erstr(mean1,low1s1,up1s1)
         nowlab2=nowlab2+' '+p2lab+'='+erstr(mean2,low1s2,up1s2)
+    if makeplot:
+        ax1.plot(LikeX1,LikeY1,label=nowlab1,**kwargs); ax2.plot(LikeX2,LikeY2,label=nowlab2,**kwargs); 
+        ax1.set_xlabel(p1lab, fontsize=16); ax2.set_xlabel(p2lab, fontsize=16);
+        
+    ### 2d contour
+    file2d = basename+'_2D_'+p1+'_'+p2
+    data = np.loadtxt(file2d)
+
+    ndat = len(data)
+    Condata = [[0 for row1 in range(ndat)] for row2 in range(ndat)]
+    # I don't know why, but have to invert the matrix...
+    for row1 in range(ndat):
+        for row2 in range(ndat):
+            Condata[row1][row2] =  data[row2][row1]
+        #data = [[data[row1][row2] for row2 in range(len(data[0])-1,-1,-1) ]
+        #        for row1 in range(len(data)-1,-1,-1)]
+    ConX2 = np.loadtxt(basename+'_2D_'+p1+'_'+p2+'_x')
+    ConX1 = np.loadtxt(basename+'_2D_'+p1+'_'+p2+'_y')
+    filelevs = file2d+'_cont'
+    Conlevs = reverse_1darray(np.loadtxt(filelevs))
+    if makeplot:
+        ax3.contour(ConX1, ConX2, Condata, Conlevs[1:3], **kwargs )
+        ax3.set_xlabel(p1lab, fontsize=16);
+        ax3.set_ylabel(p2lab, fontsize=16);
+    if figaxs == None:
+        ax2.set_title(nowlab,fontsize=18)
+    if nowlab != None:
+        for ax in [ax1, ax2]:
+            ax.legend(frameon=False,fontsize=14,loc='upper left')
+    ax1.set_ylim(0,1.15); ax2.set_ylim(0,1.15); 
+    fig.tight_layout()
+    if p1xlim!= None:
+        ax1.set_xlim(p1xlim[0],p1xlim[1]); ax3.set_xlim(p1xlim[0],p1xlim[1]);
+    if p2xlim!= None:
+        ax2.set_xlim(p2xlim[0],p2xlim[1]); ax3.set_ylim(p2xlim[0],p2xlim[1]);
+    if Likeylim!=None:
+        ax1.set_ylim(Likeylim[0],Likeylim[1]); ax2.set_ylim(Likeylim[0],Likeylim[1]);
+    #ax2.set_xlim(-1.2,-0.9); ax3.set_xlim(0.27,0.33); ax3.set_ylim(-1.2,-0.9)
+    return LikeX1, LikeY1, LikeX2, LikeY2, ConX1, ConX2, Condata, Conlevs
+    #fig.tight_layout(h_pad=200)
 
 def getdist_like(modelname, pname):
 	'''
