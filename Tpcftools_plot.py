@@ -4,6 +4,9 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
 		deltais = 2,
 		no_s_sq_in_y = False,
 		savefig=True,
+                DDcol=4,DRcol=5,RRcol=6,
+                readnorm=False,
+                #DDlist=[], DRlist=[], RRlist=[], norms=[],
 		):
 
 	smusettings = {
@@ -16,8 +19,21 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
 	smu__initsmusettings(smusettings)
 
 	if True:
+                if readnorm:
+                    norms = [float(xx) for xx in open(filename, 'r').readline().split()[1:4]]
+                else:
+                    norms = [1,1,1]
 
-		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [4,5,6])
+		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [DDcol, DRcol, RRcol])
+                #print DDlist
+                for row1 in range(len(DDlist)):
+                    for row2 in range(len(DDlist[0])):
+                        DDlist[row1][row2] /= norms[0]
+                        DRlist[row1][row2] /= norms[1]
+                        RRlist[row1][row2] /= norms[2]
+                #DDlist = [tmp/norms[0] for tmp in DDlist]
+                #DRlist = [tmp/norms[1] for tmp in DRlist]
+                #RRlist = [tmp/norms[2] for tmp in RRlist]
 		if isMAX == None:
 			isMAX = numsbin
 		fig, ax1 = figax()
@@ -55,6 +71,9 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
                         #ax1.set_xlim(0,50)
 		if savefig:
 			fig.savefig(filename+'.png', format = 'png')
+        else:
+            print "WARNING! Missing norms!"
+
 
 def smu__plot_Tpcfdatas(Tpcfdatas,  smusettings, key_leg_list=None, muedges = np.linspace(0,1,11), 
 	ismin_of_intxi = 6, ismax_of_intxi = 50, deltais = 2, 
