@@ -4,6 +4,7 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
 		deltais = 2,
 		no_s_sq_in_y = False,
 		savefig=True,
+                DDcol=4, DRcol=5, RRcol=6,
 		):
 
 	smusettings = {
@@ -17,7 +18,7 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
 
 	if True:
 
-		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [4,5,6])
+		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [DDcol, DRcol, RRcol])
 		if isMAX == None:
 			isMAX = numsbin
 		fig, ax1 = figax()

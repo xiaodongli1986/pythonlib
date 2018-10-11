@@ -1,4 +1,4 @@
-#!/home/xiaodongli/anaconda/bin/python
+#!/usr/bin/env python
 import commands
 import sys
 import os
