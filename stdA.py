@@ -885,7 +885,7 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
 	else:
 		return CS
 
-def getdist_readmarg(key1, key2, nowdir='/home/xiaodongli/software/cosmomc/outputs/',printinfo=True):
+def getdist_readmarg(key1, key2, nowdir='/home/xiaodongli/software/cosmomc/outputs/',printinfo=True,printformat=1,fmtstr='%.4f'):
     '''key1: modelname; key2: parametername; 
     nowfile = nowdir + key1 + '.margestats'  
     return mean, std, low1, up1, low2, up2'''
@@ -904,8 +904,11 @@ def getdist_readmarg(key1, key2, nowdir='/home/xiaodongli/software/cosmomc/outpu
     #print '### model = ', key1
     #print '\tw = %.4f'%mean+' \pm %.4f'%std 
     if printinfo:
-        print '\t'+key2+' \t= %.4f'%mean+'^{+%.4f'%er1u+'}_{-%.4f'%er1d+\
-            '} ^{+%.4f'%er2u+'}_{-%.4f'%er2d+'}  ('+key1+')'
+        if printformat == 1:
+	        print '\t'+key2+' \t= %.4f'%mean+'^{+'+fmtstr%er1u+'}_{-'+fmtstr%er1d+\
+        	    '} ^{+'+fmtstr%er2u+'}_{-'+fmtstr%er2d+'}  ('+key1+')'
+	else:
+	        print '\t'+key2+' \t= '+fmtstr%mean+' \pm '+fmtstr%std#+' ('+key1+')'
     commands.getoutput('cp '+nowfile+' '+nowfile+'.save')
     return mean, std, low1, up1, low2, up2
 

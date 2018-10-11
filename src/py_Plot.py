@@ -31,10 +31,11 @@ printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [
 	'\n\t\t[-singleplot/T,F]       if T, all files plotted in one plot'+\
 	'\n\t\t[-automaticcolor,autoc,autocolor,automaticc/T,F]   if T, automatically assign color'+\
 	'\n\t\t[-showleg/T,F]          if T, show legend'+\
-	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax]   set the range of x,y in figure or the contour plot'+\
+	'\n\t\t[-setxmin/-xmin, -setxmax/-xmax, -setymin/-ymin, -setymax/-ymax, -setzmin/-zmin, -setzmax/zmax]   set the range of x,y,z in figure or the contour plot'+\
 	'\n\t\t[-numx, -numy ]  number of x/y grid points in contour plot'+\
 	'\n\t\t[-histrange]     set the range of histogram; in form of e.g. 0-100 '+\
 	'\n\t\t[-cumulative]     cumulative hitogram '+\
+	'\n\t\t[-filt_xyz]       filtering the data''s x,y,z using their min/max '+\
 	'\n\n\t###############################'+\
 	'\n\t   An example'+\
         '\n\n\t\tpy_Plot scatter3d \*.txt -xcol 1 -ycol 2 -zcol 3 -randrat 0.1 -ml 10000 -savefig T -figfmt png -showfig F '+\
@@ -100,11 +101,14 @@ showleg=False
 histrange=None
 cumulative=False
 maxnlines_read=1.0e20
+filt_xyz=False
 
-xmin=None
-xmax=None
-ymin=None
-ymax=None
+xmin=-1.0e30
+xmax=1.0e30
+ymin=-1.0e30
+ymax=1.0e30
+zmin=-1.0e30
+zmax=1.0e30
 
 		
 if plotfun in ['scatter', 'scatter3d', 'scatterradec', 'scatterrw']:
@@ -293,6 +297,10 @@ if len(cmdargs) >=4:
 				ymin = float(opt2)
 			elif opt1 in ['-setymax', '-ymax']:
 				ymax = float(opt2)
+			elif opt1 in ['-setzmin', '-zmin']:
+				zmin = float(opt2)
+			elif opt1 in ['-setzmax', '-zmax']:
+				zmax = float(opt2)
 			elif opt1 == '-numx':
 				numx=int(opt2)
 			elif opt1 == '-numy':
@@ -308,6 +316,14 @@ if len(cmdargs) >=4:
 			elif opt1 == '-histrange':
 				nowi = stdA.indice_of_character(opt2, '-')[0]
 				histrange = (float(opt2[0:nowi]), float(opt2[nowi+1:len(opt2)]))
+			elif opt1 in ['-filt_xyz', '-filt']:
+                            if opt2[0] =='T':
+                                filt_xyz = True
+			    elif opt2[0] == 'F':
+                                filt_xyz = False
+		    	    else:
+				print 'ERROR (PlotIJ)!: wrong automaticcolor; must start with T or F: ', opt2
+				sys.exit()
 			else:
 				print 'ERROR (PlotIJ)!: wrong option: ', opt1
 				sys.exit()
@@ -331,7 +347,24 @@ for filename in filenames:
 #		data = np.loadtxt(filename)
 #	else:
 #		data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True)
-	data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read,skiprow=skiprow,delimiter=delimiter)
+        if filt_xyz:
+    	    data0 = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read,skiprow=skiprow,delimiter=delimiter)
+            data = []
+            len0 = len(data0[0]) 
+            if len0 >= xcol and len0 < ycol and len0 < zcol:
+                for row in range(len(data0)):
+                    if data0[row][xcol-1] < xmax and data0[row][xcol-1] > xmin:
+                        data.append([xx for xx in data0[row]])
+            elif len0 >= xcol and len0 >= ycol and len0 < zcol:
+                for row in range(len(data0)):
+                    if data0[row][xcol-1] < xmax and data0[row][xcol-1] > xmin and data0[row][ycol-1] < ymax and data0[row][ycol-1] > ymin:
+                        data.append([xx for xx in data0[row]])
+            elif len0 >= xcol and len0 >= ycol and len0 >= zcol:
+                for row in range(len(data0)):
+                    if data0[row][xcol-1] < xmax and data0[row][xcol-1] > xmin and data0[row][ycol-1] < ymax and data0[row][ycol-1] > ymin and data0[row][zcol-1] < zmax and data0[row][zcol-1] > zmin:
+                        data.append([xx for xx in data0[row]])
+        else:
+    	    data = stdA.loadtxt_rand(filename, rat=randrat, printinfo=True, maxnlines_read=maxnlines_read,skiprow=skiprow,delimiter=delimiter)
 
 #	if singlecolfile:
 #		data = [[x] for x in data]
@@ -378,10 +411,10 @@ for filename in filenames:
                 colstr = str(xcol)
                 X = stdA.Xfromdata(data, xcol-1)
                 if logX: X = [logfun(abs(x)) for x in X]
-		if xmin==None: xmin=-1
-		if xmax==None: xmax= 1
-		if ymin==None: ymin=-1
-		if ymax==None: ymax= 1
+		if xmin==-1.0e30: xmin=-1
+		if xmax==1.0e30: xmax= 1
+		if ymin==-1.0e30: ymin=-1
+		if ymax==1.0e30: ymax= 1
 		xlist = np.linspace(xmin,xmax,numx)
 		ylist = np.linspace(ymin,ymax,numy)
 		chisqlist = stdA.get_2darray_from_1d(X, numy, numx)
@@ -453,14 +486,18 @@ for filename in filenames:
 		figtitle = origfigtitle
 	ax.set_title(figtitle, fontsize=titlefs)
 	
-	if xmin != None:
+	if xmin != -1.0e30:
 		ax.set_xlim(left=xmin)
-	if xmax != None:
+	if xmax != 1.0e30:
 		ax.set_xlim(right=xmax)
-	if ymin != None:
+	if ymin != -1.0e30:
 		ax.set_ylim(bottom=ymin)
-	if ymax != None:
+	if ymax != 1.0e30:
 		ax.set_ylim(top=ymax)
+	if zmin != -1.0e30 and plotfun in ['scatter3d']:
+		ax.set_zlim(bottom=ymin)
+	if zmax != 1.0e30 and plotfun in ['scatter3d']:
+		ax.set_zlim(top=zmax)
 
 
 	if showleg:
