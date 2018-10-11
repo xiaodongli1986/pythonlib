@@ -4,13 +4,9 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
 		deltais = 2,
 		no_s_sq_in_y = False,
 		savefig=True,
-<<<<<<< HEAD
-                DDcol=4, DRcol=5, RRcol=6,
-=======
                 DDcol=4,DRcol=5,RRcol=6,
                 readnorm=False,
                 #DDlist=[], DRlist=[], RRlist=[], norms=[],
->>>>>>> f93b790723c4d836e10e3135c2c1e930b0e1ee41
 		):
 
 	smusettings = {
@@ -29,8 +25,6 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
                     norms = [1,1,1]
 
 		DDlist, DRlist, RRlist = Xsfrom2ddata(smu__loadin(filename, smusettings), [DDcol, DRcol, RRcol])
-<<<<<<< HEAD
-=======
                 #print DDlist
                 for row1 in range(len(DDlist)):
                     for row2 in range(len(DDlist[0])):
@@ -40,7 +34,6 @@ def smu__plot(filename, smax=50, numsbin=50, nummubin=120,
                 #DDlist = [tmp/norms[0] for tmp in DDlist]
                 #DRlist = [tmp/norms[1] for tmp in DRlist]
                 #RRlist = [tmp/norms[2] for tmp in RRlist]
->>>>>>> f93b790723c4d836e10e3135c2c1e930b0e1ee41
 		if isMAX == None:
 			isMAX = numsbin
 		fig, ax1 = figax()
