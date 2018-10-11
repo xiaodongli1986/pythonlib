@@ -1165,23 +1165,21 @@ def smu_xis_loaddatarlt(xis_data_file, totbin =3):
 #    return xis, ximu, intximu
 
 def xismu(data, sbin=150, mubin=120, s1=6, s2=40, DDicol=4, DRicol=5, RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, 
-          nmubin = None, imu1=None):
+          nmubin = None, imu1=None, rs=None, mus=None):
     ''' xi(s), xi(mu), AND \int xi(s,mu) ds as a function of mu
-	nowfile='/home/xiaodongli/SparseFilaments/data/input/boss2pcf/data/DR12v4-CMASS/xyzw.binsplitted/J08.RSD.000.xyzw.3of3.rmax150.150rbins.120mubins.2pcf';
-	data = np.loadtxt(nowfile)
-	nmubin = 15
-	imu1 = 1
-	xis, ximu, intximu = xismu(data, nr, nmu, 6, 40, 
-                DDicol=4,DRicol=5,RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, nmubin=nmubin, imu1=imu1);
-
-	rs, mus = get_mid_array1d(range(nr+1)), get_mid_array1d(np.linspace(0,1,nmubin+1))
-
-	fig = plt.figure(figsize=(14,6));
-	ax1, ax2, ax3 = fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133), 
-	ax1.plot(rs, xis)
-	ax2.plot(mus, ximu)
-	ax3.plot(mus, intximu)'''
-
+	Example:
+		data = np.loadtxt(nowfile)
+		nmubin = 15
+		imu1 = 1
+		rs, mus = [], []
+		xis, ximu, intximu = xismu(data, 150, 120, 6, 40, 
+	        DDicol=4,DRicol=5,RRicol=6, DDnorm=1, DRnorm=1, RRnorm=1, nmubin=nmubin, imu1=imu1, rs=rs, mus=mus,);
+		
+		fig = plt.figure(figsize=(14,6));
+		ax1, ax2, ax3 = fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133), 
+		ax1.plot(rs, xis)
+		ax2.plot(mus, ximu)
+		ax3.plot(mus, intximu)'''
     if nmubin == None:
         xis = [0 for row in range(sbin)]
         ximu = [0 for row in range(mubin)]
@@ -1226,6 +1224,25 @@ def xismu(data, sbin=150, mubin=120, s1=6, s2=40, DDicol=4, DRicol=5, RRicol=6, 
         xis = [xi_LS(DDs[row], DRs[row], RRs[row]) for row in range(sbin)]
         ximu = [xi_LS(DDmu[row], DRmu[row], RRmu[row]) for row in range(nmubin)]
         intximu = [ sum([xismu[rows][rowmu] for rows in range(s1,s2)]) for rowmu in range(nmubin)]
+    nowrs, nowmus = get_mid_array1d(range(sbin+1)), get_mid_array1d(np.linspace(0,1,nmubin+1))
+    if rs != None:
+	try:
+          if len(rs) == len(nowrs):
+	     for row in range(len(nowrs)):
+		rs[row] = nowrs[row]
+          elif len(rs) == 0:
+	     for row in range(len(nowrs)):
+		rs.append(nowrs[row])
+        except: pass
+    if mus != None:
+	try:
+          if len(mus) == len(nowmus):
+	     for row in range(len(nowmus)):
+		mus[row] = nowmus[row]
+          elif len(mus) == 0:
+	     for row in range(len(nowmus)):
+		mus.append(nowmus[row])
+        except: pass
     return xis, ximu, intximu
 
 
