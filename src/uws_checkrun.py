@@ -5,6 +5,7 @@ import sys, commands
 #joblist = cmdargs[1]
 
 rlt = commands.getoutput('uws $cstr  list')
+print rlt
 
 #for nowstr in open(joblist,'r').readlines():
 for nowstr in rlt.split('\n'): #open(joblist,'r').readlines():
@@ -18,6 +19,8 @@ for nowstr in rlt.split('\n'): #open(joblist,'r').readlines():
 	print 'Check job ', jobid, '...'
 	if nowinfo[5][1] == 'COMPLETED':
 		print '\tJob COMPLETED. Skip.'
+	elif nowinfo[5][1] == 'EXECUTING':
+		print '\tJob EXECUTING. Skip.'
 	else:
 		nowtab = nowinfo[12][2]
 		nowquery = '';
