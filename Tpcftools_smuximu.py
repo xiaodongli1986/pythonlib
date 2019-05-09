@@ -53,6 +53,43 @@ def mapping_smudata_to_another_cosmology(smutabstd, DAstd, DAnew, Hstd, Hnew, de
               smutab2[row1][row2][row3] = smutabstd[x1][y1][row3]
     return smutab2
 
+def mapping_smudata_to_another_cosmology_simple(smutabstd, DAstd, DAnew, Hstd, Hnew, deltamu=1.0/120.0, simple_replacement=False, max_mubin=120,
+                                         smin_mapping=1,smax_mapping=51):
+    ''' mapping: so far only mapping the last coordinate!! '''
+    smutab2 = copy.deepcopy(smutabstd)
+
+    for row1 in range(smin_mapping,smax_mapping):
+      for row2 in range(len(smutabstd[row1])):
+            smax, anglemax = row1, row2
+            mumin = 1 - anglemax * deltamu
+            if True:
+            #smid = smax - 0.5
+            #mumid = mumin + deltamu * 0.5
+                smax2, mumin2 = smu__CosmoConvert(smax,mumin,DAnew,DAstd,Hnew,Hstd)
+            else: # coordinate transformation using "middle" rather than "boundary" values of s and mu: not much improvement...
+                smid = smax - 0.5
+                mumid = mumin + deltamu * 0.5
+                smid2, mumid2 = smu__CosmoConvert(smid,mumid,DAnew,DAstd,Hnew,Hstd)
+                smax2, mumin2 = smid2+0.5, mumid2-deltamu*0.5
+                #print smid, mumid, smid2, mumid2, smax2, mumin2
+            anglemax2 = (1 - mumin2)/deltamu
+            if not simple_replacement:
+             x1, y1 = int(smax2), int(anglemax2)
+             #if x1 <=5: x1 +=1
+             if y1 == max_mubin-1: y1=y1-1
+             x2, y2 = x1 + 1, y1 + 1
+             #x3, y3 = x2 + 1, y2 + 1
+             #print smax, anglemax, smax2, anglemax2
+             smutab2[row1][row2] = \
+                    LinearInterpolation_2d(x1,y1,x2,y2,
+                                   smutabstd[x1][y1],smutabstd[x1][y2],smutabstd[x2][y1],\
+                                   smutabstd[x2][y2],smax2, anglemax2)
+            else:
+             x1, y1 = int(smax2+0.5), int(anglemax2+0.5)
+             smutab2[row1][row2] = smutabstd[x1][y1]
+    return smutab2
+
+
 def mapping_smudata_to_another_cosmology_DenseToSparse_old(smutabstd, DAstd, DAnew, Hstd, Hnew, 
         deltas1=0.2, deltamu1=1.0/600.0, deltas2=1.0, deltamu2=1.0/120.0, smin_mapping=1,smax_mapping=51, 
         compute_rows=[4,5,6,9], save_counts_row=0, div_counts_rows=[], method='simple_bin'):
