@@ -25,7 +25,7 @@ if len(args) > 5:
 if len(args)>6:
 	if args[6][0] in ['T', 'F']:
 		if args[6][0] == 'T': 
-			nosuffx = True
+			nosuffix = True
 		else:
 			nosuffix = False
 	else:
