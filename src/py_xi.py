@@ -19,7 +19,7 @@ def meannorm(Y):
         return Y / abs(np.mean(Y)) + 2
 
 printstr = 'Usage: py_xi filename [-smin 0] [-smax 150] [-sbin 150] [-mubin 120] [-intxismin 6] [-intxismax 40] [-savefig T/F] [-showfig T/F]'+\
-        '\n\t[-mu_pack_rat 1] reduces the bins by pack-up small bins; should be an integer 1,2,3,...; '+\
+        '\n\t[-mubin_pack_rat 1] reduces the bins by pack-up small bins; should be an integer 1,2,3,...; '+\
         '\n\t[-mumax 1] maximal value of mu in plot; can impose a cut (e.g. set -mumax 0.97) to remove FOG'+\
         '\n\t[-figname YOUR_FIGURE_FILE_NAME] '+\
         '\n\t[-figtitle YOUR_FIGURE_NAME] '+\
@@ -80,7 +80,7 @@ for icmd in range(2,len(args)):
         elif str1 == '-labs':
             labs = str2.split(',')
         else:
-            print 'Error (py_xi): cmd not recognizable! ', str2
+            print 'Error (py_xi): cmd not recognizable! ', str1, str2
             print printstr
             sys.exit()
 
