@@ -69,6 +69,6 @@ for outfile, grid in [
         [outputname+'.pygrid',vygrid],
         [outputname+'.pzgrid',vzgrid],
         ]:
-    print('\t write to file: ', outputname)
+    print('\t write to file: ', outfile)
     grid.reshape(-1).tofile(outfile, format='')
 
