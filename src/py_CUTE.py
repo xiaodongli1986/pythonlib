@@ -49,6 +49,36 @@ output_dict = {
             }
 
 printstr = 'Usage:\n\tpy_CUTE -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE -cute_ini_filename ./tmp_cute_ini ...\nDefault values of optional options:\n\t'
+
+example_str = '''        datafile = ...; ranfile = .... 
+        wei=1; zplus = 1000000000
+        input_format = 4 # means directly read-in x,y,z;
+
+        smax = 150; sbin = 150; mubin = 120
+        suffixstr_rr = '.'+str(sbin)+'s0to'+str(smax)+'.'+str(mubin)+'mu'
+        suffixstr = '.rho'+str(wei)+suffixstr_rr
+
+
+        inifile = datafile+suffixstr+'.ini'
+        Tpcffile = datafile+suffixstr+'.2pcf'
+        rrfile = ranfile+suffixstr_rr+'.rr'
+
+        print('datafile, ranfile = \\n\\t', datafile, '\\n\\t',ranfile)
+        print('We will generate: inifile, 2pcffile, rrfile: \\n\\t',inifile,'\\n\\t',Tpcffile,'\\n\\t',rrfile)
+        print('Start running CUTE...')
+
+        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)
+        print(py_CUTE_cmd)
+
+        bashf.write('echo \\'datafile, ranfile = '+str(datafile)+' '+str(ranfile)+'\\'\\n')
+        bashf.write('echo \\'Will generate:\\'\\n')
+        bashf.write('echo \\'  inifile:   '+str(inifile)+'\\'\\n')
+        bashf.write('echo \\'  2pcffile:  '+str(Tpcffile)+'\\'\\n')
+        bashf.write('echo \\'  rrfile:    '+str(rrfile)+'\\'\\n')
+        bashf.write('echo \\'Start running CUTE...\\'\\n')
+        bashf.write(py_CUTE_cmd+'\\n')
+'''
+
 for nowkey in allkeys:
     printstr += ('-'+nowkey+' '+str(output_dict[nowkey])+'   ')
 
@@ -88,9 +118,9 @@ cute_exe = '/home/xiaodongli/software/CUTE/CUTE/CUTE'
 arg_dict = {}
 cmdargs = sys.argv
 
-if (len(cmdargs) -1)%2 != 0:
+if (len(cmdargs) -1)%2 != 0 or len(cmdargs) < 2:
     print 'ERROR! Number of options + values must be a even number: we get len(cmdargs)-1 = ', len(cmdargs)-1
-    print printstr; sys.exit()
+    print printstr; print '\n###################\nexample of calling py_CUTE and write commands (to bash) in python:\n\n\n', example_str; sys.exit()
 
 for iarg in range(1, len(cmdargs), 2):
     key = cmdargs[iarg]

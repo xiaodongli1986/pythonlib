@@ -3,9 +3,10 @@ import commands
 import numpy as np
 import sys
 import stdA
+import matplotlib.pyplot as plt
 
 
-plotfunlist = ['plot', 'scatter', 'hist', 'errorbar', 'scatter3d','plot3d','scatterradec', 'histr', 'histrcube', 'scatterrw', 'contour']
+plotfunlist = ['plot', 'scatter', 'hist', 'hists', 'errorbar', 'scatter3d','plot3d','scatterradec', 'histr', 'histrcube', 'scatterrw', 'contour']
 plotfun3dlist = ['scatter3d', 'plot3d']
 
 printstr = 'Usage: EXE plotfun filename [-xcol xcol] [-ycol ycol] [-zcol zcol] [options...]'+\
@@ -120,7 +121,7 @@ else:
 
 if plotfun == 'scatterradec':
 	xlabel = 'ra'; ylabel='dec'
-if plotfun in ['hist', 'histr', 'histrcube']:
+if plotfun in ['hist', 'hists', 'histr', 'histrcube']:
 	ylabel = 'N'
 if plotfun == 'histr':
 	xlabel = 'r'	
@@ -332,7 +333,10 @@ if len(cmdargs) >=4:
 ### Make the plot
 
 if singleplot:
-	fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
+        if plotfun == 'hists':
+	    pass
+        else:
+	    fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
 
 ifile = 0
 for filename in filenames:
@@ -341,7 +345,11 @@ for filename in filenames:
 		linecolor = colors[np.mod(ifile,len(colors))]
 		color = colors[np.mod(ifile,len(colors))]
 	if not singleplot:
-		fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
+            if plotfun == 'hists':
+	        pass
+            else:
+    	        fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
+		#fig, ax = stdA.figax(figxsize=figxsize, figysize=figysize)
 
 	#if randrat >= 1.0:
 #		data = np.loadtxt(filename)
@@ -407,6 +415,14 @@ for filename in filenames:
 		X = stdA.Xfromdata(data, xcol-1)
 		if logX: X = [logfun(abs(x)) for x in X]
 		ax.hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
+	elif  plotfun == 'hists': 
+                fig, axs = plt.subplots(1,len(data[0]),figsize=(18,6)); ax = axs[0]
+                for iax in range(len(axs)): 
+                    X = stdA.Xfromdata(data, iax)
+                    if logX: X = [logfun(abs(x)) for x in X] 
+                    colstr = str(iax+1) 
+                    axs[iax].hist(X,bins=bins,label=stdA.separate_path_file(filename)[1], range=histrange, cumulative=cumulative)
+                    axs[iax].set_xlabel('column='+str(iax+1)); axs[iax].grid()
         elif  plotfun == 'contour':
                 colstr = str(xcol)
                 X = stdA.Xfromdata(data, xcol-1)
