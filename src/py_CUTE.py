@@ -8,7 +8,7 @@ print 'This is python args version of CUTE.'
 #global RRfile_create = True
 
 
-allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow']
+allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow', 'readbinary_fmt']
 
 output_dict = {
     'data_filename': 'test/shell.dat',
@@ -45,14 +45,20 @@ output_dict = {
     'yplus': '0',
     'zplus': '0',
     'weight_pow': '1',
+    'readbinary_fmt': '0',
  #   'have_weight': '1',
             }
 
 printstr = 'Usage:\n\tpy_CUTE -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE -cute_ini_filename ./tmp_cute_ini ...\nDefault values of optional options:\n\t'
 
-example_str = '''        datafile = ...; ranfile = .... 
-        wei=1; zplus = 1000000000
-        input_format = 4 # means directly read-in x,y,z;
+example_str = '''        bashf = open(???.sh, 'w') # bash script of py_CUTE commands
+        bashf.write('export OMP_NUM_THREADS=48\\n\\n') # running CUTE in 48-cores 
+
+        datafile = ... 
+        ranfile = .... 
+        wei=1; zplus=0 #zplus = 1000000000
+        input_format = 4 # 4 means directly read-in x,y,z;
+        readbinary_fmt = 0 # 0 means a usual ascii file; 1 means CUTE subsample binary file (weight be forece to be 1)
 
         smax = 150; sbin = 150; mubin = 120
         suffixstr_rr = '.'+str(sbin)+'s0to'+str(smax)+'.'+str(mubin)+'mu'
@@ -67,7 +73,7 @@ example_str = '''        datafile = ...; ranfile = ....
         print('We will generate: inifile, 2pcffile, rrfile: \\n\\t',inifile,'\\n\\t',Tpcffile,'\\n\\t',rrfile)
         print('Start running CUTE...')
 
-        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)
+        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)
         print(py_CUTE_cmd)
 
         bashf.write('echo \\'datafile, ranfile = '+str(datafile)+' '+str(ranfile)+'\\'\\n')
