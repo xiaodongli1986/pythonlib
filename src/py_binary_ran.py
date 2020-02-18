@@ -3,7 +3,8 @@ import numpy as np
 import struct, sys
 
 printstr = 'Usage: py_binary_ran filename -format your_format -nran nran -shape box -size boxsize'+\
-            '\n\tformat=1/CUTE_subsample: boxsize/par-mass/omegam/h/a/redshift/nran/[x,y,z,vx,vy,vz]*6*nran/nran'
+            '\n\tformat=1/CUTE_subsample: boxsize/par-mass/omegam/h/a/redshift/nran/[x,y,z,vx,vy,vz]*nran/nran'+\
+            '\n\tformat=2/xyzw: nran/[x,y,z,w]*nran/nran'
 
 print printstr+'\n'
 
@@ -35,6 +36,8 @@ for iopt in range(nopt):
     if str1 == '-format':
         if str2 in ['1','CUTE_subsample', 'CUTEsubsample', 'CUTE-subsample']:
             binaryformat = 'CUTE_subsample'
+        elif str2 in ['2','xyzw', ]:
+            binaryformat = 'xyzw'
         else:
             print 'Unknown format: ', str1, str2
             sys.exit()
@@ -59,8 +62,18 @@ if binaryformat == 'CUTE_subsample':
     print '\tcreate a head for the data:',head
     nowf.write(struct.pack("6f1i",*head))
     for iran in range(nran):
-        nowf.write(struct.pack("3f",*np.random.uniform(0,size,3)))
+        if shape == 'box':
+            nowf.write(struct.pack("3f",*np.random.uniform(0,size,3)))
         nowf.write(struct.pack("3f",0,0,0))
+    nowf.write(struct.pack("i",nran))
+elif binaryformat == 'xyzw':
+    head = [nran]
+    print '\tcreate a head for the data:',head
+    nowf.write(struct.pack("1i",*head))
+    for iran in range(nran):
+        if shape == 'box':
+            nowf.write(struct.pack("3f",*np.random.uniform(0,size,3)))
+        nowf.write(struct.pack("1f",1))
     nowf.write(struct.pack("i",nran))
 nowf.close()
 print 'Finishing writing ', nran, 'particles to ', filename
