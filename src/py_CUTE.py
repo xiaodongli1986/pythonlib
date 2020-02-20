@@ -55,12 +55,15 @@ output_dict = {
 
 printstr = 'Usage:\n\tpy_CUTE -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE -cute_ini_filename ./tmp_cute_ini ...\nDefault values of optional options:\n\t'
 
-example_str = '''        bashf = open(???.sh, 'w') # bash script of py_CUTE commands
-        bashf.write('export OMP_NUM_THREADS=48\\n\\n') # running CUTE in 48-cores 
+example_str = '''bashf = open(???.sh, 'w') # bash script of py_CUTE commands
+bashf.write('export OMP_NUM_THREADS=48\\n\\n') # running CUTE in 48-cores 
+for ...:
 
         datafile = ... 
         ranfile = .... 
-        wei=1; zplus=0 #zplus = 1000000000
+
+        wei=1;  ### weight -> weight ^wei ; convenient for mark weighted CF
+        zplus=0 #zplus = 1000000000
         input_format = 4 # 4 means directly read-in x,y,z;
 
         ### binary format sample
@@ -70,7 +73,7 @@ example_str = '''        bashf = open(???.sh, 'w') # bash script of py_CUTE comm
         readbinary_fmt = 0 
 
         ### automatically add rsd to the z-direction
-        # Use them only if readbinary_fmt == 1 !!!
+        # Use them only if readbinary_fmt != 0 and velocites provided in the format !!!
         addrsd_shiftz_pbbox = 0  ### 0: don't do it; 1: add it.
         addrsd_pbboxsize = -1  ### boxsize; in case of readbinary_fmt==CUTE-subsample, you do not need to give it (set as -1)
         addrsd_redshift = -1  ### redshift of the sample; in case of readbinary_fmt==CUTE-subsample, you do not need to give it (set as -1)
@@ -78,12 +81,10 @@ example_str = '''        bashf = open(???.sh, 'w') # bash script of py_CUTE comm
 
         smax = 150; sbin = 150; mubin = 120
         suffixstr_rr = '.'+str(sbin)+'s0to'+str(smax)+'.'+str(mubin)+'mu'
-        suffixstr = '.rho'+str(wei)+suffixstr_rr
+        suffixstr = '.weipow'+str(wei)+suffixstr_rr
         if addrsd_shiftz_pbbox != 0:
             suffixstr = '.shiftz'+suffixstr
         if zplus!= 0: suffixstr = '.zplus'+str(zplus)+suffixstr
-
-
 
         inifile = datafile+suffixstr+'.ini'
         Tpcffile = datafile+suffixstr+'.2pcf'
