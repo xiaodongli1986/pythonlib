@@ -45,7 +45,7 @@ def tf_readin(str2):
                 print printstr
                 sys.exit()
 
-smin=0; smax=150; sbin=150; mubin=120; intxismin=6; intxismax=40; mubin_pack_rat=1; fs=14; savefig = True; showfig = True; mumax = 1.0; 
+smin=0; smax=150; sbin=150; mubin=120; intxismin=6; intxismax=40; mubin_pack_rat=1; fs=14; savefig = False; showfig = True; mumax = 1.0; 
 figtitle=None; figname=None; labs=[];
 
 for icmd in range(2,len(args)):

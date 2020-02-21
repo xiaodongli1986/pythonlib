@@ -9,6 +9,9 @@ import os , sys
 print(' CIC rho/px/py/pz grid calculation, multi files ')
 print(' Usage: py_cic filename nc xyzmin xyzmax outputname')
 
+if len(sys.argv)<5:
+    sys.exit()
+
 filename = sys.argv[1]
 nc, xyzmin, xyzmax = [float(xx) for xx in sys.argv[2:5]]; nc = int(nc)
 dx = (xyzmax-xyzmin)/float(nc); dx_inv = 1./dx
