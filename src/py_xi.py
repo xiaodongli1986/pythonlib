@@ -153,8 +153,9 @@ if figname==None:
 else:
     figname = figname+'.png'
 
-print 'figure saved: ', figname
-fig.savefig(figname, format='png')
+if savefig:
+    print 'figure saved: ', figname
+    fig.savefig(figname, format='png')
 if showfig:
     plt.show()
 

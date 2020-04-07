@@ -34,14 +34,14 @@ for filename in filenames:
  while True:
 	nowstr = nowf.readline()
 	if nowstr == '': break
+        nowstr = nowstr[:len(nowstr)-1]
 	iline += 1
 	if nowstr[0] in ['#']: continue
 	if nowchar == None:
 		try:
 			nowstrs = nowstr.split()
 			ncol = len(nowstrs)
-			xs = [float(x) for x in nowstrs]
-			nowchar = ' '
+                        xs = [float(x) for x in nowstrs]
 		except:
 			nowstrs = nowstr.split(',')
 			ncol = len(nowstrs)

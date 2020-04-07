@@ -8,7 +8,7 @@ print 'This is python args version of CUTE.'
 #global RRfile_create = True
 
 
-allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow', 'readbinary_fmt', 'addrsd_shiftz_pbbox', 'addrsd_redshift', 'addrsd_pbboxsize', 'addrsd_om']
+allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow', 'readbinary_fmt', 'addrsd_shiftz_pbbox', 'addrsd_shiftr_lightcone', 'addrsd_redshift', 'addrsd_pbboxsize', 'addrsd_om']
 
 output_dict = {
     'data_filename': 'test/shell.dat',
@@ -47,6 +47,7 @@ output_dict = {
     'weight_pow': '1',
     'readbinary_fmt': '0',
     'addrsd_shiftz_pbbox': '0',
+    'addrsd_shiftr_lightcone': '0',
     'addrsd_redshift': '-1',
     'addrsd_pbboxsize': '-1',
     'addrsd_om': '-1',
@@ -70,20 +71,29 @@ for ...:
         #  0 means a usual ascii file; 
         #  1 means CUTE subsample binary file (weight be forece to be 1);  
         #  2 means xyzw binary (head and end contains a 4-bytes integer specifying n-sample)
+        #  3 means xyzvxvyvzw binary (type py_binary_ascii_conv to see its format)
         readbinary_fmt = 0 
 
-        ### automatically add rsd to the z-direction
+        ### automatically add rsd to the z-direction, for peoriodic boundary box
         # Use them only if readbinary_fmt != 0 and velocites provided in the format !!!
         addrsd_shiftz_pbbox = 0  ### 0: don't do it; 1: add it.
-        addrsd_pbboxsize = -1  ### boxsize; in case of readbinary_fmt==CUTE-subsample, you do not need to give it (set as -1)
-        addrsd_redshift = -1  ### redshift of the sample; in case of readbinary_fmt==CUTE-subsample, you do not need to give it (set as -1)
-        addrsd_om = -1 ### omegam of the sample; in case of readbinary_fmt==CUTE-subsample, you do not need to give it (set as -1)
+        addrsd_pbboxsize = -1  ### boxsize; in case of readbinary_fmt==CUTE-subsample or 3 (xyzvxvyvzw), you do not need to give it (set as -1)
+        addrsd_redshift = -1  ### redshift of the sample; in case of readbinary_fmt==CUTE-subsample or 3, you do not need to give it (set as -1)
+
+
+        ### automatically add rsd to the r-direction, for lightcone sample
+        # Use them only if readbinary_fmt != 0 and velocites provided in the format !!!
+        addrsd_shiftr_lightcone = 0  ### 0: don't do it; 1: add it.
+
+        addrsd_om = -1 ### omegam of the sample; in case of readbinary_fmt==CUTE-subsample or 3, you do not need to give it (set as -1)
 
         smax = 150; sbin = 150; mubin = 120
         suffixstr_rr = '.'+str(sbin)+'s0to'+str(smax)+'.'+str(mubin)+'mu'
         suffixstr = '.weipow'+str(wei)+suffixstr_rr
         if addrsd_shiftz_pbbox != 0:
             suffixstr = '.shiftz'+suffixstr
+        if addrsd_shiftr_lightcone!= 0:
+            suffixstr = '.shiftr'+suffixstr
         if zplus!= 0: suffixstr = '.zplus'+str(zplus)+suffixstr
 
         inifile = datafile+suffixstr+'.ini'
@@ -94,7 +104,7 @@ for ...:
         print('We will generate: inifile, 2pcffile, rrfile: \\n\\t',inifile,'\\n\\t',Tpcffile,'\\n\\t',rrfile)
         print('Start running CUTE...')
 
-        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)
+        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lightcone '+str(addrsd_shiftr_lightcone)
         print(py_CUTE_cmd)
 
         bashf.write('echo \\'datafile, ranfile = '+str(datafile)+' '+str(ranfile)+'\\'\\n')
