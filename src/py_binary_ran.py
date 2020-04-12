@@ -9,7 +9,8 @@ printstr = 'Usage: py_binary_ran filename -format your_format -nran nran -shape 
                 '\n\t        3/xyzvxvyvzw/pos_vel_w: \n\t\t\tint-block+64*double+int-block + int-block+[x,y,z,vx,vy,vz,w]*nran+int-block'+\
                 '\n\tshape: '+\
                 '\n\t        box / sphere / shell (1-eighth of a sphere): uniform random distributed in cavity of given shape'+\
-                '\n\t        input_file_spherical / input_file_shell \n\t\t\tGenerating a spherical / shell (1-eighth of sphere) shape sample, whose N(r) varis according to the N(r) of the inputfile \n\t\t\t   Must give: -inputfile -binsize ;  \n\t\t\t   Optional: \n\t\t\t\t-rmin/-rmax (if not given, use the sample\'s rmin and rmax) \n\t\t\t\t-drop_at_rmax (drop some sample near the maximal R boundary of the sample, to avoid the RSD shifting-out) \n\t\t\t\t-input_file_fmt  by default ascii; also support fmt3\n\t\t\t\t-rat (e.g., 10 means 10 times number in the input_file) '
+                '\n\t        input_file_spherical / input_file_shell \n\t\t\tGenerating a spherical / shell (1-eighth of sphere) shape sample, whose N(r) varis according to the N(r) of the inputfile \n\t\t\t   Must give: -inputfile -binsize ;  \n\t\t\t   Optional: \n\t\t\t\t-rmin/-rmax (if not given, use the sample\'s rmin and rmax) \n\t\t\t\t-drop_at_rmax (drop some sample near the maximal R boundary of the sample, to avoid the RSD shifting-out) \n\t\t\t\t-input_file_format  by default ascii; also support fmt3\n\t\t\t\t-rat (e.g., 10 means 10 times number in the input_file) '+\
+                '\n\t        Example:     py_binary_ran FILENAME   -format 3   -shape input_file_shell   -rmin 0   -binsize 30   -rat 10   -input_file_format 3   -inputfile YOURFILE   '
 
 print printstr+'\n'
 
@@ -81,7 +82,7 @@ for iopt in range(nopt):
         binsize = float(str2)
     elif str1 == '-drop_at_rmax':
         drop_at_rmax = float(str2)
-    elif str1 in ['-inputfile_format', '-input_file_format']:
+    elif str1 in ['-inputfile_format', '-input_file_format', '-input_file_fmt', '-inputfile_fmt']:
         inputfile_format = str2
     elif str1 == '-rat':
         rat = float(str2)
@@ -109,11 +110,15 @@ if shape in ['input_file_spherical', 'input_file_shell']:
     if inputfile_format == 'ascii':
         print ' read in ascii : ', inputfile
         input_data = np.loadtxt(inputfile)[:,:3]
-    elif inputfile_format in ['fmt3', 'format3']:
+    elif inputfile_format in ['fmt3', 'format3', '3']:
         print ' read in binary fmt3: ', inputfile
         nowf1 = open(inputfile,'rb')
         block1 = struct.unpack('i',nowf1.read(4))[0]; head  = struct.unpack('64d',nowf1.read(8*64)); block2 = struct.unpack('i',nowf1.read(4))[0]
         noutput, boxsize, parmass, redshift, omegam, h = head[:6]; # need to add weos!
+        if head[6] <= -0.1:
+            weos = head[6]
+        else:
+            weos = -1.0
         print '\tread-in head: npar-total, boxsize, parmass, redshift, omegam, h = ', head[:6]
         block1 = struct.unpack('i',nowf1.read(4))[0]; npar = int(block1/7/4 + 0.1)
         input_data = np.array(struct.unpack(npar*'7f',nowf1.read(npar*7*4))).reshape(-1,7)[:,:3]
@@ -206,7 +211,7 @@ elif binaryformat == 'pos_vel_w':
         head = head + [0 for row in range(64-len(head))]
         head[0] = nran
     else:
-        head = [nran, size, parmass, redshift, omegam, h]+[0. for row in range(64-6)]
+        head = [nran, size, parmass, redshift, omegam, h, weos]+[0. for row in range(64-7)]
     nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))            
     nowf.write(struct.pack('i',nran*7*4))
     #for iran in range(nran):

@@ -8,7 +8,7 @@ print 'This is python args version of CUTE.'
 #global RRfile_create = True
 
 
-allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow', 'readbinary_fmt', 'addrsd_shiftz_pbbox', 'addrsd_shiftr_lightcone', 'addrsd_redshift', 'addrsd_pbboxsize', 'addrsd_om']
+allkeys = [   'data_filename', 'random_filename', 'data_filename_2', 'random_filename_2', 'input_format', 'output_filename', 'corr_type', 'omega_M', 'omega_L', 'w', 'log_bin', 'dim1_max', 'dim1_min_logbin', 'dim1_nbin', 'dim2_max', 'dim2_nbin', 'dim3_min', 'dim3_max', 'dim3_nbin', 'radial_aperture', 'use_pm', 'n_pix_sph', 'RR_filename', 'xplus', 'yplus', 'zplus', 'weight_pow', 'readbinary_fmt', 'addrsd_shiftz_pbbox', 'addrsd_shiftr_lc', 'addrsd_redshift', 'addrsd_pbboxsize', 'addrsd_om', 'rmin', 'rmax']
 
 output_dict = {
     'data_filename': 'test/shell.dat',
@@ -47,17 +47,22 @@ output_dict = {
     'weight_pow': '1',
     'readbinary_fmt': '0',
     'addrsd_shiftz_pbbox': '0',
-    'addrsd_shiftr_lightcone': '0',
+    'addrsd_shiftr_lc': '0',
     'addrsd_redshift': '-1',
     'addrsd_pbboxsize': '-1',
     'addrsd_om': '-1',
+    'rmin': -1, 'rmax': 2e30,
  #   'have_weight': '1',
             }
 
 printstr = 'Usage:\n\tpy_CUTE -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE -cute_ini_filename ./tmp_cute_ini ...\nDefault values of optional options:\n\t'
 
-example_str = '''bashf = open(???.sh, 'w') # bash script of py_CUTE commands
+example_str = '''import os, sys
+bashfile = 'run.sh'
+bashf = open(bashfile, 'w') # bash script of py_CUTE commands
 bashf.write('export OMP_NUM_THREADS=48\\n\\n') # running CUTE in 48-cores 
+bashf.close()
+# I don't know, but I have to add this, otherwise the addrsd_shiftr_lc will not work ... !!! Too strange!!! 
 for ...:
 
         datafile = ... 
@@ -81,18 +86,30 @@ for ...:
         addrsd_redshift = -1  ### redshift of the sample; in case of readbinary_fmt==CUTE-subsample or 3, you do not need to give it (set as -1)
 
 
-        ### automatically add rsd to the r-direction, for lightcone sample
+        ### automatically add rsd to the r-direction, for light-cone sample
         # Use them only if readbinary_fmt != 0 and velocites provided in the format !!!
-        addrsd_shiftr_lightcone = 0  ### 0: don't do it; 1: add it.
+        addrsd_shiftr_lc = 0  ### 0: don't do it; 1: add it.
+
+        rmin = -1; rmax = 2e30; ### if you want to select a shell with rmin<r<rmax, modify them
 
         addrsd_om = -1 ### omegam of the sample; in case of readbinary_fmt==CUTE-subsample or 3, you do not need to give it (set as -1)
 
         smax = 150; sbin = 150; mubin = 120
+
         suffixstr_rr = '.'+str(sbin)+'s0to'+str(smax)+'.'+str(mubin)+'mu'
+
+        if rmin >= 0:
+            suffixstr_rr += ('.rmin'+str(rmin))
+        if rmax < 1e30:
+            suffixstr_rr += ('.rmax'+str(rmax))
+
         suffixstr = '.weipow'+str(wei)+suffixstr_rr
+
+            
+
         if addrsd_shiftz_pbbox != 0:
             suffixstr = '.shiftz'+suffixstr
-        if addrsd_shiftr_lightcone!= 0:
+        if addrsd_shiftr_lc!= 0:
             suffixstr = '.shiftr'+suffixstr
         if zplus!= 0: suffixstr = '.zplus'+str(zplus)+suffixstr
 
@@ -104,16 +121,22 @@ for ...:
         print('We will generate: inifile, 2pcffile, rrfile: \\n\\t',inifile,'\\n\\t',Tpcffile,'\\n\\t',rrfile)
         print('Start running CUTE...')
 
-        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lightcone '+str(addrsd_shiftr_lightcone)
-        print(py_CUTE_cmd)
 
+        bashf = open(bashfile, 'a')
+        bashf.write('\\n#################################\\n')
         bashf.write('echo \\'datafile, ranfile = '+str(datafile)+' '+str(ranfile)+'\\'\\n')
         bashf.write('echo \\'Will generate:\\'\\n')
         bashf.write('echo \\'  inifile:   '+str(inifile)+'\\'\\n')
         bashf.write('echo \\'  2pcffile:  '+str(Tpcffile)+'\\'\\n')
         bashf.write('echo \\'  rrfile:    '+str(rrfile)+'\\'\\n')
         bashf.write('echo \\'Start running CUTE...\\'\\n')
-        bashf.write(py_CUTE_cmd+'\\n')
+        bashf.close()
+
+        #bashf.write(py_CUTE_cmd+'\\n')
+        #bashf.write('export LD_LIBRARY_PATH=/home/xiaodongli/software/cfitsio/lib:/home/xiaodongli/software/openmpi/lib:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64/:/lib:/lib64:/home/xiaodongli/software/cfitsio/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64/:/home/xiaodongli/software/plc-3.01/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64:/home/xiaodongli/software/fftw3.3.8/lib://home/xiaodongli/software/gsl-2.5/.libs:/home/xiadongli/software/gsl2.5/lib:/home/xiaodongli/software/intel/compiler/lib/intel64:/home/xiaodongli/software/intel/mkl/lib/intel64:/home/xiaodongli/software/bin:/usr/local/lib:/opt/intel//impi/5.0.3.048/intel64/lib:/opt/intel/composer_xe_2015.3.187/mpirt/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/tools/intel64/perfsys:/opt/intel/composer_xe_2015.3.187/mkl/lib/intel64:/opt/intel/composer_xe_2015.3.187/tbb/lib/intel64/gcc4.4:/opt/intel/composer_xe_2015.3.187/debugger/libipt/intel64/lib:/software/iraf/lib:/software/astro-gadget/lib:/home/xiaodongli/software/plc-3.01/lib && /home/xiaodongli/software/CUTE/CUTE/CUTE '+inifile+'\\n')
+        #bashf.write('cp '+2pcffile+' '+rrfile)
+        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lc '+str(addrsd_shiftr_lc)+' -bashfile '+bashfile+' -rmin '+str(rmin)+' -rmax '+str(rmax)
+        print(os.popen(py_CUTE_cmd).read())
 '''
 
 for nowkey in allkeys:
@@ -129,18 +152,18 @@ def cute_ini(ini_file_name = None, **kws):
         ini_file_name = './tmp_cute_ini.ini'
     for key in kws.keys():
         if key not in output_dict.keys():
-            print '(cute_ini) ERROR! unkwon key!: key = ', key
+            print '# (cute_ini) ERROR! unkwon key!: key = ', key
             return  'Nothing!!!!'
         else:
             output_dict[key] = kws[key]
     RRfile = output_dict['RR_filename']
     if RRfile != None:
         if not os.path.exists(RRfile):
-            print '(cute_ini) Can not find given RRfile... will be created.'
+            print '# (cute_ini) Can not find given RRfile... will be created.'
             #if RRfile_create:
             RRfile_create = True
             output_dict['RR_filename'] = None
-    print 'create ini file: ', ini_file_name, '...\n'
+    print '# create ini file: ', ini_file_name, '...\n'
     nowf = open(ini_file_name, 'w')
     for key in allkeys:
         if output_dict[key] != None:
@@ -152,11 +175,12 @@ def cute_ini(ini_file_name = None, **kws):
 
 cute_ini_filename = None
 cute_exe = '/home/xiaodongli/software/CUTE/CUTE/CUTE'
+bashfile = None
 arg_dict = {}
 cmdargs = sys.argv
 
 if (len(cmdargs) -1)%2 != 0 or len(cmdargs) < 2:
-    print 'ERROR! Number of options + values must be a even number: we get len(cmdargs)-1 = ', len(cmdargs)-1
+    print '# ERROR! Number of options + values must be a even number: we get len(cmdargs)-1 = ', len(cmdargs)-1
     print printstr; print '\n###################\nexample of calling py_CUTE and write commands (to bash) in python:\n\n\n', example_str; sys.exit()
 
 for iarg in range(1, len(cmdargs), 2):
@@ -167,16 +191,30 @@ for iarg in range(1, len(cmdargs), 2):
         cute_ini_filename = value
     elif key == 'cute_exe':
         cute_exe = value
+    elif key == 'bashfile':
+        bashfile = value
+        print '# set bashfile as ', bashfile
     else:
         arg_dict[key] = value
 
 cute_ini_filename = cute_ini(cute_ini_filename, **arg_dict)
-nowcmd = cute_exe + ' ' + cute_ini_filename
-print '\nRun command:\n\t'+nowcmd+'\n'
-print commands.getoutput(cute_exe + ' ' + cute_ini_filename)
+cmd1 = 'export LD_LIBRARY_PATH=/home/xiaodongli/software/cfitsio/lib:/home/xiaodongli/software/openmpi/lib:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64/:/lib:/lib64:/home/xiaodongli/software/cfitsio/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64/:/home/xiaodongli/software/plc-3.01/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64:/home/xiaodongli/software/fftw3.3.8/lib://home/xiaodongli/software/gsl-2.5/.libs:/home/xiadongli/software/gsl2.5/lib:/home/xiaodongli/software/intel/compiler/lib/intel64:/home/xiaodongli/software/intel/mkl/lib/intel64:/home/xiaodongli/software/bin:/usr/local/lib:/opt/intel//impi/5.0.3.048/intel64/lib:/opt/intel/composer_xe_2015.3.187/mpirt/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/tools/intel64/perfsys:/opt/intel/composer_xe_2015.3.187/mkl/lib/intel64:/opt/intel/composer_xe_2015.3.187/tbb/lib/intel64/gcc4.4:/opt/intel/composer_xe_2015.3.187/debugger/libipt/intel64/lib:/software/iraf/lib:/software/astro-gadget/lib:/home/xiaodongli/software/plc-3.01/lib'
+#nowcmd =  cmd1 + ' && '+ cute_exe + ' ' + cute_ini_filename
+nowcmd =  cute_exe + ' ' + cute_ini_filename
+print '\n# Will run command:\n\t # '+nowcmd+'\n'
+print 'bashfile = ', bashfile
+if bashfile == None:
+    print os.popen( nowcmd).read()
+else:
+    #print os.popen('echo '+nowcmd+' >> '+ bashfile ).read()
+    nowf = open(bashfile, 'a'); nowf.write('\n'+nowcmd+'\n'); nowf.close()
 print output_dict
 if RRfile_create:
-    print 'Create RRfile...'
+    print '# Create RRfile...'
     nowcmd = 'cp '+output_dict['output_filename'] + ' ' + RRfile
-    print '\t'+nowcmd
-    print commands.getoutput(nowcmd)
+    print '# add command: '+nowcmd
+    if bashfile == None:
+        print commands.getoutput(nowcmd)
+    else:
+        #print os.popen('echo '+nowcmd+' >> '+ bashfile ).read()
+        nowf = open(bashfile, 'a'); nowf.write('\n'+nowcmd+'\n'); nowf.close()

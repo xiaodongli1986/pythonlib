@@ -1,7 +1,7 @@
 
 import os, sys
 
-printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15.0   -xyzmin 0.0   -xyzmax 600.0   -output_1eighthLC T   -mv_lightcone_files T
+printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4
 
 # Bash Example:
 
@@ -47,6 +47,8 @@ if len(args) <=2:
 
 output_1eighthLC = True
 mv_lightcone_files = True
+just_create_bash = False
+split_np = 4
 
 for iarg in range(1,len(args),2):
     str1, str2 = args[iarg], args[iarg+1]
@@ -88,6 +90,14 @@ for iarg in range(1,len(args),2):
         else:
             print('ERROR! wrong arg for mv_lightcone_files: (must start with T or F) ', str2)
             print(printstr); sys.exit()
+    elif str1 in ['-just_create_bash', '-just_bash', '-just_shfile']:
+        if str2[0] in ['T', 't']:
+            just_create_bash = True
+        elif str2[0] in ['F', 'f']:
+            just_create_bash = False
+    elif str1 in ['-split_np']:
+        split_np = int(str2)
+        print('\t set split_np as ', split_np)
     else:
         print('ERROR! unknown arg: ', str1)
         print(printstr); sys.exit()
@@ -110,27 +120,53 @@ output_suffix = '.nbox'+str(nbox)+'_overlap%.1f'%overlap_distance+'_xyz%.1f'%xyz
 cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %.1f'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile
 cmd = ' && '.join([cmd1,cmd2,cmd3])
 
+bashfile1 = basename+'_1_run_split.sh'
+bashfile2 = basename+'_2_jsub_find_rockstar.sh'
+bashfile3 = basename+'_3_run_merge_mv_conv.sh'
+
+if just_create_bash:
+    bashf = open(bashfile1, 'w'); bashf.write(cmd); bashf.close()
+    
+
 files = [basename+output_suffix+str(ibox) for ibox in range(1,nbox**3+1)]
-for nowfile in files:
+for ifile, nowfile in enumerate(files):
     cmd += ' &&  cd rockstar_halos && py_rockstar '+nowfile+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'
+    if just_create_bash:
+        bashfile = basename+'_2_run'+str(ifile)+'.sh'; bashf = open(bashfile, 'w'); bashf.write('cd rockstar_halos && py_rockstar '+nowfile+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'); bashf.close()
+        if ifile == 0:
+            bashf = open(bashfile2, 'w'); 
+        else:
+            bashf = open(bashfile2, 'a'); 
+        bashf.write('jsub -n '+str(split_np)+' -o '+bashfile+'.output  -e '+bashfile+'.er   sh '+bashfile+'\nsleep 2 \n'); bashf.close()
+
+    
 
 cmd4 = 'py_LightconeHalo_halo_for_iboxes_merge '+str(nbox)+' %.1f'%overlap_distance+' %.1f'%xyzmin+' %.1f'%xyzmax+' rockstar_halos '+basename+' '+str(output_1eighthLC)+' T '
+if just_create_bash:
+    bashf = open(bashfile3,'w'); bashf.write(cmd4+'\n'); bashf.close()
 
 cmd += (' && '+cmd4)
 
 if mv_lightcone_files == True:
     cmd5 = ' mkdir -p  '+basename+'_lightcone_files && mv '+basename+'_lightcone.* '+basename+'_lightcone_files'
     cmd += (' && '+cmd5)
+    if just_create_bash:
+        bashf = open(bashfile3,'a'); bashf.write(cmd5+'\n'); bashf.close()
 elif mv_lightcone_files == "Delete": 
     cmd5 = ' /usr/bin/rm -rf  '+basename+'_lightcone.* '
     cmd += (' && '+cmd5)
+    if just_create_bash:
+        bashf = open(bashfile3,'a'); bashf.write(cmd5+'\n'); bashf.close()
 
 file1 = 'rockstar_halos/'+basename+output_suffix+'ALL_rockstar_halo.ascii.xyzvxvyvz_mvir_vmax'
 file2 = file1+'_fmt3'
 cmd6 = 'py_binary_ascii_conv '+file1+' '+file2+' ab 3 -fmt3_headfile '+headfile
 cmd += (' && '+cmd6)
+if just_create_bash:
+    bashf = open(bashfile3,'a'); bashf.write(cmd6+'\n'); bashf.close()
 
-print('Executing cmd:\n\t', cmd)
-print(os.popen(cmd).read())
+if not just_create_bash:
+    print('Executing cmd:\n\t', cmd)
+    print(os.popen(cmd).read())
 
 

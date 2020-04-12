@@ -99,7 +99,7 @@ used_labs = []
 for ifile, filename in enumerate(filenames):
     DDnorm, DRnorm, RRnorm = [float(xx) for xx in open(filename, 'r').readline().split()[1:4]]
     data = np.loadtxt(filename)
-    DD, DR, RR = [data[:,row].reshape(sbin,mubin) for row in [3,4,6]]
+    DD, DR, RR = [data[:sbin*mubin,row].reshape(sbin,mubin) for row in [3,4,6]]
     DD /= DDnorm; DR /= DRnorm; RR /= RRnorm
 
     DDs = DD[:,:].sum(1); 

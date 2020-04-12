@@ -122,9 +122,9 @@ elif binaryformat in ['3', 'xyzvxvyvzw', 'pos_vel_w']:
         head  = struct.unpack('64d',nowf1.read(8*64))
         block2 = struct.unpack('i',nowf1.read(4))[0]
 #        n-particle/boxsize/part-mass/redshift/omegam/h/
-        noutput, boxsize, parmass, redshift, omegam, h = head[:6]; noutput = int(noutput+0.1)
-        print '\tread-in head: npar-total, boxsize, parmass, redshift, omegam, h = ', head[:6]
-        nowf3.write('read-in head: npar-total, boxsize, parmass, redshift, omegam, h = '+' '.join([str(xx) for xx in head[:6]])+'\n')
+        noutput, boxsize, parmass, redshift, omegam, h, w = head[:7]; noutput = int(noutput+0.1)
+        print '\tread-in head: npar-total, boxsize, parmass, redshift, omegam, h, w (w=0 means w=-1) = ', head[:7]
+        nowf3.write('read-in head: npar-total, boxsize, parmass, redshift, omegam, h, w = '+' '.join([str(xx) for xx in head[:7]])+'\n')
         nowf4.write(' '.join([str(xx) for xx in head]))
         print '\tread-in noutput = ', noutput
         print '\tget iline: ', str(noutput), 'lines in input binary file.'
