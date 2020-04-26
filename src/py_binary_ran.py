@@ -27,6 +27,7 @@ omegam = 0.3071
 h = 0.7 
 a = 1
 redshift = 0
+weos = -1
 
 # for input_file_spherical and input_file_shell
 inputfile = None
@@ -212,7 +213,9 @@ elif binaryformat == 'pos_vel_w':
         head[0] = nran
     else:
         head = [nran, size, parmass, redshift, omegam, h, weos]+[0. for row in range(64-7)]
-    nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))            
+    nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))   
+    print 'nran is ', nran
+    print '4*7*nran is ', nran*7*4
     nowf.write(struct.pack('i',nran*7*4))
     #for iran in range(nran):
     for iran, X in enumerate(yield_xyz()):

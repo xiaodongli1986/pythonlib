@@ -58,6 +58,7 @@ output_dict = {
 printstr = 'Usage:\n\tpy_CUTE -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE -cute_ini_filename ./tmp_cute_ini ...\nDefault values of optional options:\n\t'
 
 example_str = '''import os, sys
+import numpy as np
 bashfile = 'run.sh'
 bashf = open(bashfile, 'w') # bash script of py_CUTE commands
 bashf.write('export OMP_NUM_THREADS=48\\n\\n') # running CUTE in 48-cores 
@@ -130,13 +131,22 @@ for ...:
         bashf.write('echo \\'  2pcffile:  '+str(Tpcffile)+'\\'\\n')
         bashf.write('echo \\'  rrfile:    '+str(rrfile)+'\\'\\n')
         bashf.write('echo \\'Start running CUTE...\\'\\n')
-        bashf.close()
 
         #bashf.write(py_CUTE_cmd+'\\n')
         #bashf.write('export LD_LIBRARY_PATH=/home/xiaodongli/software/cfitsio/lib:/home/xiaodongli/software/openmpi/lib:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64/:/lib:/lib64:/home/xiaodongli/software/cfitsio/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64/:/home/xiaodongli/software/plc-3.01/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64:/home/xiaodongli/software/fftw3.3.8/lib://home/xiaodongli/software/gsl-2.5/.libs:/home/xiadongli/software/gsl2.5/lib:/home/xiaodongli/software/intel/compiler/lib/intel64:/home/xiaodongli/software/intel/mkl/lib/intel64:/home/xiaodongli/software/bin:/usr/local/lib:/opt/intel//impi/5.0.3.048/intel64/lib:/opt/intel/composer_xe_2015.3.187/mpirt/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/tools/intel64/perfsys:/opt/intel/composer_xe_2015.3.187/mkl/lib/intel64:/opt/intel/composer_xe_2015.3.187/tbb/lib/intel64/gcc4.4:/opt/intel/composer_xe_2015.3.187/debugger/libipt/intel64/lib:/software/iraf/lib:/software/astro-gadget/lib:/home/xiaodongli/software/plc-3.01/lib && /home/xiaodongli/software/CUTE/CUTE/CUTE '+inifile+'\\n')
         #bashf.write('cp '+2pcffile+' '+rrfile)
-        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lc '+str(addrsd_shiftr_lc)+' -bashfile '+bashfile+' -rmin '+str(rmin)+' -rmax '+str(rmax)
-        print(os.popen(py_CUTE_cmd).read())
+        #py_CUTE_cmd = 'py_CUTE    -force_rr F   -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lc '+str(addrsd_shiftr_lc)+' -bashfile '+bashfile+' -rmin '+str(rmin)+' -rmax '+str(rmax)+' '
+        #print(os.popen(py_CUTE_cmd).read())
+
+        i1, i2 = np.random.randint(10000000), np.random.randint(10000000) 
+        bashfile_tmp = bashfile+'.ifile'+str(i1)+'.'+str(i2)+'.sh'
+        py_CUTE_cmd = 'py_CUTE    -cute_exe /home/xiaodongli/software/CUTE/CUTE/CUTE    -cute_ini_filename '+inifile+'    -corr_type 3D_rm  -input_format '+str(input_format)+'    -log_bin 0 -dim1_max '+str(smax)+'   -dim1_nbin '+str(sbin)+' -dim2_max 1   -dim2_nbin '+str(mubin)+'  -omega_M 0.3071  -omega_L 0.6929 -w -1    -data_filename '+str(datafile)+'   -random_filename '+str(ranfile)+' -output_filename '+str(Tpcffile)+'   -RR_filename '+str(rrfile)+' -weight_pow '+str(wei)+' -zplus '+str(zplus)+' -readbinary_fmt '+str(readbinary_fmt)+' -addrsd_shiftz_pbbox '+str(addrsd_shiftz_pbbox)+' -addrsd_pbboxsize '+str(addrsd_pbboxsize)+' -addrsd_redshift '+str(addrsd_redshift)+' -addrsd_om '+str(addrsd_om)+' -addrsd_shiftr_lc '+str(addrsd_shiftr_lc)+' -bashfile '+bashfile_tmp+' -rmin '+str(rmin)+' -rmax '+str(rmax)
+        bashf.write(py_CUTE_cmd+' \\n\\n')
+        bashf.write('sh '+bashfile_tmp+'\\n')
+        bashf.write('rm '+bashfile_tmp+'\\n')
+
+
+        bashf.close()
 '''
 
 for nowkey in allkeys:
@@ -145,6 +155,7 @@ for nowkey in allkeys:
 def cute_ini(ini_file_name = None, **kws):
     global RRfile, RRfile_create
     RRfile_create = True
+    force_rr = False
     for nowkey in output_dict.keys():
         output_dict[nowkey] = None
     output_dict['dim3_nbin'] = 1; output_dict['dim3_min'] = 0.4; output_dict['dim3_max'] = 0.7
@@ -158,7 +169,7 @@ def cute_ini(ini_file_name = None, **kws):
             output_dict[key] = kws[key]
     RRfile = output_dict['RR_filename']
     if RRfile != None:
-        if not os.path.exists(RRfile):
+        if not os.path.exists(RRfile) and not force_rr:
             print '# (cute_ini) Can not find given RRfile... will be created.'
             #if RRfile_create:
             RRfile_create = True
@@ -194,6 +205,14 @@ for iarg in range(1, len(cmdargs), 2):
     elif key == 'bashfile':
         bashfile = value
         print '# set bashfile as ', bashfile
+    elif key == 'force_rr':
+        if value[0] in ['T', 't']:
+            force_rr= True
+        elif value[0] in ['F', 'f']:
+            force_rr = False
+        else:
+            print '# ERROR! Not valid value, force_rr = ', value
+            sys.exit()
     else:
         arg_dict[key] = value
 

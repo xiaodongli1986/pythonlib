@@ -50,8 +50,8 @@ for iarg in range(1,len(args),2):
         nproc = arg2
         print('\t set np (num-of-processes) as ',nproc)
     elif arg1 in ['-zinit', '-init_redshift']:
-        Init_redshift = arg2
-        print('\t set zinit as ',Init_redshift)
+        Init_Redshift = arg2
+        print('\t set zinit as ',Init_Redshift)
     elif arg1 in ['-start_redshift']:
         start_redshift = arg2
         print('\t set start_redshift as ',start_redshift)
@@ -120,6 +120,8 @@ if NumFilesWrittenInParallel in [None, 0, '0']:
 
 #sys.exit()
 runname=''.join([ boxsize,'box_', nmesh, 'mesh_', nparticle, 'par_z', start_redshift, '_startstep', nstep1, '_', end_redshift, '_endstep', nstep2])
+if float(Init_Redshift) != 9.0:
+    runname += '_zinit'+str(float(Init_Redshift))
 
 if outputdir in [None, 'None']:
     outputdir = runname
@@ -261,8 +263,8 @@ for istr, nowstr in enumerate(setstrs):
         setstrs[istr] = nowstrs[0] + '     ' + nmesh
     elif nowstrs[0] == 'Nsample':
         setstrs[istr] = nowstrs[0] + '     ' + nparticle
-    elif nowstrs[0] == 'Init_redshift':
-        setstrs[istr] = nowstrs[0] + '     ' + Init_redshift
+    elif nowstrs[0] == 'Init_Redshift':
+        setstrs[istr] = nowstrs[0] + '     ' + Init_Redshift
     elif nowstrs[0] == 'Seed':
         setstrs[istr] = nowstrs[0] + '     ' + seed
     elif nowstrs[0] == 'Buffer':

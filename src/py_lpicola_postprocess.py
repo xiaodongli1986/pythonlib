@@ -125,7 +125,7 @@ bashfile2 = basename+'_2_jsub_find_rockstar.sh'
 bashfile3 = basename+'_3_run_merge_mv_conv.sh'
 
 if just_create_bash:
-    bashf = open(bashfile1, 'w'); bashf.write(cmd); bashf.close()
+    bashf = open(bashfile1, 'w'); bashf.write(cmd+'\n'); bashf.write('sh '+bashfile2+'\n'); bashf.close()
     
 
 files = [basename+output_suffix+str(ibox) for ibox in range(1,nbox**3+1)]

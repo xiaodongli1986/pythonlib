@@ -116,9 +116,15 @@ for ifile, filename in enumerate(filenames):
 
     X = np.linspace(smin,smax,sbin+1)
     X = (X[1:] + X[:len(X)-1]) / 2.
+   # Turn on for cic field
+    X = np.delete(X,0)
+    xis = np.delete(xis,0)
+    #print 'xis[0:5] = ', xis[0:5]
     axs[0].plot(X,xis,label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$\\xi$',fontsize=fs); axs[0].set_yscale('symlog')
+    #print 'xis_mean =', np.mean(xis)
     axs[1].plot(X,meannorm(xis)); axs[1].set_xlabel('s',fontsize=fs); axs[1].set_ylabel('$\\xi$, normed',fontsize=fs); axs[1].set_yscale('symlog')
     axs[2].plot(X,X**2*xis); axs[2].set_xlabel('s',fontsize=fs); axs[2].set_ylabel('$s^2\\ \\xi$',fontsize=fs) 
+    #print 's^2 xis_mean =', np.mean(X**2*xis)
     axs[3].plot(X,meannorm(X**2*xis)); axs[3].set_xlabel('s',fontsize=fs); axs[3].set_ylabel('$s^2\\ \\xi$, normed',fontsize=fs) 
 
     imumax = int(mubin*mumax) 
@@ -141,7 +147,7 @@ for ifile, filename in enumerate(filenames):
 legfs = (60./  max([len(lab) for lab in used_labs]))**0.5 * 10; legfs = min(legfs, 16)
 for ax in axs:
    ax.grid()
-   ax.legend(frameon=False,fontsize=legfs)
+   ax.legend(frameon=False,fontsize=legfs,loc='upper left')
 
 if figtitle==None:
     fig.suptitle(figname,fontsize=16)
