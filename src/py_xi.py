@@ -120,7 +120,8 @@ for ifile, filename in enumerate(filenames):
     X = np.delete(X,0)
     xis = np.delete(xis,0)
     #print 'xis[0:5] = ', xis[0:5]
-    axs[0].plot(X,xis,label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$\\xi$',fontsize=fs); axs[0].set_yscale('symlog')
+    #axs[0].plot(X,xis,label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$\\xi$',fontsize=fs); axs[0].set_yscale('symlog')
+    axs[0].plot(X,np.log10(abs(xis)),label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$log10 |\\xi|$',fontsize=fs); #axs[0].set_yscale('symlog')
     #print 'xis_mean =', np.mean(xis)
     axs[1].plot(X,meannorm(xis)); axs[1].set_xlabel('s',fontsize=fs); axs[1].set_ylabel('$\\xi$, normed',fontsize=fs); axs[1].set_yscale('symlog')
     axs[2].plot(X,X**2*xis); axs[2].set_xlabel('s',fontsize=fs); axs[2].set_ylabel('$s^2\\ \\xi$',fontsize=fs) 
