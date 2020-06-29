@@ -208,9 +208,14 @@ elif binaryformat == 'xyzw':
     nowf.write(struct.pack("i",nran))
 elif binaryformat == 'pos_vel_w':
     if headfile !=None:
-        head = [float(xx) for xx in open(headfile,'r').readline().split()]
-        head = head + [0 for row in range(64-len(head))]
-        head[0] = nran
+        for nowstr in open(headfile,'r').readlines():
+            if nowstr.split()[0][0] == '#':
+                continue
+            #head = [float(xx) for xx in open(headfile,'r').readline().split()]
+            head = [float(xx) for xx in nowstr.split()]
+            head = head + [0 for row in range(64-len(head))]
+            head[0] = nran
+            break
     else:
         head = [nran, size, parmass, redshift, omegam, h, weos]+[0. for row in range(64-7)]
     nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))   
