@@ -18,13 +18,14 @@ FileWithInputSpectrum  = '/home/xiaodongli/software/l-picola/files/input_spectru
 EXE_path = '/home/xiaodongli/software/l-picola-wcdm/L-PICOLA'
 outputdir= None
 basename = None
+simple_basename = False
 
 args = sys.argv
 
 #-outputdir outputdir   -basename basename   -omegam/-om omegam   -w w   -omegab omegab   -omegal omegal   -H0 H0   -sigma8 sigma8   -ns ns   -Pkfile Pkfile    -np np   - start_redshfit start_redshift  -end_redshift end_redshift   -nstep1 nstep1   -nstep2 nstep2   -boxsize boxsize   -nmesh nmesh   -nparticle nparticle   -zinit zinit   -buffer buffer   -seed seed
 
 printstr = '''# Example:
-   py_lpicola  -np 48   -nparticle 256   -nmesh 256   -boxsize 512   -seed 5000   -buffer 2.0   -EXE_path "/home/xiaodongli/software/l-picola-wcdm/L-PICOLA"      -NumFilesWrittenInParallel 0   -zinit 9.0   -nstep1 30   -start_redshift 0.05   -end_redshift 0.0   -nstep2 30  -omegam 0.3000   -w -1.0000   -omegab 0.0480   -omegal 0.7000   -h 69.00   -sigma8 0.8300   -ns 0.9600   -basename None   -outputdir None   -Pkfile "/home/xiaodongli/software/l-picola/files/input_spectrum.dat"   
+   py_lpicola  -np 48   -nparticle 256   -nmesh 256   -boxsize 512   -seed 5000   -buffer 2.0   -EXE_path "/home/xiaodongli/software/l-picola-wcdm/L-PICOLA"      -NumFilesWrittenInParallel 0   -zinit 9.0   -nstep1 30   -start_redshift 0.05   -end_redshift 0.0   -nstep2 30  -omegam 0.3000   -w -1.0000   -omegab 0.0480   -omegal 0.7000   -h 69.00   -sigma8 0.8300   -ns 0.9600   -basename None   -outputdir None   -Pkfile "/home/xiaodongli/software/l-picola/files/input_spectrum.dat"   -simple_filename F
         NumFilesWrittenInParallel: if set as 0, then will be set to np 
         baename/outputdir: if set as None, automatic generating a name based on parameters'''
 
@@ -106,6 +107,15 @@ for iarg in range(1,len(args),2):
     elif arg1 in ['-buffer', '-Buffer']:
         Buffer = arg2
         print('\t set Buffer as ', Buffer)
+    elif arg1 in ['-simple_basename', '-simplebasename']:
+        if arg2[0] in ['t', 'T']:
+            simple_basename = True
+        elif arg2[0] in ['f', 'F']:
+            simple_basename = False
+        else:
+            print('Error: value for -simple_basename must be logic: we get  ',arg2)
+            sys.exit()
+        print('\t set simple_basename as ', simple_basename)
     else:
         print('Unknown arg1 :', arg1)
         print(printstr)
@@ -128,15 +138,21 @@ if outputdir in [None, 'None']:
 else:
     outputdir = outputdir # +'__'+runname
 
-os.popen('mkdir -p '+outputdir)
-os.popen('sleep 1')
 
 cosmostr = 'om%.4f'%(float(Omega))+'_omb%.4f'%(float(OmegaBaryon))+'_oml%.4f'%(float(OmegaLambda))+'_w%.4f'%(float(De_w))+'_Hubble%.2f'%(float(HubbleParam))+'_sig8%.4f'%(float(Sigma8))+'_ns%.4f'%(float(PrimordialIndex))
 
 if basename in [None, 'None']:
-    basename = cosmostr
+    if not simple_basename:
+        basename = cosmostr
+    else:
+        outputdir = runname + '/' + cosmostr
+        basename = 'sim'
 else:
     basename = basename #+'__'+cosmostr
+
+
+os.popen('mkdir -p '+outputdir)
+os.popen('sleep 1')
 
 ## redshift file
 modelname = outputdir+'/'+basename

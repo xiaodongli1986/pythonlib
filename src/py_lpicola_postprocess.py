@@ -1,7 +1,7 @@
 
 import os, sys
 
-printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4
+printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola
 
 # Bash Example:
 
@@ -32,7 +32,7 @@ mv_lightcone_files="F" # mv the many  ${basename}_ligthcone.* files into one dir
 
 for basename in ............... De_w_-0.7_AnalyticalGrowth   De_w_-1.3_AnalyticalGrowth   Omega_0.3071_AnalyticalGrowth De_w_-0.7    De_w_-1.3  Omega_0.3071 
 do
-	cmd="py_lpicola_postprocess  -basename $basename  -nbox $nbox -overlap_distance $overlap_distance -xyzmin $xyzmin -xyzmax $xyzmax -output_1eighthLC $output_1eighthLC   -mv_lightcone_files $mv_lightcone_files"
+	cmd="py_lpicola_postprocess  -basename $basename  -nbox $nbox -overlap_distance $overlap_distance -xyzmin $xyzmin -xyzmax $xyzmax -output_1eighthLC $output_1eighthLC   -mv_lightcone_files $mv_lightcone_files"   -inputtype lpicola
 	#$cmd
 	jsub -n $np -o pp_${basename}.output  -e pp_${basename}.er $cmd
 	sleep 2
@@ -49,6 +49,7 @@ output_1eighthLC = True
 mv_lightcone_files = True
 just_create_bash = False
 split_np = 4
+inputtype = 'lpicola'
 
 for iarg in range(1,len(args),2):
     str1, str2 = args[iarg], args[iarg+1]
@@ -98,6 +99,8 @@ for iarg in range(1,len(args),2):
     elif str1 in ['-split_np']:
         split_np = int(str2)
         print('\t set split_np as ', split_np)
+    elif str1 == '-inputtype':
+        inputtype = str2
     else:
         print('ERROR! unknown arg: ', str1)
         print(printstr); sys.exit()
@@ -112,12 +115,25 @@ for iarg in range(1,len(args),2):
 filelist = basename+'_filelist'
 headfile = basename+'_parameters'
 outputname = 'rockstar_halos/' + basename 
-cmd1 = 'ls '+basename+'_lightcone.* > '+ filelist
+cmd1 = 'ls '+basename+'_lightcone.*  '#+ filelist
+
+f_filelist = open(filelist, 'w')
+files = os.popen(cmd1).read().split()
+for nowfile in files:
+    tail = nowfile[-4:]
+    if tail == '.txt' or tail == 'npar':
+        continue
+    else:
+        f_filelist.write(nowfile+'\n')
+f_filelist.close()
+
+
+
 cmd2 = 'mkdir -p rockstar_halos'
 
 output_suffix = '.nbox'+str(nbox)+'_overlap%.1f'%overlap_distance+'_xyz%.1f'%xyzmin+'to%.1f'%xyzmax+'.ibox'
 
-cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %.1f'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile
+cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %.1f'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile+'   -inputtype '+inputtype
 cmd = ' && '.join([cmd1,cmd2,cmd3])
 
 bashfile1 = basename+'_1_run_split.sh'
