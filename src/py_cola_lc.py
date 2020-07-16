@@ -21,11 +21,11 @@ default_keys = {
         'pm_nc_factor': 3,      'np_alloc_factor':  1.5,    'loglevel':  2,
         'powerspectrum':        '"BigMDPL_matterpower.dat"', 
 
-        'fof':   '"fof"',   'linking_factor' : 0.2,
+        #'fof':   '"fof"',   'linking_factor' : 0.2,
         'snapshot': None, #'"snp"',
-        'subsample': None, 'subsample_factor' : 0.01,
+        'subsample': '"subsample"', 'subsample_factor' : 0.0001,
 
-        'coarse_grid' : None, 'coarse_grid_nc' : 32,
+        #'coarse_grid' : None, 'coarse_grid_nc' : 32,
         'init': None, 
         
         ## for lightcone

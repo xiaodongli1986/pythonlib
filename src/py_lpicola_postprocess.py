@@ -134,7 +134,7 @@ cmd2 = 'mkdir -p rockstar_halos'
 output_suffix = '.nbox'+str(nbox)+'_overlap%.1f'%overlap_distance+'_xyz%.1f'%xyzmin+'to%.1f'%xyzmax+'.ibox'
 
 cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %.1f'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile+'   -inputtype '+inputtype
-cmd = ' && '.join([cmd1,cmd2,cmd3])
+cmd = ' && '.join([cmd1, cmd2,cmd3])
 
 bashfile1 = basename+'_1_run_split.sh'
 bashfile2 = basename+'_2_jsub_find_rockstar.sh'
