@@ -2,29 +2,32 @@
 print("Creating a bash file to conduct rockstar halo searching for multiple snapshots..\n\t 1.py_rockstar_multisnap.sh")
 
 nowf = open("1.py_rockstar_multisnap.sh", 'w')
-nowf.write('''py_rockstar \*snap\*a.\*
-py_rockstar \*snap\*b.\*
-py_rockstar \*snap\*c.\*
-py_rockstar \*snap\*d.\*
-py_rockstar \*snap\*e.\*
-py_rockstar \*snap\*f.\*
-py_rockstar \*snap\*g.\*
-py_rockstar \*snap\*h.\*
-py_rockstar \*snap\*i.\*
-py_rockstar \*snap\*j.\*
-py_rockstar \*snap\*k.\*
-py_rockstar \*snap\*l.\*
-py_rockstar \*snap\*m.\*
-py_rockstar \*snap\*n.\*
-py_rockstar \*snap\*o.\*
-py_rockstar \*snap\*p.\*
-py_rockstar \*snap\*q.\*
-py_rockstar \*snap\*r.\*
-py_rockstar \*snap\*s.\*
-py_rockstar \*snap\*t.\*
-py_rockstar \*snap\*u.\*
-py_rockstar \*snap\*v.\*
-py_rockstar \*snap\*w.\*
-py_rockstar \*snap\*x.\*
+nowf.write('''
+ranseed=01810
+basename=sim
+py_rockstar ${basename}\*snap${ranseed}a.\*
+py_rockstar ${basename}\*snap${ranseed}b.\*
+py_rockstar ${basename}\*snap${ranseed}c.\*
+py_rockstar ${basename}\*snap${ranseed}d.\*
+py_rockstar ${basename}\*snap${ranseed}e.\*
+py_rockstar ${basename}\*snap${ranseed}f.\*
+py_rockstar ${basename}\*snap${ranseed}g.\*
+py_rockstar ${basename}\*snap${ranseed}h.\*
+py_rockstar ${basename}\*snap${ranseed}i.\*
+py_rockstar ${basename}\*snap${ranseed}j.\*
+py_rockstar ${basename}\*snap${ranseed}k.\*
+py_rockstar ${basename}\*snap${ranseed}l.\*
+py_rockstar ${basename}\*snap${ranseed}m.\*
+py_rockstar ${basename}\*snap${ranseed}n.\*
+py_rockstar ${basename}\*snap${ranseed}o.\*
+py_rockstar ${basename}\*snap${ranseed}p.\*
+py_rockstar ${basename}\*snap${ranseed}q.\*
+py_rockstar ${basename}\*snap${ranseed}r.\*
+py_rockstar ${basename}\*snap${ranseed}s.\*
+py_rockstar ${basename}\*snap${ranseed}t.\*
+py_rockstar ${basename}\*snap${ranseed}u.\*
+py_rockstar ${basename}\*snap${ranseed}v.\*
+py_rockstar ${basename}\*snap${ranseed}w.\*
+py_rockstar ${basename}\*snap${ranseed}x.\*
 ''')
 nowf.close()
