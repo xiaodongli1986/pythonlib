@@ -113,7 +113,7 @@ elif binaryformat in ['3', 'xyzvxvyvzw', 'pos_vel_w']:
             nowf2.write(struct.pack('7f',x,y,z,vx,vy,vz,w))
         nowf2.write(struct.pack('i',npar*7*4))
         nowf2.close(); nowf3.close()
-    elif mode in ['2','ba']: # binary to ascii
+    elif mode in ['0','ba']: # binary to ascii
         nowf1 = open(inputfile,'rb')
         nowf2 = open(outputfile, 'w')
         nowf3 = open(infofile, 'w')
@@ -169,7 +169,7 @@ elif binaryformat in ['2', 'simple_xyzw', 'xyzw']:
             nowf2.write(struct.pack('4f',x,y,z,w))
         nowf2.write(struct.pack('i',npar))
         nowf2.close(); nowf3.close()
-    elif mode in ['2','ba']: # ascii to binary
+    elif mode in ['0','ba']: # ascii to binary
         nowf1 = open(inputfile,'rb')
         nowf2 = open(outputfile, 'w')
         nowf3 = open(infofile, 'w')
