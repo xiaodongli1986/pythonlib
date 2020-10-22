@@ -10,7 +10,7 @@ printstr = 'Usage: py_binary_ran filename -format your_format -nran nran -shape 
                 '\n\tshape: '+\
                 '\n\t        box / sphere / shell (1-eighth of a sphere): uniform random distributed in cavity of given shape'+\
                 '\n\t        input_file_spherical / input_file_shell \n\t\t\tGenerating a spherical / shell (1-eighth of sphere) shape sample, whose N(r) varis according to the N(r) of the inputfile \n\t\t\t   Must give: -inputfile -binsize ;  \n\t\t\t   Optional: \n\t\t\t\t-rmin/-rmax (if not given, use the sample\'s rmin and rmax) \n\t\t\t\t-drop_at_rmax (drop some sample near the maximal R boundary of the sample, to avoid the RSD shifting-out) \n\t\t\t\t-input_file_format  by default ascii; also support fmt3\n\t\t\t\t-rat (e.g., 10 means 10 times number in the input_file) '+\
-                '\n\t        Example:     py_binary_ran FILENAME   -format 3   -shape input_file_shell   -rmin 0   -binsize 30   -rat 10   -input_file_format 3   -inputfile YOURFILE   '
+                '\n\t        Example:     py_binary_ran FILENAME   -format 3   -shape input_file_shell   -rmin 0   -binsize 30   -rat 10   -input_file_format 3   -inputfile YOURFILE  -size 1000 '
 
 print printstr+'\n'
 
@@ -221,14 +221,27 @@ elif binaryformat == 'pos_vel_w':
     nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))   
     print 'nran is ', nran
     print '4*7*nran is ', nran*7*4
-    nowf.write(struct.pack('i',nran*7*4))
+    #nowf.write(struct.pack('i',nran*7*4)) # change this to 64!
+    if nran*7*4 >= 2147483647:
+        nowf.write(struct.pack('i',64)) # change this to 64!
+        print('WARNING! output a very large nran*7*4 = ', nran*7*4, '!!!: not possible to read it using FORTRAN!')
+    else:
+        nowf.write(struct.pack('i',nran*7*4)) # change this to 64!
+
+    #nowf.write(struct.pack("d", nran*7*r))
     #for iran in range(nran):
     for iran, X in enumerate(yield_xyz()):
             x,y,z = X
             nowf.write(struct.pack("7f",x,y,z,0,0,0,1))
             if iran ==0:       print('\t begin with x,y,z = '+str(x)+' '+str(y)+' '+str(z))
             if iran ==nran-1:  print('\t end with   x,y,z = '+str(x)+' '+str(y)+' '+str(z))
-    nowf.write(struct.pack('i',nran*7*4))
+    #nowf.write(struct.pack('i',64))  # change this to 64!
+    if nran*7*4 >= 2147483647:
+        nowf.write(struct.pack('i',64)) # change this to 64!
+        print('WARNING! output a very large nran*7*4 = ', nran*7*4, '!!!: not possible to read it using FORTRAN!')
+    else:
+        nowf.write(struct.pack('i',nran*7*4)) # change this to 64!
+    #nowf.write(struct.pack('i',nran*7*4))  # change this to 64!
 elif binaryformat == 'gadget':
     # head
     nowf.write(struct.pack("1i",666))

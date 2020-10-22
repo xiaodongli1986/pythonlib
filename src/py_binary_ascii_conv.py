@@ -9,7 +9,8 @@ printstr = 'Usage: py_binary_ascii_conv   inputfile    outputfile    mode(=ba/ab
         '\n\t        2/simpler_xyzw/xyzw: \n\t\t\tinteger-npar + [x,y,z,w]*npar + integer-npar'+\
         '\n\t        3/xyzvxvyvzw/pos_vel_w: \n\t\t\tint-block+64*double+int-block + int-block+[x,y,z,vx,vy,vz,w]*nran+int-block'+\
         '\n\t -weightcol (column of the weight in the ascii file; can use in case of mode=1'+\
-        '\n\t -fmt3_headfile headfile for the fmt3 output; should be an ascii with 1 row: (noutput, boxsize, mass, redshfit, Omega0, HubbleParam, De_w)'
+        '\n\t -fmt3_headfile headfile for the fmt3 output; should be an ascii with 1 row: (noutput, boxsize, mass, redshfit, Omega0, HubbleParam, De_w)'+\
+        '\n\t -fmt3_set_v_as_0   for fmt3 file: input file only provides x,y,z,(weight);  automatically skip read-in of v by setting vx,vy,vz as 0'
 
 print printstr+'\n'
 
@@ -22,6 +23,7 @@ if len(args) < 5:
 inputfile, outputfile, mode, binaryformat = args[1:5]
 headfile = None
 infofile = outputfile+'.info'
+fmt3_set_v_as_0 = False
 print 'inputfile, outputfile, mode, binaryformat = ', inputfile, outputfile, mode, binaryformat 
 
 ###
@@ -36,6 +38,16 @@ for iopt in range(int(nopt/2)):
     elif str1 == '-fmt3_headfile':
         headfile = str2
         print 'set headfile = ', headfile
+    elif str1 == '-fmt3_set_v_as_0':
+        if str2[0] in 'tT':
+            fmt3_set_v_as_0 = True
+        elif str2[0] in 'fF':
+            fmt3_set_v_as_0 = False
+        else:
+            print 'Wrong value of fmt3_set_v_as_0: must begin with t/T/f/F!'
+            sys.exit()
+        print 'set fmt3_set_v_as_0 = ', fmt3_set_v_as_0
+
     else:
         print 'Unknown args! ', str1, str2
         sys.exit()
@@ -105,7 +117,10 @@ elif binaryformat in ['3', 'xyzvxvyvzw', 'pos_vel_w']:
             nowstr = nowf1.readline()
             if nowstr == '': break
             nowstrs = nowstr.split()
-            x, y, z, vx, vy, vz = float(nowstrs[0]), float(nowstrs[1]), float(nowstrs[2]), float(nowstrs[3]), float(nowstrs[4]), float(nowstrs[5])
+            if fmt3_set_v_as_0:
+                x, y, z, vx, vy, vz = float(nowstrs[0]), float(nowstrs[1]), float(nowstrs[2]), 0, 0, 0
+            else:
+                x, y, z, vx, vy, vz = float(nowstrs[0]), float(nowstrs[1]), float(nowstrs[2]), float(nowstrs[3]), float(nowstrs[4]), float(nowstrs[5])
             if weightcol == -1:
                 w = 1
             else:
