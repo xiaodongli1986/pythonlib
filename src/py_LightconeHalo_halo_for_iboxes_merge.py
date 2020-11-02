@@ -1,9 +1,9 @@
 
 import os, numpy, sys
 
-print 'Usage: EXE num-of-iboxes overlap xyzmin xyzmax dir-name file-name output_1-eighth-shell(T or F) in-one-dir (T or F)'
-print '## The files with names "dir-name$i/file-name", where i goes from 1 to num-of-iboxes, will be merged, with their overlapping region properly treated (so that no redundant particlse are included) '
-print '## The last argument tells whether just outputing 1/8 shell (xyz>0). By default False (output all sphere)'
+print ('Usage: EXE num-of-iboxes overlap xyzmin xyzmax dir-name file-name output_1-eighth-shell(T or F) in-one-dir (T or F)')
+print ('## The files with names "dir-name$i/file-name", where i goes from 1 to num-of-iboxes, will be merged, with their overlapping region properly treated (so that no redundant particlse are included) ')
+print ('## The last argument tells whether just outputing 1/8 shell (xyz>0). By default False (output all sphere)')
 
 #filename = 'test_lightcone.nbox4_overlap10.0_xyz-1800.0to1800.0.ibox'
 
@@ -24,14 +24,14 @@ if len(args) >= 8:
         shell_output = True
     elif shell_output[0] in ['F', 'f']:
         shell_output = False
-    print 'set according to input:  args[7], shell_output = ', args[7], shell_output
+    print ('set according to input:  args[7], shell_output = ', args[7], shell_output)
 if len(args) >= 9:
     nowstr = args[8] 
     if nowstr[0] in ['T', 't']:
         in_one_dir = True
     elif nowstr[0] in ['F', 'f']:
         in_one_dir = False
-    print 'set according to input:  args[8], in_one_dir   = ', args[8], in_one_dir  
+    print ('set according to input:  args[8], in_one_dir   = ', args[8], in_one_dir  )
 
 
 nbox, overlap, xyzmin, xyzmax = int(nbox), float(overlap), float(xyzmin), float(xyzmax)
@@ -44,7 +44,7 @@ else:
     files = [dirname+'/'+filename+'.nbox'+str(nbox)+'_overlap%.1f'%overlap+'_xyz%.1f'%xyzmin+'to%.1f'%xyzmax+'.ibox'+str(ibox)+'_rockstar_halo.ascii.xyzvxvyvz_mvir_vmax' for ibox in range(1,nbox**3+1)]
     outputfile = dirname + '/' + outputfile
 
-print 'Write results to ', outputfile
+print ('Write results to ', outputfile)
 dxyz = (xyzmax - xyzmin) / float(nbox)
 
 
@@ -52,18 +52,18 @@ zranges = [[xyzmin + dxyz*(i%nbox), xyzmin+dxyz*((i)%nbox+1)] for i in range(0,n
 yranges = [[xyzmin + dxyz*((i//nbox)%nbox), xyzmin+dxyz*((i//nbox)%nbox+1)] for i in range(0,nbox**3)]
 xranges = [[xyzmin + dxyz*((i//(nbox**2))%nbox), xyzmin+dxyz*((i//(nbox**2))%nbox+1)] for i in range(0,nbox**3)]
 
-print 'Processing files with enforced ranges:'
+print ('Processing files with enforced ranges:')
 for ibox in range(nbox*nbox*nbox):
-    print '\tbox', ibox, ':', xranges[ibox], yranges[ibox], zranges[ibox]
+    print ('\tbox', ibox, ':', xranges[ibox], yranges[ibox], zranges[ibox])
 
-print '###########################################'
+print ('###########################################')
 fout = open(outputfile, 'w')
 for ibox in range(nbox**3):
     if shell_output: 
         if xranges[ibox][1] < 0 or yranges[ibox][1] < 0 or zranges[ibox][1] < 0:
            continue
-    print '\tbox', ibox, ':', xranges[ibox], yranges[ibox], zranges[ibox]
-    print '\t\tRead in ', files[ibox], '...'
+    print ('\tbox', ibox, ':', xranges[ibox], yranges[ibox], zranges[ibox])
+    print ('\t\tRead in ', files[ibox], '...')
     nowf = open(files[ibox], 'r')
     i1, i2 = 0, 0
     while True:
@@ -78,5 +78,5 @@ for ibox in range(nbox**3):
             i2 += 1
         i1 += 1
     nowf.close()
-    print '\t\t\t\t * Lines   read-in / write    =    %10i'%i1, '%10i'%i2
+    print ('\t\t\t\t * Lines   read-in / write    =    %10i'%i1, '%10i'%i2)
 fout.close()

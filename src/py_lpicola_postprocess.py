@@ -1,7 +1,7 @@
 
 import os, sys
 
-printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/ubuntu/software/Rockstar
+printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/ubuntu/software/Rockstar   -rm_exe  /usr/bin/rm    -jsub_or_localrun  jsub
 
 # Bash Example:
 
@@ -51,6 +51,8 @@ just_create_bash = False
 rockstar_exe = "/home/ubuntu/software/Rockstar/rockstar"
 split_np = 4
 inputtype = 'lpicola'
+rm_exe = '/usr/bin/rm'
+jsub_or_localrun = 'jsub'
 
 for iarg in range(1,len(args),2):
     str1, str2 = args[iarg], args[iarg+1]
@@ -73,6 +75,12 @@ for iarg in range(1,len(args),2):
     elif str1 in ['-rockstar_exe']:
         rockstar_exe = str2
         print('\t set rockstar_exe as ', rockstar_exe)
+    elif str1 in ['-rm_exe']:
+        rm_exe = str2
+        print('\t set rm_exe as ', rm_exe)
+    elif str1 in ['-jsub_or_localrun']:
+        jsub_or_localrun = str2
+        print('\t set jsub_or_localrun as ', jsub_or_localrun)
     elif str1 in ['-output_1eighthLC']:
         if str2[0] in ['T', 't']:
             output_1eighthLC = True
@@ -142,10 +150,16 @@ cmd = ' && '.join([cmd1, cmd2,cmd3])
 
 bashfile1 = basename+'_1_run_split.sh'
 bashfile2 = basename+'_2_jsub_find_rockstar.sh'
+bashfile2_run = basename+'_2_run_find_rockstar.sh'
 bashfile3 = basename+'_3_run_merge_mv_conv.sh'
 
 if just_create_bash:
-    bashf = open(bashfile1, 'w'); bashf.write(cmd+'\n'); bashf.write('sh '+bashfile2+'\n'); bashf.close()
+    bashf = open(bashfile1, 'w'); bashf.write(cmd+'\n'); 
+    if jsub_or_localrun == 'jsub':
+            bashf.write('sh '+bashfile2+'\n'); 
+    else:
+       bashf.write('sh '+bashfile2_run+'\n'); 
+    bashf.close()
     
 
 files = [basename+output_suffix+str(ibox) for ibox in range(1,nbox**3+1)]
@@ -155,9 +169,12 @@ for ifile, nowfile in enumerate(files):
         bashfile = basename+'_2_run'+str(ifile)+'.sh'; bashf = open(bashfile, 'w'); bashf.write('cd rockstar_halos && py_rockstar '+nowfile+'  -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'); bashf.close()
         if ifile == 0:
             bashf = open(bashfile2, 'w'); 
+            bashf_run = open(bashfile2_run, 'w'); 
         else:
             bashf = open(bashfile2, 'a'); 
+            bashf_run = open(bashfile2_run, 'a'); 
         bashf.write('jsub -n '+str(split_np)+' -o '+bashfile+'.output  -e '+bashfile+'.er   sh '+bashfile+'\nsleep 2 \n'); bashf.close()
+        bashf_run.write('nohup  sh '+bashfile+' & \nsleep 2 \n'); bashf_run.close()
 
     
 
@@ -173,7 +190,7 @@ if mv_lightcone_files == True:
     if just_create_bash:
         bashf = open(bashfile3,'a'); bashf.write(cmd5+'\n'); bashf.close()
 elif mv_lightcone_files == "Delete": 
-    cmd5 = ' /usr/bin/rm -rf  '+basename+'_lightcone.* '
+    cmd5 = rm_exe + ' -rf  '+basename+'_lightcone.* '
     cmd += (' && '+cmd5)
     if just_create_bash:
         bashf = open(bashfile3,'a'); bashf.write(cmd5+'\n'); bashf.close()
@@ -184,6 +201,7 @@ cmd6 = 'py_binary_ascii_conv '+file1+' '+file2+' ab 3 -fmt3_headfile '+headfile
 cmd += (' && '+cmd6)
 if just_create_bash:
     bashf = open(bashfile3,'a'); bashf.write(cmd6+'\n'); bashf.close()
+    bashf_run = open(bashfile2_run, 'a'); 
 
 if not just_create_bash:
     print('Executing cmd:\n\t', cmd)
