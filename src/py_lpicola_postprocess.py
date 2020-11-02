@@ -1,7 +1,7 @@
 
 import os, sys
 
-printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/ubuntu/software/Rockstar   -rm_exe  /usr/bin/rm    -jsub_or_localrun  jsub
+printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/xiaodongli/software/Rockstar/rockstar   -rm_exe  /usr/bin/rm    -jsub_or_localrun  jsub
 
 # Bash Example:
 
