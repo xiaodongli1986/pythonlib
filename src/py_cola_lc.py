@@ -7,6 +7,7 @@ default_keys = {
 
         'nc': 256,               'boxsize': 512, 
         'nrealization': 1,       # multiple realisations for random_seed, random_seed+1, ...
+        'only_output_1eighth' : 0,  # only output 1-eighth of the full sky
 
         'ntimestep': 20,        'a_final': 1,     'output_redshifts': '{ 0.0}' ,
 
@@ -46,10 +47,10 @@ args = sys.argv
 
 printstr = '''# Example:
 # This outpus the lightcones:
-   py_cola_lc   -np 4   -basename None   -nc 256   -boxsize 256   -random_seed 4000   -ntimestep 20   -powerspectrum "BigMDPL_matterpower.dat"   -EXE_path "/home/xiaodongli/software/cola_halo_lc/cola_halo"    -omegam 0.3071   -h 0.6787    -omegal 0.6929  -sigma8 0.8228    -omegab 0.048206    -ns 0.96   -outputdir None   -zmax 0.5   -de_w -1.0   -use_solve_growth 1    -simple_basename T    -pm_nc_factor 3    -np_alloc_factor 1.5  # nc means nmesh 
+   py_cola_lc   -np 4   -basename None   -nc 256   -boxsize 256   -random_seed 4000   -ntimestep 20   -powerspectrum "BigMDPL_matterpower.dat"   -EXE_path "/home/xiaodongli/software/cola_halo_lc/cola_halo"    -omegam 0.3071   -h 0.6787    -omegal 0.6929  -sigma8 0.8228    -omegab 0.048206    -ns 0.96   -outputdir None   -zmax 0.5   -de_w -1.0   -use_solve_growth 1    -simple_basename T    -pm_nc_factor 3    -np_alloc_factor 1.5    -only_output_1eighth 0    # nc means nmesh 
 
 # This ONLY outputs many snapshot and subsamples (by setting a very small zmax)
-   py_cola_lc   -np 4   -basename None   -nc 256   -boxsize 256   -random_seed 4000   -ntimestep 30   -powerspectrum "BigMDPL_matterpower.dat"   -EXE_path "/home/xiaodongli/software/cola_halo_lc/cola_halo"    -omegam 0.3071   -h 0.6787    -omegal 0.6929  -sigma8 0.8228    -omegab 0.048206    -ns 0.96   -outputdir None   -zmax 0.01   -de_w -1.0   -use_solve_growth 1    -simple_basename T    -output_redshifts "{5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 2.75, 2.5, 2.25, 2.0, 1.75, 1.5, 1.25,  1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0}"  -snapshot automatic   -subsample automatic   -pm_nc_factor 5    -np_alloc_factor 18  # nc means nmesh 
+   py_cola_lc   -np 4   -basename None   -nc 256   -boxsize 256   -random_seed 4000   -ntimestep 30   -powerspectrum "BigMDPL_matterpower.dat"   -EXE_path "/home/xiaodongli/software/cola_halo_lc/cola_halo"    -omegam 0.3071   -h 0.6787    -omegal 0.6929  -sigma8 0.8228    -omegab 0.048206    -ns 0.96   -outputdir None   -zmax 0.01   -de_w -1.0   -use_solve_growth 1    -simple_basename T    -output_redshifts "{5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 2.75, 2.5, 2.25, 2.0, 1.75, 1.5, 1.25,  1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0}"  -snapshot automatic   -subsample automatic   -pm_nc_factor 5    -np_alloc_factor 18   -only_output_1eighth 0   # nc means nmesh 
 
    ## !!! Still need to add: De_w, zmax, basename, omgeal!!!  # firstly, add them to cola_halo!
    #  recommend to set use_solve_growth=1 (if de_w != -1)
@@ -97,8 +98,12 @@ for iarg in range(1,len(args),2):
 
 default_keys['powerspectrum'] = '"'+default_keys['powerspectrum'] + '"'
 boxsize=default_keys['boxsize'];  nc=default_keys['nc'];  ntimestep=default_keys['ntimestep'];  random_seed=default_keys['random_seed']
-runname=''.join([ str(boxsize),'box_', str(nc), 'npar_', str(default_keys['pm_nc_factor']), 'pmfactor_',   str(ntimestep), 'steps_ranseed', str(random_seed), 
-    '_zmax%.3f'%(float(default_keys['zmax'])) ])
+runname=''.join([ str(boxsize),'box_', str(nc), 'npar_', str(default_keys['pm_nc_factor']), 'pmfactor_',   str(ntimestep), 'steps_ranseed', str(random_seed), '_zmax%.3f'%(float(default_keys['zmax'])) ])
+
+if default_keys['only_output_1eighth'] != 0:
+        runname += "_only_output_1eighth"
+        
+
 
 # ----------------------------------------
 #  * set names

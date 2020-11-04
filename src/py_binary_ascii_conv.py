@@ -108,8 +108,11 @@ elif binaryformat in ['3', 'xyzvxvyvzw', 'pos_vel_w']:
             print ('\theadfile read-write error : ',headfile)
             print ('\theadfile read-write error : ',headfile)
             print ('\theadfile read-write error : ',headfile)
-            sys.exit()
-            nowf2.write(struct.pack('64d',*[-1.0 for row in range(64)]))
+            #sys.exit()
+#            noutput, boxsize, mass, redshfit, Omega0, HubbleParam, De_w
+            headinfo = [npar, 512, 1e10, -1, 0.3, 67, -1]
+            nowf2.write(struct.pack('64d',*(headinfo+[0 for row in range(64-len(headinfo))])))
+            #nowf2.write(struct.pack('64d',*[-1.0 for row in range(64)]))
 
         nowf2.write(struct.pack('i',64*8))
         nowf2.write(struct.pack('i',npar*7*4))

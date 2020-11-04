@@ -26,11 +26,11 @@ printstr = 'Usage: py_xi filename [-smin 0] [-smax 150] [-sbin 150] [-mubin 120]
         '\n\t[-labs hand-given labels of curves, separted using comma; e.g. \'curve1,curve2,curve3\']'
 
 
-print printstr+'\n'
+print( printstr+'\n')
 args = sys.argv
 
 if len(args) <=1:
-    print printstr
+    print (printstr)
     sys.exit()
 
 filenames = os.popen('ls '+args[1]).read().split()
@@ -41,8 +41,8 @@ def tf_readin(str2):
      elif str2[0] in ['f', 'F']:
                 return  False
      else:
-                print 'Error (py_xi): intput option not recognizable! ', str2
-                print printstr
+                print ('Error (py_xi): intput option not recognizable! ', str2)
+                print( printstr)
                 sys.exit()
 
 smin=0; smax=150; sbin=150; mubin=120; intxismin=6; intxismax=40; mubin_pack_rat=1; fs=14; savefig = False; showfig = True; mumax = 1.0; 
@@ -80,16 +80,16 @@ for icmd in range(2,len(args)):
         elif str1 == '-labs':
             labs = str2.split(',')
         else:
-            print 'Error (py_xi): cmd not recognizable! ', str1, str2
-            print printstr
+            print( 'Error (py_xi): cmd not recognizable! ', str1, str2)
+            print( printstr)
             sys.exit()
 
-print 'Plot CF for ', len(filenames), 'files...'
+print( 'Plot CF for ', len(filenames), 'files...')
 for filename in filenames:
-    print '\t',filename
-print ' * smin/smax/sbin = ', smin, smax, sbin
-print ' * mubin/intxismin/intxisma = ', mubin, intxismin, intxismax
-print ' * mubin_pack_rat/mumax = ', mubin_pack_rat, mumax
+    print( '\t',filename)
+print( ' * smin/smax/sbin = ', smin, smax, sbin)
+print( ' * mubin/intxismin/intxisma = ', mubin, intxismin, intxismax)
+print( ' * mubin_pack_rat/mumax = ', mubin_pack_rat, mumax)
 
 fig, axs = plt.subplots(3,2,figsize=(18,15))
 axs = axs.reshape(-1)
@@ -161,7 +161,7 @@ else:
     figname = figname+'.png'
 
 if savefig:
-    print 'figure saved: ', figname
+    print( 'figure saved: ', figname)
     fig.savefig(figname, format='png')
 if showfig:
     plt.show()

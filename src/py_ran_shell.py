@@ -3,15 +3,15 @@ import sys
 import random
 import numpy as np
 #from __future__ import division
-print 'Usage: \n\t input_filename output_filename times bins weight(optional, ranw or 1w or now) nosuffix(T,F) 1-eighth-shell(Y or N)'
+print('Usage: \n\t input_filename output_filename times bins weight(optional, ranw or 1w or now) nosuffix(T,F) 1-eighth-shell(Y or N)')
 
-print '\ntimes is the number of random particles generated with a real particle, bins is the size of the shell in radius.'
-print '\nExample py_ran_shell inputf outputf 2 100 1w \n'
-print '## the last argument tells whether generating 1/8 shell(xyz>0)'
+print('\ntimes is the number of random particles generated with a real particle, bins is the size of the shell in radius.')
+print('\nExample py_ran_shell inputf outputf 2 100 1w \n')
+print('## the last argument tells whether generating 1/8 shell(xyz>0)')
 args = sys.argv
 
 if len(args)<4:
-        print 'ERROR (ran_shell.py)! Must have at least 4 arguments.'
+        print('ERROR (ran_shell.py)! Must have at least 4 arguments.')
         sys.exit()
 
 weight = 'now'
@@ -22,7 +22,7 @@ if len(args) > 5:
         if args[5] in ['ranw','1w','now']:
                 weight = args[5]
         else:
-                print 'ERROR(ran_shell.py)! weight type must be ranw, 1w, now: ', weight
+                print('ERROR(ran_shell.py)! weight type must be ranw, 1w, now: ', weight)
                 sys.exit()
 
 if len(args) > 6:
@@ -37,7 +37,7 @@ if len(args) > 6:
                         noshell_1_8 = True
 
         else:
-                print 'ERROR(ran_shell.py)! nosuffxi must be True/False or 1-eighth-shell must be Y/N'
+                print('ERROR(ran_shell.py)! nosuffxi must be True/False or 1-eighth-shell must be Y/N')
                 sys.exit()
 if len(args) > 7:
         if args[7][0] in ['Y','N']:
@@ -46,11 +46,11 @@ if len(args) > 7:
                 else:
                         noshell_1_8 = True
         else:
-                print 'ERROR(ran_shell.py)!  1-eighth-shell must be Y/N', shll_1_8
+                print('ERROR(ran_shell.py)!  1-eighth-shell must be Y/N', shll_1_8)
                 sys.exit()
 
 
-print 'Reading the data: ', inputf
+print('Reading the data: ', inputf)
 
 data = np.loadtxt(inputf)
 X = data[:,0];Y = data[:,1];Z = data[:,2]
@@ -72,7 +72,7 @@ if nosuffix:
 else:
         ofilename = outputf +'.bins.'+str(bins)+'.times.'+str(nran)
 
-print 'write to', ofilename, '...'
+print('write to', ofilename, '...')
 outf = open(ofilename, 'w')
 
 for i in range(int(bins)):
@@ -108,7 +108,7 @@ for i in range(int(bins)):
                 outf.write(outstr)
 outf.close()
 
-print 'Finishing writing. '
+print('Finishing writing. ')
 
 #mR = max(R)
 #sect = mR//bins + 1
@@ -124,7 +124,7 @@ print 'Finishing writing. '
 #else:
 #        ofilename = outputf +'.bins.'+str(bins)+'.random.'+str(len(R)*nran)
 
-#print 'write to', ofilename, '...'
+#print('write to', ofilename, '...'
 #outf = open(ofilename, 'w')
 
 #for i in range(int(sect)):
@@ -157,5 +157,5 @@ print 'Finishing writing. '
 #                outf.write(outstr)
 #outf.close()
 #
-#print 'Finishing writing. '
+#print('Finishing writing. '
 

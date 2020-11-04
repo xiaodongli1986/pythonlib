@@ -1,10 +1,10 @@
 
 import numpy as np
 import sys
-import commands
+#import commands
 import os
 
-print 'This is python args version of CUTE.'
+print ('This is python args version of CUTE.')
 #global RRfile_create = True
 
 
@@ -163,24 +163,24 @@ def cute_ini(ini_file_name = None, **kws):
         ini_file_name = './tmp_cute_ini.ini'
     for key in kws.keys():
         if key not in output_dict.keys():
-            print '# (cute_ini) ERROR! unkwon key!: key = ', key
+            print( '# (cute_ini) ERROR! unkwon key!: key = ', key)
             return  'Nothing!!!!'
         else:
             output_dict[key] = kws[key]
     RRfile = output_dict['RR_filename']
     if RRfile != None:
         if not os.path.exists(RRfile) and not force_rr:
-            print '# (cute_ini) Can not find given RRfile... will be created.'
+            print( '# (cute_ini) Can not find given RRfile... will be created.')
             #if RRfile_create:
             RRfile_create = True
             output_dict['RR_filename'] = None
-    print '# create ini file: ', ini_file_name, '...\n'
+    print( '# create ini file: ', ini_file_name, '...\n')
     nowf = open(ini_file_name, 'w')
     for key in allkeys:
         if output_dict[key] != None:
             nowstr = str(key)+'= '+str(output_dict[key])
             nowf.write(nowstr+'\n')
-            print nowstr
+            print( nowstr)
     nowf.close()
     return ini_file_name
 
@@ -191,8 +191,8 @@ arg_dict = {}
 cmdargs = sys.argv
 
 if (len(cmdargs) -1)%2 != 0 or len(cmdargs) < 2:
-    print '# ERROR! Number of options + values must be a even number: we get len(cmdargs)-1 = ', len(cmdargs)-1
-    print printstr; print '\n###################\nexample of calling py_CUTE and write commands (to bash) in python:\n\n\n', example_str; sys.exit()
+    print( '# ERROR! Number of options + values must be a even number: we get len(cmdargs)-1 = ', len(cmdargs)-1)
+    print( printstr); print( '\n###################\nexample of calling py_CUTE and write commands (to bash) in python:\n\n\n', example_str); sys.exit()
 
 for iarg in range(1, len(cmdargs), 2):
     key = cmdargs[iarg]
@@ -204,14 +204,14 @@ for iarg in range(1, len(cmdargs), 2):
         cute_exe = value
     elif key == 'bashfile':
         bashfile = value
-        print '# set bashfile as ', bashfile
+        print( '# set bashfile as ', bashfile)
     elif key == 'force_rr':
         if value[0] in ['T', 't']:
             force_rr= True
         elif value[0] in ['F', 'f']:
             force_rr = False
         else:
-            print '# ERROR! Not valid value, force_rr = ', value
+            print( '# ERROR! Not valid value, force_rr = ', value)
             sys.exit()
     else:
         arg_dict[key] = value
@@ -220,20 +220,21 @@ cute_ini_filename = cute_ini(cute_ini_filename, **arg_dict)
 cmd1 = 'export LD_LIBRARY_PATH=/home/xiaodongli/software/cfitsio/lib:/home/xiaodongli/software/openmpi/lib:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64:/opt/intel/composer_xe_2015.3.187/compiler/lib/intel64/:/lib:/lib64:/home/xiaodongli/software/cfitsio/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64/:/home/xiaodongli/software/plc-3.01/lib:/opt/intel/composer_xe_2015.3.187/ipp/../compiler/lib/intel64:/home/xiaodongli/software/fftw3.3.8/lib://home/xiaodongli/software/gsl-2.5/.libs:/home/xiadongli/software/gsl2.5/lib:/home/xiaodongli/software/intel/compiler/lib/intel64:/home/xiaodongli/software/intel/mkl/lib/intel64:/home/xiaodongli/software/bin:/usr/local/lib:/opt/intel//impi/5.0.3.048/intel64/lib:/opt/intel/composer_xe_2015.3.187/mpirt/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/lib/intel64:/opt/intel/composer_xe_2015.3.187/ipp/tools/intel64/perfsys:/opt/intel/composer_xe_2015.3.187/mkl/lib/intel64:/opt/intel/composer_xe_2015.3.187/tbb/lib/intel64/gcc4.4:/opt/intel/composer_xe_2015.3.187/debugger/libipt/intel64/lib:/software/iraf/lib:/software/astro-gadget/lib:/home/xiaodongli/software/plc-3.01/lib'
 #nowcmd =  cmd1 + ' && '+ cute_exe + ' ' + cute_ini_filename
 nowcmd =  cute_exe + ' ' + cute_ini_filename
-print '\n# Will run command:\n\t # '+nowcmd+'\n'
-print 'bashfile = ', bashfile
+print( '\n# Will run command:\n\t # '+nowcmd+'\n')
+print( 'bashfile = ', bashfile)
 if bashfile == None:
-    print os.popen( nowcmd).read()
+    print( os.popen( nowcmd).read())
 else:
     #print os.popen('echo '+nowcmd+' >> '+ bashfile ).read()
     nowf = open(bashfile, 'a'); nowf.write('\n'+nowcmd+'\n'); nowf.close()
-print output_dict
+print( output_dict)
 if RRfile_create:
-    print '# Create RRfile...'
+    print( '# Create RRfile...')
     nowcmd = 'cp '+output_dict['output_filename'] + ' ' + RRfile
-    print '# add command: '+nowcmd
+    print( '# add command: '+nowcmd)
     if bashfile == None:
-        print commands.getoutput(nowcmd)
+        #print commands.getoutput(nowcmd)
+        print (os.popen(nowcmd).read())
     else:
         #print os.popen('echo '+nowcmd+' >> '+ bashfile ).read()
         nowf = open(bashfile, 'a'); nowf.write('\n'+nowcmd+'\n'); nowf.close()

@@ -12,7 +12,7 @@ printstr = 'Usage: py_binary_ran filename -format your_format -nran nran -shape 
                 '\n\t        input_file_spherical / input_file_shell \n\t\t\tGenerating a spherical / shell (1-eighth of sphere) shape sample, whose N(r) varis according to the N(r) of the inputfile \n\t\t\t   Must give: -inputfile -binsize ;  \n\t\t\t   Optional: \n\t\t\t\t-rmin/-rmax (if not given, use the sample\'s rmin and rmax) \n\t\t\t\t-drop_at_rmax (drop some sample near the maximal R boundary of the sample, to avoid the RSD shifting-out) \n\t\t\t\t-input_file_format  by default ascii; also support fmt3\n\t\t\t\t-rat (e.g., 10 means 10 times number in the input_file) '+\
                 '\n\t        Example:     py_binary_ran FILENAME   -format 3   -shape input_file_shell   -rmin 0   -binsize 30   -rat 10   -input_file_format 3   -inputfile YOURFILE  -size 1000 '
 
-print printstr+'\n'
+print(printstr+'\n')
 
 # default settings
 binaryformat = 'CUTE_subsample'
@@ -44,12 +44,12 @@ if len(args) <= 1:
     sys.exit()
 
 filename = args[1]
-print '\toutput file-name = ',filename
+print('\toutput file-name = ',filename)
 nopt =int( (len(args)-2)/2)
 
 for iopt in range(nopt):
     str1, str2 = args[2+iopt*2], args[2+iopt*2+1]
-    print str1, str2
+    print(str1, str2)
     if str1 == '-format':
         if str2 in ['1','CUTE_subsample', 'CUTEsubsample', 'CUTE-subsample']:
             binaryformat = 'CUTE_subsample'
@@ -60,7 +60,7 @@ for iopt in range(nopt):
         elif str2 in ['4','Nbody', 'nbody', 'gadget' ]:
             binaryformat = 'gadget'
         else:
-            print 'Unknown format: ', str1, str2
+            print('Unknown format: ', str1, str2)
             sys.exit()
     elif str1 == '-nran':
         nran = int(str2)
@@ -68,7 +68,7 @@ for iopt in range(nopt):
         headfile = str2
     elif str1 == '-shape':
         if str2 not in ['box', 'sphere', 'shell', 'input_file_spherical', 'input_file_shell']:
-            print 'Unknown shape: ', str1, str2
+            print('Unknown shape: ', str1, str2)
             sys.exit()
         shape = str2
     elif str1 == '-size':
@@ -88,10 +88,10 @@ for iopt in range(nopt):
     elif str1 == '-rat':
         rat = float(str2)
     else:
-        print 'Unknown options: ', str1, str2
+        print('Unknown options: ', str1, str2)
         sys.exit()
 
-print '\t', nran, 'randoms in', shape, 'with size',size,' | binary-file-format =', binaryformat
+print('\t', nran, 'randoms in', shape, 'with size',size,' | binary-file-format =', binaryformat)
 
 def gadget_head(nran,size,omegam,h):
     head = [nran,0,0,0,0,0] + [1.]*6 + [0.,0.] + [0,0,nran,0,0,0,0,0,0,1] + [size,omegam,1.-omegam,h] + [0]*24
@@ -101,18 +101,18 @@ def gadget_head(nran,size,omegam,h):
 
 if shape in ['input_file_spherical', 'input_file_shell']:
     if binsize == None:
-        print ' ERROR! found binsize None'; sys.exit()
+        print(' ERROR! found binsize None'); sys.exit()
     else:
-        print ' read-in binsize as ', binsize
+        print(' read-in binsize as ', binsize)
     if rat == None:
-        print ' Warning! found rat == None. '
+        print(' Warning! found rat == None. ')
     else:
-        print ' read-in rat as ', rat
+        print(' read-in rat as ', rat)
     if inputfile_format == 'ascii':
-        print ' read in ascii : ', inputfile
+        print(' read in ascii : ', inputfile)
         input_data = np.loadtxt(inputfile)[:,:3]
     elif inputfile_format in ['fmt3', 'format3', '3']:
-        print ' read in binary fmt3: ', inputfile
+        print(' read in binary fmt3: ', inputfile)
         nowf1 = open(inputfile,'rb')
         block1 = struct.unpack('i',nowf1.read(4))[0]; head  = struct.unpack('64d',nowf1.read(8*64)); block2 = struct.unpack('i',nowf1.read(4))[0]
         noutput, boxsize, parmass, redshift, omegam, h = head[:6]; # need to add weos!
@@ -120,7 +120,7 @@ if shape in ['input_file_spherical', 'input_file_shell']:
             weos = head[6]
         else:
             weos = -1.0
-        print '\tread-in head: npar-total, boxsize, parmass, redshift, omegam, h = ', head[:6]
+        print('\tread-in head: npar-total, boxsize, parmass, redshift, omegam, h = ', head[:6])
         block1 = struct.unpack('i',nowf1.read(4))[0]; npar = int(block1/7/4 + 0.1)
         input_data = np.array(struct.unpack(npar*'7f',nowf1.read(npar*7*4))).reshape(-1,7)[:,:3]
         block2 = struct.unpack('i',nowf1.read(4))[0]; npar2 = int(block2/7/4 + 0.1)
@@ -128,52 +128,52 @@ if shape in ['input_file_spherical', 'input_file_shell']:
     r = (input_data[:,0]**2 + input_data[:,1]**2 + input_data[:,2]**2)**0.5
     if rat == None:
         rat = nran / float(len(r))
-        print ' set rat = nran / #-line of inputfile = ', rat
+        print(' set rat = nran / #-line of inputfile = ', rat)
     if rmin == None:
-        rmin = min(r); print ' set rmin as ', rmin
+        rmin = min(r); print(' set rmin as ', rmin)
     if rmax == None:
         rmax = max(r); 
         if drop_at_rmax != None:
             rmax -= drop_at_rmax
-            print ' considering drop_at_rmax', drop_at_rmax
-        print ' set rmax as ', rmax
+            print(' considering drop_at_rmax', drop_at_rmax)
+        print(' set rmax as ', rmax)
     nbin = int((rmax-rmin) / float(binsize)+0.5)
     binsize = (rmax-rmin) / nbin
-    print ' set nbin, binsize as ', nbin, binsize
+    print(' set nbin, binsize as ', nbin, binsize)
 
     nums, edges = np.histogram(r, range=(rmin,rmax), bins=nbin)
     nums = nums*rat; nums = nums.astype('int32'); nran = sum(nums)
-    print ' set nums as ', nums
-    print ' set r-edges as ', edges
+    print(' set nums as ', nums)
+    print(' set r-edges as ', edges)
 
 
 nowf = open(filename,'wb')
 
 def yield_xyz():
-	if shape =='box':
+        if shape =='box':
             for iran in range(nran):
-		x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
+                x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
                 yield [x,y,z]
-	elif shape == 'sphere':
+        elif shape == 'sphere':
             for iran in range(nran):
-		x,y,z = np.random.uniform(-size,size), np.random.uniform(-size,size), np.random.uniform(-size,size)
-		radius = (x*x+y*y+z*z)**0.5
-		while radius > size:
-			x,y,z = np.random.uniform(-size,size), np.random.uniform(-size,size), np.random.uniform(-size,size)
-			radius = (x*x+y*y+z*z)**0.5
+                x,y,z = np.random.uniform(-size,size), np.random.uniform(-size,size), np.random.uniform(-size,size)
+                radius = (x*x+y*y+z*z)**0.5
+                while radius > size:
+                        x,y,z = np.random.uniform(-size,size), np.random.uniform(-size,size), np.random.uniform(-size,size)
+                        radius = (x*x+y*y+z*z)**0.5
                 yield [x,y,z]
-	elif shape == 'shell':
+        elif shape == 'shell':
             for iran in range(nran):
-		x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
-		radius = (x*x+y*y+z*z)**0.5
-		while radius > size:
-			x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
-			radius = (x*x+y*y+z*z)**0.5
+                x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
+                radius = (x*x+y*y+z*z)**0.5
+                while radius > size:
+                        x,y,z = np.random.uniform(0,size), np.random.uniform(0,size), np.random.uniform(0,size)
+                        radius = (x*x+y*y+z*z)**0.5
                 yield [x,y,z]
         elif shape in ['input_file_spherical', 'input_file_shell']:
             for iedge in range(len(nums)):
               r1, r2 = edges[iedge], edges[iedge+1]; 
-              print '   \t  generating %12i'%nums[iedge] ,'randoms in the bin of  %20.3f'%r1, '< r < ', '%.3f'%r2
+              print('   \t  generating %12i'%nums[iedge] ,'randoms in the bin of  %20.3f'%r1, '< r < ', '%.3f'%r2)
               for ipar in range(nums[iedge]):
                 r = np.random.uniform(r1**3, r2**3)**(1/3.) # uniform distribution with r cube
                 cos_theta = np.random.uniform(-1,1); sin_theta = (1-cos_theta**2)**0.5; 
@@ -186,7 +186,7 @@ def yield_xyz():
 
 if binaryformat == 'CUTE_subsample':
     head = [size,parmass,omegam,h,a,redshift,nran]
-    print '\tcreate a head for the data:',head
+    print('\tcreate a head for the data:',head)
     nowf.write(struct.pack("6f1i",*head))
     #for iran in range(nran):
     for X in yield_xyz():
@@ -197,7 +197,7 @@ if binaryformat == 'CUTE_subsample':
     nowf.write(struct.pack("i",nran))
 elif binaryformat == 'xyzw':
     head = [nran]
-    print '\tcreate a head for the data:',head
+    print('\tcreate a head for the data:',head)
     nowf.write(struct.pack("1i",*head))
     #for iran in range(nran):
     for X in yield_xyz():
@@ -219,8 +219,8 @@ elif binaryformat == 'pos_vel_w':
     else:
         head = [nran, size, parmass, redshift, omegam, h, weos]+[0. for row in range(64-7)]
     nowf.write(struct.pack('i',64*8)); nowf.write(struct.pack('64d',*head)); nowf.write(struct.pack('i',64*8))   
-    print 'nran is ', nran
-    print '4*7*nran is ', nran*7*4
+    print('nran is ', nran)
+    print('4*7*nran is ', nran*7*4)
     #nowf.write(struct.pack('i',nran*7*4)) # change this to 64!
     if nran*7*4 >= 2147483647:
         nowf.write(struct.pack('i',64)) # change this to 64!
@@ -265,5 +265,4 @@ elif binaryformat == 'gadget':
 
 
 nowf.close()
-print 'Finishing writing ', nran, 'particles to ', filename
-
+print('Finishing writing ', nran, 'particles to ', filename)
