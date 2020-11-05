@@ -1,7 +1,7 @@
 #!/home/xiaodongli/software/anaconda/bin/python
 # Filename: stdA.py 
 
-import subprocess as commands
+#import subprocess as commands
 import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits.mplot3d.axes3d as Axes3D
@@ -11,7 +11,8 @@ import glob as glob
 import textwrap
 
 
-pythonlibPATH = commands.getoutput('echo $pythonlibPATH')
+#pythonlibPATH = commands.getoutput('echo $pythonlibPATH')
+pythonlibPATH = os.popen('echo $pythonlibPATH').read()
 pyfile=pythonlibPATH+'/'+'stdA_py3.py'
 
 #################################
@@ -489,7 +490,8 @@ from stdA_array_py3 import *
 
 def getfilelist(path):
         """        List of files from ls"""
-        return commands.getoutput('ls '+path).split('\n')
+        #return commands.getoutput('ls '+path).split('\n')
+        return os.popen('ls '+path).read().split('\n')
 
 def shfile__cmdlist(shfilename, cmdlist, binlocation='#!/bin/bash'):
         f0 = open(shfilename, 'w')
@@ -543,7 +545,8 @@ def cp_except(file1, file2, except_lines = [], except_strs = []):
                                 row-1, except_lines[row-1], ' and ', row, except_lines[row])
                         return 0
         if len(except_lines) == 0:
-                commands.getoutput('cp '+file1+' '+file2)
+                #commands.getoutput('cp '+file1+' '+file2)
+                os.popen('cp '+file1+' '+file2).read()
                 return 1
         nowiexcept = 0; nowlexcept = except_lines[nowiexcept]; nowstrexcept = except_strs[nowiexcept]
         f1 = open(file1, 'r')
@@ -914,7 +917,8 @@ def getdist_readmarg(key1, key2, nowdir='/home/xiaodongli/software/cosmomc/outpu
                     '} ^{+'+fmtstr%er2u+'}_{-'+fmtstr%er2d+'}  ('+key1+')')
         else:
                 print ('\t'+key2+' \t= '+fmtstr%mean+' \pm '+fmtstr%std)#+' ('+key1+')'
-    commands.getoutput('cp '+nowfile+' '+nowfile+'.save')
+    #commands.getoutput('cp '+nowfile+' '+nowfile+'.save')
+    os.popen('cp '+nowfile+' '+nowfile+'.save')
     return mean, std, low1, up1, low2, up2
 
 def erstr(mean,low,up,fmt='%.3f'):

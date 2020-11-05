@@ -1,12 +1,12 @@
 
 import sys, random, numpy
 
-print 'Usage: \n\tEXE filename n-particle size shape(box/sphere/shell) weight(optional, ranw or 1w or now) nosuffix(T,F)'
-print 'Example:\n\tpy_ran file0 10000 100 box 1w \n'
+print('Usage: \n\tEXE filename n-particle size shape(box/sphere/shell) weight(optional, ranw or 1w or now) nosuffix(T,F)')
+print('Example:\n\tpy_ran file0 10000 100 box 1w \n')
 args = sys.argv
 
 if len(args) <4:
-	print 'ERROR (ran.py)! Must have at least 4 arguments.'
+	print('ERROR (ran.py)! Must have at least 4 arguments.')
 	sys.exit()
 
 weight ='now'
@@ -14,13 +14,13 @@ nosuffix=True
 
 filestr, nran, size, shape = args[1], int(float(args[2])), float(args[3]), args[4]
 if not shape in ['box', 'sphere', 'shell']:
-	print 'ERROR (ran.py)! shape must be box, sphere, shell:', shape
+	print('ERROR (ran.py)! shape must be box, sphere, shell:', shape)
 	sys.exit()
 if len(args) > 5:
 	if args[5] in ['ranw', '1w', 'now']:
 		weight = args[5]
 	else:
-		print 'ERROR (ran.py)! weight type must be ranw, 1w, now: ', weight
+		print('ERROR (ran.py)! weight type must be ranw, 1w, now: ', weight)
 		sys.exit()
 if len(args)>6:
 	if args[6][0] in ['T', 'F']:
@@ -29,14 +29,14 @@ if len(args)>6:
 		else:
 			nosuffix = False
 	else:
-		print 'ERROR (ran.py)! nosuffxi must be True/False ', nosuffix
+		print('ERROR (ran.py)! nosuffxi must be True/False ', nosuffix)
 		sys.exit()
 		 
 if nosuffix:
 	filename = filestr
 else:
 	filename = filestr+'.'+str(nran)+'random.size%i'%size+'.'+shape
-print 'Creating random sample: ', filename
+print('Creating random sample: ', filename)
 
 nowf = open(filename, 'w')
 iran = 0
@@ -65,5 +65,5 @@ while iran < nran:
 	nowf.write(nowstr)
 	iran += 1
 nowf.close()
-print 'Finishing writing ', nran, 'lines.'
+print('Finishing writing ', nran, 'lines.')
 	

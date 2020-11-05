@@ -1,5 +1,5 @@
 
-import commands
+import os #commands
 import numpy as np
 import sys
 import stdA
@@ -10,20 +10,21 @@ outputfile = cmdargs[1]
 
 filenames = []
 for i in range(2,len(cmdargs)):
-	nowfilenames = commands.getoutput('ls '+cmdargs[i]).split()
+	#nowfilenames = commands.getoutput('ls '+cmdargs[i]).split()
+	nowfilenames = os.getoutput('ls '+cmdargs[i]).read().split()
 	filenames = filenames + nowfilenames
 
-print 'Merge ', len(filenames) ,'csv files:'
+print('Merge ', len(filenames) ,'csv files:')
 for nowfile in filenames:
-	print '\t', nowfile
-print 'Will create new file:\n\t', outputfile
+	print('\t', nowfile)
+print('Will create new file:\n\t', outputfile)
 
 outputf = open(outputfile, 'w')
 
 totlines = 0
 ifile = 0
 for nowfile in filenames:
-	print '\tOpening ', nowfile, '...'
+	print('\tOpening ', nowfile, '...')
 	nowf = open(nowfile,'r')
 	nowlines = 0
 	nowstr = nowf.readline()
@@ -34,8 +35,8 @@ for nowfile in filenames:
 		outputf.write(nowstr)
 		totlines += 1
 		nowlines += 1
-	print '\t\t', nowlines, 'lines read & write.'
+	print('\t\t', nowlines, 'lines read & write.')
 	nowf.close()
 	ifile += 1
-print '\t', totlines, 'lines read & write in total. Finish.'
+print('\t', totlines, 'lines read & write in total. Finish.')
 outputf.close()

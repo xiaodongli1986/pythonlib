@@ -1,7 +1,7 @@
 
 import os, numpy, sys
 
-print 'Usage: EXE filename num-of-iboxes quickstart-cfg-file'
+print('Usage: EXE filename num-of-iboxes quickstart-cfg-file')
 
 #filename = 'test_lightcone.nbox4_overlap10.0_xyz-1800.0to1800.0.ibox'
 

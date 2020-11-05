@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import commands
+#import commands
 import sys
 import os
 import time
@@ -14,10 +14,10 @@ usagestr = 'Usage: EXE inputfile [options...]\n'+\
 
 cmdargs = sys.argv
 if len(cmdargs) < 2:
-	print 'Error! Must have at list one arg!'
-	print usagestr
+	print('Error! Must have at list one arg!')
+	print(usagestr)
 	sys.exit()
-print cmdargs
+print(cmdargs)
 
 nowfile=cmdargs[1]
 
@@ -30,8 +30,8 @@ if len(cmdargs) > 3:
 	while i1 <= len(cmdargs) -1:
 		i2 = i1+1
 		if i2 == len(cmdargs):
-			print 'Error! overflowing: nothing after ', cmdargs[i1], ', arg -', i1
-			print usagestr
+			print('Error! overflowing: nothing after ', cmdargs[i1], ', arg -', i1)
+			print(usagestr)
 			sys.exit
 		if cmdargs[i1] in ['-outputfile', '-output']:
 			outputfile = cmdargs[i2]
@@ -44,7 +44,7 @@ if len(cmdargs) > 3:
 			elif nowstr[0] in ['f', 'F']:
 				skipexisted = False		
 			else:
-				print 'Wrong skipexisted: must start with t/T/f/F, we get ', nowstr
+				print('Wrong skipexisted: must start with t/T/f/F, we get ', nowstr)
 				sys.exit()
 		elif cmdargs[i1] in [ '-parallel']:
 			nowstr = cmdargs[i2]
@@ -53,11 +53,11 @@ if len(cmdargs) > 3:
 			elif nowstr[0] in ['f', 'F']:
 				parallel = False		
 			else:
-				print 'Wrong parallel: must start with t/T/f/F, we get ', nowstr
+				print('Wrong parallel: must start with t/T/f/F, we get ', nowstr)
 				sys.exit()
 		else:
-			print 'Wrong arg!', cmdargs[i1]
-			print usagestr
+			print('Wrong arg!', cmdargs[i1])
+			print(usagestr)
 		i1 += 2
 
 
@@ -65,8 +65,8 @@ if len(cmdargs) > 3:
 #	outputfile = nowfile+'.downloadinfo'
 #else:
 #	outputfile = cmdargs[2]
-print 'Load in ids:   \n\t', nowfile
-print 'showing rlt:   \n\t', outputfile
+print('Load in ids:   \n\t', nowfile)
+print('showing rlt:   \n\t', outputfile)
 
 os.system('rm $outputfile')
 
@@ -76,15 +76,15 @@ for nowstr in open(nowfile,'r').readlines():
 	nowstrs = nowstr.split()
 	nowid, nowstatus, nowfile = nowstrs[0], nowstrs[1], nowstrs[2]+'.csv'
 	if skipexisted and os.path.isfile(nowfile):
-		print 'Skip existed file: ', nowfile
+		print('Skip existed file: ', nowfile)
 		continue
 	if nowstatus != 'COMPLETED':
-		print 'Skip not completed job: ', nowid, nowstatus
+		print('Skip not completed job: ', nowid, nowstatus)
 		continue
 	dl_id_files.append([nowid,nowfile])
-print  len(dl_id_files), 'jobs for download:'
+print(  len(dl_id_files), 'jobs for download:')
 for nowidfile in  dl_id_files:
-	print '\t', nowidfile[0], '   ', nowidfile[1]
+	print('\t', nowidfile[0], '   ', nowidfile[1])
 
 
 nowf2=open(outputfile,'w')
@@ -95,19 +95,19 @@ for nowid_file in dl_id_files:
 	nowid, nowfile = nowid_file
 	time1 = time.time()
 	if skipexisted and os.path.isfile(nowfile):
-		print 'Skip existed file: ', nowid, nowfile
+		print( 'Skip existed file: ', nowid, nowfile)
 		nowf2.write('Skip existed file: '+str(nowid)+' '+nowfile+'\n')
 		continue
-	print 'Downloding ', nowid, '   ', nowfile, ':       ',numid, 'of', len(dl_id_files)
+	print( 'Downloding ', nowid, '   ', nowfile, ':       ',numid, 'of', len(dl_id_files))
 	nowf2.write('Downloding '+str(nowid)+'...\n')
 	if parallel:
 		os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile+' &')
-		print 'Start next job after ', sleepstr, 'seconds...'
+		print( 'Start next job after ', sleepstr, 'seconds...')
 		os.system('sleep '+sleepstr)
 	else:
 		os.system('uws $cstr job results '+str(nowid)+' csv >> '+outputfile)
 	time2 = time.time()
-	print '   Time consumed:   this_job/all_jobs = ', time2-time1, time2-time0
+	print( '   Time consumed:   this_job/all_jobs = ', time2-time1, time2-time0)
 	nowf2.write('   Time consumed:   this_job/all_jobs = '+str(time2-time1)+'/'+str(time2-time0))
 nowf2.close()
 #nowf2.close()
