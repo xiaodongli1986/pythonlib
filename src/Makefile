@@ -1,7 +1,7 @@
-#pythonbin = \#!/home/ubuntu/archiconda3/bin/python
-#python3bin = \#!/home/ubuntu/archiconda3/bin/python
-pythonbin = \#!/home/xiaodongli/software/anaconda3/bin/python
-python3bin = \#!/home/xiaodongli/software/anaconda3/bin/python
+pythonbin = \#!/home/ubuntu/archiconda3/bin/python
+python3bin = \#!/home/ubuntu/archiconda3/bin/python
+#pythonbin = \#!/home/xiaodongli/software/anaconda3/bin/python
+#python3bin = \#!/home/xiaodongli/software/anaconda3/bin/python
 #EXEs = ../bin/py_helloworld  ../bin/py_Plot  ../bin/uws_download ../bin/uws_id  ../bin/uws_show  ../bin/uws_submit ../bin/uws_mergefiles ../bin/checkxyzwfiles ../bin/py_ran ../bin/uws_checkrun ../bin/py_stat ../bin/py_MIAOEXE ../bin/py_CUTE
 EXEs =   ../bin/py_Plot  ../bin/uws_download ../bin/uws_id  ../bin/uws_show  ../bin/uws_submit ../bin/uws_mergefiles ../bin/checkxyzwfiles ../bin/py_ran ../bin/uws_checkrun ../bin/py_stat ../bin/py_MIAOEXE ../bin/py_CUTE ../bin/py_ran_shell ../bin/py_sort_file_acto_size ../bin/py_merge_files ../bin/py_LightconeHalo_halo_for_iboxes ../bin/py_LightconeHalo_halo_for_iboxes_merge ../bin/py_xi ../bin/py_binary_ran ../bin/py_binary_ascii_conv  ../bin/exec_all_sh
 

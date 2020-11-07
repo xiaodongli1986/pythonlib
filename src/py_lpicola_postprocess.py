@@ -1,7 +1,7 @@
 
 import os, sys
 
-printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/xiaodongli/software/Rockstar/rockstar   -rm_exe  /usr/bin/rm    -jsub_or_localrun  jsub
+printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -nbox 2   -overlap_distance 15   -xyzmin 0   -xyzmax 600   -output_1eighthLC T   -mv_lightcone_files T   -just_create_bash F   -split_np 4    -inputtype cola/lpicola    -rockstar_exe  /home/xiaodongli/software/Rockstar/rockstar   -rm_exe  /usr/bin/rm    -jsub_or_localrun  jsub     -mpi_split T     -mpi_split_np  4   # mpi_split_np: how many cores when split;; ## split_np:  how many cores when do rockstar
 
 # Bash Example:
 
@@ -17,8 +17,8 @@ printstr='''#Example: \n\tpy_lpicola_postprocess   -basename YOUR_BASE_NAME   -n
 nbox=2
 
 # In the range of xyzmin to xyzmax, (if want full-sky, set xyzmin as minus xyzmax)
-xyzmin=0
-xyzmax=600
+xyzmin=-...
+xyzmax=...
 
 # Each subbox has this amount of overlap_distance 
 overlap_distance=15
@@ -26,16 +26,30 @@ overlap_distance=15
 # Run the job using this numer of processors
 np=4
 
+## whether using mpi to do split? How many cores when do split (should not larger than np)?
+mpi_split=False
+mpi_split_np=4
+
 output_1eighthLC="T" # only output 1/8 of the LC (e.g., the x>0, y>0, z>0 part)
 mv_lightcone_files="F" # mv the many  ${basename}_ligthcone.* files into one directory 
                 ## if you want to delete them, set it as 'Delete'
 
 for basename in ............... De_w_-0.7_AnalyticalGrowth   De_w_-1.3_AnalyticalGrowth   Omega_0.3071_AnalyticalGrowth De_w_-0.7    De_w_-1.3  Omega_0.3071 
 do
-	cmd="py_lpicola_postprocess  -basename $basename  -nbox $nbox -overlap_distance $overlap_distance -xyzmin $xyzmin -xyzmax $xyzmax -output_1eighthLC $output_1eighthLC   -mv_lightcone_files $mv_lightcone_files"   -inputtype lpicola   -rockstar_exe /home/ubuntu/software/Rockstar
-	#$cmd
-	jsub -n $np -o pp_${basename}.output  -e pp_${basename}.er $cmd
+        cmd="py_lpicola_postprocess  -basename sim -nbox $nbox -overlap_distance $overlap_distance -xyzmin $xyzmin -xyzmax $xyzmax -output_1eighthLC $output_1eighthLC   -mv_lightcone_files $mv_lightcone_files   -inputtype cola -just_create_bash T -split_np 4  -rockstar_exe /home/ubuntu/software/Rockstar/rockstar  -rm_exe  rm   -jsub_or_localrun run   -mpi_split $mpi_split     -mpi_split_np  $mpi_split_np  "
+	#cmd="py_lpicola_postprocess  -basename $basename  -nbox $nbox -overlap_distance $overlap_distance -xyzmin $xyzmin -xyzmax $xyzmax -output_1eighthLC $output_1eighthLC   -mv_lightcone_files $mv_lightcone_files"   -inputtype lpicola   -rockstar_exe /home/ubuntu/software/Rockstar
+        cd $basename
+	echo '####################################################################################'
+	$cmd
+        continue
+        pwd
+	echo $cmd
 	sleep 2
+	echo $cmd > ${basename}_pp.sh
+	jsub -n $np -o pp_${basename}.output  -e pp_${basename}.er sh ${basename}_pp.sh
+	sleep 2
+	#jsub -n $np -Is $cmd
+	cd $maindir
 done
 
 '''
@@ -90,6 +104,18 @@ for iarg in range(1,len(args),2):
             print('ERROR! wrong arg for output_1eighthLC: (must start with T or F) ', str2)
             print(printstr); sys.exit()
         print('\t set output_1eighthLC as ', output_1eighthLC)
+    elif str1 in ['-mpi_split']:
+        if str2[0] in ['T', 't']:
+            mpi_split = True
+        elif str2[0] in ['F', 'f']:
+            mpi_split = False
+        else:
+            print('ERROR! wrong arg for mpi_split: (must start with T or F) ', str2)
+            print(printstr); sys.exit()
+        print('\t set mpi_split as ', mpi_split)
+    elif str1 in ['-mpi_split_np']:
+        mpi_split_np = int(str2)
+        print('\t set mpi_split_np as ', mpi_split_np)
     elif str1 in ['-mv_lightcone_files']:
         if str2[0] in ['T', 't']:
             mv_lightcone_files= True; print('\t set mv_lightcone_files as ', mv_lightcone_files)
@@ -145,7 +171,10 @@ cmd2 = 'mkdir -p rockstar_halos'
 
 output_suffix = '.nbox'+str(nbox)+'_overlap%.1f'%overlap_distance+'_xyz%.1f'%xyzmin+'to%.1f'%xyzmax+'.ibox'
 
-cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %i'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile+'   -inputtype '+inputtype
+if not mpi_split:
+        cmd3 = 'LSS_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %i'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile+'   -inputtype '+inputtype
+else:
+        cmd3 = 'mpirun -np '+str(mpi_split_np)+'  LSS_mpi_lpicola_lightcone_boxsplit -inputfilelist '+filelist+'   -outputname '+outputname+'   -nbox %i'%nbox+'   -overlap_distance %.1f'%overlap_distance+'   -xyzmin %.1f'%xyzmin+'   -xyzmax %.1f'%xyzmax+'  -binary_IO T    -headfile '+headfile+'   -inputtype '+inputtype
 cmd = ' && '.join([cmd1, cmd2,cmd3])
 
 bashfile1 = basename+'_1_run_split.sh'
@@ -164,9 +193,15 @@ if just_create_bash:
 
 files = [basename+output_suffix+str(ibox) for ibox in range(1,nbox**3+1)]
 for ifile, nowfile in enumerate(files):
-    cmd += ' &&  cd rockstar_halos && py_rockstar '+nowfile+' -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'
+    if not mpi_split:
+        cmd += ' &&  cd rockstar_halos && py_rockstar '+nowfile+' -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'
+    else:
+        cmd += ' &&  cd rockstar_halos && py_rockstar '+nowfile+'.\* -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'
     if just_create_bash:
-        bashfile = basename+'_2_run'+str(ifile)+'.sh'; bashf = open(bashfile, 'w'); bashf.write('cd rockstar_halos && py_rockstar '+nowfile+'  -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'); bashf.close()
+        if not mpi_split:
+                bashfile = basename+'_2_run'+str(ifile)+'.sh'; bashf = open(bashfile, 'w'); bashf.write('cd rockstar_halos && py_rockstar '+nowfile+'  -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'); bashf.close()
+        else:
+                bashfile = basename+'_2_run'+str(ifile)+'.sh'; bashf = open(bashfile, 'w'); bashf.write('cd rockstar_halos && py_rockstar '+nowfile+'.\*  -exe '+rockstar_exe+' &&  cd .. && LSS_rockstar_select_xyzvxvyvz_mvir_vmax rockstar_halos/'+nowfile+'_rockstar_halo.ascii'); bashf.close()
         if ifile == 0:
             bashf = open(bashfile2, 'w'); 
             bashf_run = open(bashfile2_run, 'w'); 
