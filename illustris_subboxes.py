@@ -93,7 +93,7 @@ class illustris_subbox:
                     ax.scatter(df['x'][rows], df['y'][rows],
                             s=pointsize, label='_'.join(['subbox']+[str(xx) for xx in [i1,i2,i3]]))
             #axs[iparttype].legend(loc='upper left');
-        ax.set_title('parttype = '+str(self.parttype)+', z<'+str(zmax)); ax.grid()
+        ax.set_title(self.sim+', parttype = '+str(self.parttype)+', z<'+str(zmax)); ax.grid()
         return fig, ax
 
     def scatter_3d(self, i1=0, i2=0, i3=0,
@@ -108,18 +108,21 @@ class illustris_subbox:
         ax.scatter(df['x'], df['y'], df['z'], alpha=0.3, s=pointsize, c=df['z'],
                    label='_'.join(['subbox']+[str(xx) for xx in [i1,i2,i3]]))
         #axs[iparttype].legend(loc='upper left');
-        ax.set_title('parttype = '+str(self.parttype)); ax.grid()
+        ax.set_title(self.sim+', parttype = '+str(self.parttype)); ax.grid()
         return fig, ax
 
-    def do_cic(self, nc, i1s=None,i2s=None,i3s=None, ):
+    def do_cic(self, nc, i1s=None,i2s=None,i3s=None, create_bash=True):
         '''Generate bash script for cic filed calculation for i1, i2, i3 in range of i1s, i2s, i3s.
         if i1s,i2s,i3s not given, then compute all fields
         nc: number of cells in each direction
         '''
-        if i1s == None: i1s = range(nsplit);
-        if i2s == None: i2s = range(nsplit);
-        if i3s == None: i3s = range(nsplit);
+        if i1s == None: i1s = range(self.nsplit);
+        if i2s == None: i2s = range(self.nsplit);
+        if i3s == None: i3s = range(self.nsplit);
         dxyz = self.boxsize / float(self.nsplit)
+        if create_bash:
+            bashfile = self.path+'/nsplit'+str(self.nsplit)+'_overlaprat%.3f'%(self.overlaprat)+'_'+str(nc)+'cic.sh'
+            bashf = open(bashfile, 'w')
         for i1 in i1s:
             for i2 in i2s:
                 for i3 in i3s:
@@ -132,7 +135,13 @@ class illustris_subbox:
                      '-nc ', nc, '-xmin',xmin,'-ymin',ymin,'-zmin',zmin,'-boxsize','%.2f'%boxsize,
                                 '-npar',npar,'-nfeature',nfeature,'-output',
                                     self.subbox_data_file(i1,i2,i3)+'_cic', '-nsplit 1']])
-                    print(cmd)
+                    if create_bash:
+                        bashf.write(cmd+'\n')
+                    else:
+                        print(cmd)
+        if create_bash:
+            print('commands written to : ', bashfile)
+            return bashfile
     def subbox_cic_files(self, i1,i2,i3,nc,do_check=False):
         cic_dict = {}
         for ifeature, feature in enumerate(self.cic_feature_names):
