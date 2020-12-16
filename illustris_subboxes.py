@@ -9,6 +9,9 @@ if make_plot:
     from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
 
+def conv_to_log(A):
+    return np.sign(A) * np.log(np.abs(A) + 1.)
+
 #siparttype, nsplit, overlaprat = 0, 2, 0.
 class illustris_subbox:
 
@@ -27,6 +30,7 @@ class illustris_subbox:
         self.feature_names = self.output_columns['PartType'+str(parttype)]
         self.cic_feature_names = (' '.join(self.feature_names).replace('Coordinates', '').\
             replace('Velocities', ' vx vy vz ')+' number').split()
+        self.n_cic_feature = len(self.cic_feature_names)
         if path == None:
             if self.sim == 'Illustris-3':
                 self.path = '/mnt/xiaodong/1/Illustris_xiaodong/Illustris_cic/'+self.sim+'/'+self.snapdir+\
@@ -51,7 +55,7 @@ class illustris_subbox:
 
     def subbox_data_par(self, i1, i2, i3):
         for nowkey in self.filename_npar_dict:
-            if nowkey.split('/')[-1] in self.subbox_data_file(i1,i2,i3):
+            if nowkey.split('/')[-1] == self.subbox_data_file(i1,i2,i3).split('/')[-1]:
                 return self.filename_npar_dict[nowkey]
 
     def load_subbox_data(self, i1, i2, i3, datatype='DataFrame'):
@@ -80,16 +84,17 @@ class illustris_subbox:
             subbox_file = self.subbox_data_file(i1,i2,i3)
             print(' * subbox ',i1,i2,i3,':\n\t',os.popen('ls -alh '+subbox_file).read()[:-1], )
             print('\tnpar, nfeature, boxsize = ', self.subbox_data_par(i1, i2, i3))
-    def scatter_2d(self, i1_range = [0], i2_range = [0], i3_range = [0], zmax = 300,
+    def scatter_2d(self, i1_range = [0], i2_range = [0], i3_range = [0], zmin = 0., zmax = 300,
                    fig=None, ax=None, pointsize=0.01):
         if not make_plot:
             print(' scatter_2d exist since make_plot = ', make_plot); return
         if ax == None:
             fig, ax = plt.subplots(1, 1, figsize=(6,6));
         for i1 in i1_range:
-            for i2 in i1_range:
-                for i3 in i1_range:
-                    df = self.load_subbox_data(i1, i2, i3); rows = np.where(df['z'] < zmax)[0]
+            for i2 in i2_range:
+                for i3 in i3_range:
+                    df = self.load_subbox_data(i1, i2, i3); 
+                    rows = np.where((df['z'] < df['z'].min()+zmax)&(df['z'].min()+zmin<df['z']))[0]
                     ax.scatter(df['x'][rows], df['y'][rows],
                             s=pointsize, label='_'.join(['subbox']+[str(xx) for xx in [i1,i2,i3]]))
             #axs[iparttype].legend(loc='upper left');
@@ -150,3 +155,22 @@ class illustris_subbox:
             if do_check:
                 print(feature,':\t', os.popen('ls -alh '+nowfile).read())
         return cic_dict
+    def cic_file(self, i1,i2,i3,nc, ifeature):
+        return self.subbox_data_file(i1,i2,i3)+'_cic_'+str(nc)+'grid_feature'+str(ifeature+1)
+    def load_cic_file(self, i1,i2,i3,nc, ifeature):
+        gridfile = self.cic_file(i1,i2,i3,nc,ifeature)
+        nowf = open(gridfile, 'rb')
+        grid = struct.unpack('1i'+str(nc**3)+'f1i', nowf.read())
+        return np.array(grid[1:-1]).reshape(nc,nc,nc)
+    def imshow_cic(self, i1,i2,i3,nc, ifeature, logfield=True, iz=0, fig = None, ax = None):
+        if not make_plot:
+            print(' imshow_cic exit since make_plot = ', make_plot); return
+        grid = self.load_cic_file(i1,i2,i3,nc, ifeature)
+        if fig == None or ax == None:
+            fig, ax = plt.subplots()
+        xy = grid[:,::-1,iz].T
+        if logfield: xy = conv_to_log(xy)
+        ax.imshow(xy); ax.set_title(', '.join([self.sim, 'parttype='+str(self.parttype), '\n', 
+            str(self.cic_feature_names[ifeature]), str(nc)+'-grid']))
+        return fig, ax
+
