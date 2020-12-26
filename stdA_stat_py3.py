@@ -1,5 +1,12 @@
 from scipy import stats
+import numpy as np
 
+def index_of_max(X):
+            im = 0; xmax = X[0];
+            for row in range(len(X)):
+                if X[row] > xmax:
+                    xmax = X[row]; im = row
+            return im
 
 def nsigofsigCL(sig):
         if sig == sig1:
@@ -149,7 +156,7 @@ def chisq_like_cov_xbar(X, Cov, Xbar = [], chisq0=0):
     for i in range(p):
         for j in range(p):
             chisq += Xdiff[i]*invcov[i,j]*Xdiff[j]
-    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * scipy.exp(-0.5 * (chisq-chisq0));
+    like = (2.0*np.pi)**(-p/2.0) * (detcov**(-0.5)) * np.exp(-0.5 * (chisq-chisq0));
     return chisq, like
 
 def chisqs_to_likes(chisqs):
@@ -294,7 +301,7 @@ def list_find_CL_chisqcut(chisqlist, CLlist, chisq1 = 0, chisq2 = 30):
     for row in range(len(chisqlist)):
         chisq1d += chisqlist[row]
     chisqmin = min(chisq1d)
-    like1d = [scipy.exp(-(chisq1d[row]-chisqmin)/2.0) for row in range(len(chisq1d))]
+    like1d = [np.exp(-(chisq1d[row]-chisqmin)/2.0) for row in range(len(chisq1d))]
     chisqcutlist = []
     for CL in CLlist:
         cutlike = get_cut(like1d, CL)
@@ -318,13 +325,13 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
             chisqmin= min(chisqmin, chisqlist[row1][row2])
     for row1 in range(numw):
         for row2 in range(numom):
-            nowlikelist[row1][row2] = scipy.exp(-0.5*(chisqlist[row1][row2]-chisqmin)) 
+            nowlikelist[row1][row2] = np.exp(-0.5*(chisqlist[row1][row2]-chisqmin)) 
     # Marginalized constraint on Omegam
     for iom in range(numom):
         margomlike[iom] = sum([nowlikelist[row][iom] for row in range(numw)])
         # Some times there are some too small values, leading to numerical error.
         if not margomlike[iom] > 1.0e-8:
-            margomlike[iom] = random.uniform(1.0e-9,1.0e-8) 
+            margomlike[iom] = np.random.uniform(1.0e-9,1.0e-8) 
     maxlike = max(margomlike[0:numom])
     for iom in range(numom):
         margomlike[iom] /= maxlike
@@ -340,7 +347,7 @@ def get_margconstraint(chisqlist, omlist, wlist, do_smooth=False, smsigma=0.8, s
     for iw in range(numw):
         margwlike[iw] = sum([nowlikelist[iw][row] for row in range(numom)])
         if not margwlike[iw] > 1.0e-8:
-            margwlike[iw] = random.uniform(1.0e-9,1.0e-8)
+            margwlike[iw] = np.random.uniform(1.0e-9,1.0e-8)
     maxlike = max(margwlike[0:numw])
     for iw in range(numw):
         margwlike[iw] /= maxlike
@@ -654,7 +661,7 @@ def COSMOMC_post_chisq(MCMCfile,
         ### Add the addtional chisq
         AddChisq = chisqfun(Par)
         Loglike += AddChisq / 2.0
-        Weight *= scipy.exp(  - AddChisq / 2.0)
+        Weight *= np.exp(  - AddChisq / 2.0)
         B = [Weight, Loglike] + Par
         f2.write(fmtstrlist(B, fmtstr=fmtstr)+'\n')
         
