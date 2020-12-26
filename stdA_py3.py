@@ -373,7 +373,8 @@ def list_xyz_to_radecr(X,Y,Z,degreefac = np.pi/180.0):
     if len(X) != len(Y) or len(X) != len(Z):
         print ('Error! length of X,Y,Z not match!: ', len(X), len(Y), len(Z))
         ndat = min(len(X), len(Y), len(Z))
-    RA, DEC, R = range(ndat), range(ndat), range(ndat)
+    #RA, DEC, R = np.array(range(ndat)), np.array(range(ndat)), np.array(range(ndat))
+    RA, DEC, R = list(range(ndat)), list(range(ndat)), list(range(ndat))
     for row in range(ndat):
         RA[row], DEC[row], R[row] = xyz_to_radecr(X[row], Y[row], Z[row],degreefac = degreefac)
     return RA, DEC, R
@@ -1034,3 +1035,19 @@ def getdist_con(modelname, p1name, p2name):
             Condata[row1][row2] =  Z[row2][row1]
     return X, Y, reverse_1darray(Con), Condata
 
+
+class zerror:
+	def __init__(self, sig=0.002, z_slope=0.):
+		'''
+	redshift error, based on model of
+		z_error = sig*(1+z) * (z+z_slope*z)
+	sig  is the base scattering; z_slope describes linear variation of z_error '''
+		self.sig = sig; self.z_slope=z_slope
+	def z_error(self, z):
+		return self.sig*(1+z)*(1+self.z_slope*z)
+	def vLOS_effective(self, z):
+		''' dz = vLOS * (1+z) / c '''
+		return self.z_error(z) * 3e5 / (1.+z)
+	def r_error(self, z, om=0.3071, w=-1):
+		dz = self.z_error(z)
+		return comov_r( om, w, 0.7, z+dz) - comov_r( om, w, 0.7, z)
