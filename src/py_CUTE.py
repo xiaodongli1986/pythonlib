@@ -105,6 +105,8 @@ for ...:
             suffixstr_rr += ('.rmax'+str(rmax))
 
         suffixstr = '.weipow'+str(wei)+suffixstr_rr
+        if True:
+           suffixstr_rr = '.weipow'+str(wei)+suffixstr_rr
 
             
 

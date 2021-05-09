@@ -87,6 +87,7 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
     sbound1, mubound1 = smu__CosmoConvert(smax_mapping,0,DAnew,DAstd,Hnew,Hstd)
     sbound2, mubound2 = smu__CosmoConvert(smax_mapping,1,DAnew,DAstd,Hnew,Hstd)
     sbound = max(sbound1, sbound2); nums1 = int(sbound / deltas1 + 0.5)
+    smutab1 = np.array(smutabstd)
 
     sbound1, mubound1 = smu__CosmoConvert(smin_mapping,0,DAnew,DAstd,Hnew,Hstd)
     sbound2, mubound2 = smu__CosmoConvert(smin_mapping,1,DAnew,DAstd,Hnew,Hstd)
@@ -94,12 +95,12 @@ def mapping_smudata_to_another_cosmology_DenseToSparse(smutabstd, DAstd, DAnew, 
 
     nums2, nummu2 = int(smax_mapping / deltas2 + 0.5), int(1.0/deltamu2 + 0.5)
     numrow3=len(smutabstd[0][0])
-    smutab2 = [[[0 for row3 in range(numrow3+1)] for row2 in range(nummu2)] for row1 in range(nums2)]
+    smutab2 = np.array([[[0 for row3 in range(numrow3+1)] for row2 in range(nummu2)] for row1 in range(nums2)])
 
     #numtests = 0###DEBUG
     #print mins1, nums1, nummu1, nums2, nummu2
     if method == 'divided_pixel':
-        smutab1_centers = [[0 for row2 in range(nummu1)] for row1 in range(nums1)]
+        smutab1_centers = np.array([[0 for row2 in range(nummu1)] for row1 in range(nums1)])
     for is1 in range(mins1, nums1):
         for iangle1 in range(nummu1):
             scenter, anglecenter = (is1+0.5)*deltas1, (iangle1+0.5)*deltamu1
@@ -316,10 +317,26 @@ class xismu:
             DAstd, DAnew = DA(omstd, wstd, h, redshift), DA(omwrong, wwrong, h, redshift)
             Hzstd, Hznew = Hz(omstd, wstd, h, redshift), Hz(omwrong, wwrong, h, redshift)
             data = self.data.reshape(self.sbin, self.mubin, -1); data = data[:,::-1,:]
-            data = mapping_smudata_to_another_cosmology_simple(data, DAstd, DAnew, Hzstd, Hznew, deltamu=1.0/120.0,
+            data = mapping_smudata_to_another_cosmology_simple(data, DAstd, DAnew, Hzstd, Hznew, deltamu=1.0/self.mubin,
                                                        simple_replacement=False,smax_mapping=smax_mapping)
             data = data[:,::-1,:]
             sbin2=int(self.sbin*smax_mapping/self.smax)
             DDs ,DRs ,RRs = [data[:sbin2,:,row] for row in [3,4,6]]; #DDs = DDs.reshape(-1); DRs = DRs.reshape(-1); RRs = RRs.reshape(-1)
             return xismu(  filename=None, smax=smax_mapping, sbin=sbin2, mubin=self.mubin,
                     DDnorm=1, DRnorm=1, RRnorm=1, DD=DDs, DR=DRs, RR=RRs)
+    def cosmo_conv_DenseToSparse(self, omstd=0.3071, wstd=-1, omwrong=0.5, wwrong=-1, redshift=None, 
+        sbin2=150, mubin2=120, smin_mapping=1, smax_mapping=60, method='divided_pixel'):
+            h = 0.6777
+            redshift = max(redshift , 0.0001)
+            DAstd, DAnew = DA(omstd, wstd, h, redshift), DA(omwrong, wwrong, h, redshift)
+            Hzstd, Hznew = Hz(omstd, wstd, h, redshift), Hz(omwrong, wwrong, h, redshift)
+            data = self.data.reshape(self.sbin, self.mubin, -1); data = data[:,::-1,:]
+        
+            data = mapping_smudata_to_another_cosmology_DenseToSparse(data, DAstd, DAnew, Hzstd, Hznew,
+                deltas1=1.0/self.sbin, deltamu1=1.0/self.mubin, deltas2=1.0/sbin2, deltamu2=1.0/mubin2, 
+                smin_mapping=smin_mapping,smax_mapping=smax_mapping,
+                compute_rows=[3,4,6], save_counts_row=0, method=method)
+            DDs,DRs ,RRs = [data[:,:,row] for row in [3,4,6]]; #DDs = DDs.reshape(-1); DRs = DRs.reshape(-1); RRs = RRs.reshape(-1)
+            return xismu(  filename=None, smax=smax_mapping, sbin=sbin2, mubin=mubin2,
+                    DDnorm=1, DRnorm=1, RRnorm=1, DD=DDs, DR=DRs, RR=RRs)
+

@@ -117,8 +117,8 @@ for ifile, filename in enumerate(filenames):
     X = np.linspace(smin,smax,sbin+1)
     X = (X[1:] + X[:len(X)-1]) / 2.
    # Turn on for cic field
-    X = np.delete(X,0)
-    xis = np.delete(xis,0)
+    #X = np.delete(X,0)
+    #xis = np.delete(xis,0)
     #print 'xis[0:5] = ', xis[0:5]
     axs[0].plot(X,xis,label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$\\xi$',fontsize=fs); axs[0].set_yscale('symlog')
     #axs[0].plot(X,np.log10(abs(xis)),label=lab); axs[0].set_xlabel('s',fontsize=fs); axs[0].set_ylabel('$log10 |\\xi|$',fontsize=fs); #axs[0].set_yscale('symlog')

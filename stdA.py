@@ -49,11 +49,11 @@ def get_color_style(sepreturn=False,init=False):
     color_style = PLOT_COLOR_ARRAY[i]+PLOT_STYLE_ARRAY[j]
     NOW_PLOT_COLOR = NOW_PLOT_COLOR + 1; NOW_PLOT_STYLE = NOW_PLOT_STYLE + 1
     if init:
-	NOW_PLOT_COLOR = 0; NOW_PLOT_STYLE = 0;
+        NOW_PLOT_COLOR = 0; NOW_PLOT_STYLE = 0;
     if sepreturn:
-	return PLOT_COLOR_ARRAY[i], PLOT_STYLE_ARRAY[j]
+        return PLOT_COLOR_ARRAY[i], PLOT_STYLE_ARRAY[j]
     else:
-	return color_style
+        return color_style
 
 
 ############################################################
@@ -70,7 +70,7 @@ def isfile(filename, exit_if_not_exit=False):
 		return os.path.isfile(filename)
 	else:
 		if not os.path.isfile(filename):
-			print '(isfile) (Exit now...) File not found:\n\t', filename
+			print ('(isfile) (Exit now...) File not found:\n\t', filename)
 			sys.exit()
 		else:
 			return True
@@ -116,7 +116,7 @@ def loadtxt_rand(filename, rat=1.1, printinfo=False,
                         break
         nowf.close()
         if printinfo:
-                print nlines_read, ' lines read from ', nlines, ' lines; file = ', filename
+                print (nlines_read, ' lines read from ', nlines, ' lines; file = ', filename)
         return rlt
 
 def quickload_1col(nowfile):
