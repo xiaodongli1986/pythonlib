@@ -1,10 +1,26 @@
 
-print("Creating a bash file to conduct rockstar halo searching for multiple snapshots..\n\t 1.py_rockstar_multisnap.sh")
+import os, sys
+
+print("Creating a bash file to conduct rockstar halo searching for multiple snapshots..\n\t 1.py_rockstar_multisnap.sh\n\nUsage: py_rockstar_multisnap -basename sim -ranseed 4000")
+
+args = sys.argv
+print(args)
+
+ranseed = '4000'
+basename= 'sim'
+
+for iarg in range(1,len(args),2):
+    arg1, arg2 = args[iarg], args[iarg+1]
+    print(arg1, arg2)
+    if arg1 in ['-ranseed']:
+        ranseed = '%05i'%(int(arg2))
+    elif arg1 in ['-basename']:
+        basename = arg2
 
 nowf = open("1.py_rockstar_multisnap.sh", 'w')
 nowf.write('''
-ranseed=01810
-basename=sim
+ranseed='''+ranseed+'''
+basename='''+basename+'''
 py_rockstar ${basename}\*snap${ranseed}a.\*
 py_rockstar ${basename}\*snap${ranseed}b.\*
 py_rockstar ${basename}\*snap${ranseed}c.\*
