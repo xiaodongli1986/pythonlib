@@ -1,48 +1,35 @@
-
 import numpy as np
 import sys, os
 
-default_keys = {
-        'random_seed': 4000, 
-        'nc': 256,               
-        'boxsize': 512, 
-        'nrealization': 1,       # multiple realisations for random_seed, random_seed+1, ...
-        'only_output_1eighth' : 0,  # only output 1-eighth of the full sky
-
-        'ntimestep': 20,        
-        'a_final': 1,     
-        'output_redshifts': '{ 0.0}' ,
-
-        'omega_m': 0.3071,      
-        'h': 0.6787,     
-        'sigma8': 0.8228, 
-    
-        'omega_l': -1.,         
-        'de_w_add10': 9.,
-
-        #'De_w': None,
-
-        # pm_nc_factor= 3            -- Particle Mesh grid pm_nc_factor*nc per dimension
-        # np_alloc_factor= 5.        -- Amount of memory allocated for particle
-        # loglevel=2                 -- 0=debug, 1=verbose, 2=normal, increase the value to reduce output msgs
-        'pm_nc_factor': 3,      
-        'np_alloc_factor':  1.5,    
-        'loglevel':  2,
-    
-        'powerspectrum': '"BigMDPL_matterpower.dat"', 
-
-        #'fof':   '"fof"',   'linking_factor' : 0.2,
-        'snapshot': None, #'"snp"',
-        'subsample': '"subsample"', 
-        'subsample_factor' : 0.0001,
-
-        #'coarse_grid' : None, 'coarse_grid_nc' : 32,
-        'init': None, 
-        
-        ## for lightcone
-        'zmax': 0.0,  
-        'use_solve_growth' : 0,
-        }
+default_keys = {'random_seed'         : 4000, 
+                'nc'                  : 256,               
+                'boxsize'             : 512, 
+                'nrealization'        : 1,            # multiple realisations for random_seed, random_seed+1, ...
+                'only_output_1eighth' : 0,            # only output 1-eighth of the full sky
+                'ntimestep'           : 20,        
+                'a_final'             : 1,     
+                'output_redshifts'    : '{ 0.0}' ,
+                'omega_m'             : 0.3071,      
+                'h'                   : 0.6787,     
+                'sigma8'              : 0.8228, 
+                'omega_l'             : -1.,         
+                'de_w_add10'          : 9.,
+                #'De_w'                : None,
+                'pm_nc_factor'        : 3,            # Particle Mesh grid pm_nc_factor*nc per dimension
+                'np_alloc_factor'     : 8,            # Amount of memory allocated for particle
+                'loglevel'            : 2,            # 0=debug, 1=verbose, 2=normal, increase the value to reduce output msgs
+                'powerspectrum'       : '"BigMDPL_matterpower.dat"', 
+                 #'fof'                : '"fof"',   
+                 #'linking_factor'     : 0.2,
+                'snapshot'            : None,         #'"snp"',
+                'subsample'           : '"subsample"', 
+                'subsample_factor'    : 0.0001,
+                 #'coarse_grid'        : None, 
+                 #'coarse_grid_nc'     : 32,
+                'init'                : None, 
+                'zmax'                : 0.0,          #the max redshift of the output lightcone
+                'use_solve_growth'    : 0
+               }
 
 append_param_dict = {'omegab': 0.048206, 
                      'ns'    : 0.96     }
@@ -126,7 +113,11 @@ ntimestep   = default_keys['ntimestep']
 random_seed = default_keys['random_seed']
 
 # Folder_name
-runname=''.join([str(boxsize), 'box_', str(nc), 'npar_', str(default_keys['pm_nc_factor']), 'pmfactor_', str(ntimestep), 'steps_ranseed', str(random_seed), '_zmax%.3f'%(float(default_keys['zmax']))])
+runname = ''.join([str(boxsize),   'box_', 
+                   str(nc),        'npar_', 
+                   str(ntimestep), 'steps_', 
+                   str(default_keys['pm_nc_factor']), 'pmfactor_', 
+                   'zmax%.3f'%(float(default_keys['zmax']))])
 
 if default_keys['only_output_1eighth'] != 0:
     runname += "_only_output_1eighth"
@@ -152,7 +143,9 @@ omegal   = default_keys['omega_l']
 ns       = append_param_dict['ns'] 
 
 ### idx ###
-cosmostr = idx+'_om%.4f'%(float(omegam))+'_omb%.4f'%(float(omegab))+'_oml%.4f'%(float(omegal))+'_w%.4f'%(float(w))+'_Hubble%.2f'%(float(h))+'_sig8%.4f'%(float(sigma8))+'_ns%.4f'%(float(ns))
+cosmostr = idx+'_ranseed'+str(ranseed)+\
+           '_om%.4f'%(float(omegam))+'_omb%.4f'%(float(omegab))+'_oml%.4f'%(float(omegal))+\
+           '_w%.4f'%(float(w))+'_Hubble%.2f'%(float(h))+'_sig8%.4f'%(float(sigma8))+'_ns%.4f'%(float(ns))
 
 
 if basename in [None, 'None']:

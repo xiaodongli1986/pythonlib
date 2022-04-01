@@ -768,7 +768,7 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                     ommin = None, ommax = None, wmin = None, wmax = None,  do_smooth=True, smsigma=0.5, 
                     extratitle = '', titleftsize=15, notitle = False, xylabelfs=26,
                     sigA = 0.683, sigB = 0.954, sigC = 0.997,  sigs = None, return_chisqcuts=False,
-                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],
+                    nolegend = False, nolabel = False, legftsize=15, color1=0.55, color2=0.75, colorlist = [],color='r',linestyle='--',
                     noxticks = False, noyticks = False, showgrid = False, use_ratCL = True, plotformat = 1,
                     show_marg_rlt = True, scatter_WMAP5=False, scatter_point=None):
     '''
@@ -777,6 +777,9 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
             X, Y = XYfromdata(CS.collections[0].get_paths()[0].vertices)
 
     '''
+    """ Modify log:
+    2021.12.22 Modify the plotframe==2: To add color and linestyle control. --- By Xiao Liang
+    """
 #       Here are some code for testing:
 #       ###
 #               import stdA; execfile(stdA.pyfile)
@@ -836,8 +839,8 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
                 CS = ax.contourf(omlist, wlist, Z, [0, chisqs[numchisq - row - 1]], colors = colorlist[row])
             ax.plot(X,Y,c='0.55',lw=10,label=label)
         elif plotformat == 2:
-            CS = ax.contour(omlist, wlist, Z, chisqs, colors='r', linewidths = 2, linestyles = 'dashed')
-            ax.plot(X,Y,c='r',lw=3,ls='--',label=label)
+            CS = ax.contour(omlist, wlist, Z, chisqs, colors=color, linewidths = 2, linestyles = linestyle)
+            ax.plot(X,Y,c=color,lw=3,ls=linestyle,label=label)
         elif plotformat == 3:
             CS = ax.contour(omlist, wlist, Z, chisqs, colors='b', linewidths = 2)
             ax.plot(X,Y,c='b',lw=3,ls='-',label=label)
@@ -861,8 +864,8 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
         
         ax.set_xlim(ommin,ommax);   ax.set_ylim(wmin, wmax)
         if showgrid:
-            grid(b=True, which='major', color='g', linestyle='-');
-            grid(b=True, which='minor', color='g', linestyle='--');
+            plt.grid(b=True, which='major', color='g', linestyle='-')
+            plt.grid(b=True, which='minor', color='g', linestyle='--')
         if not notitle:
             ax.set_title(extratitle, fontsize=titleftsize)
         if not nolegend:
@@ -890,7 +893,7 @@ def plot_contour(ax, omlist, wlist, chisqlist, label='NO RSD',
             ax.text(0.02, 0.2,omtext,  transform=ax.transAxes, fontsize=legftsize)
             ax.text(0.02, 0.1,wtext, transform=ax.transAxes, fontsize=legftsize)
         if return_chisqcuts:
-                return chisqs, CS
+                return Z, CS
         else:
                 return CS
 

@@ -281,11 +281,11 @@ def mapping_smudata_to_another_cosmology_simple(smutabstd, DAstd, DAnew, Hstd, H
 
 class xismu:
     def __init__(self, filename=None, smax=150, sbin=150, mubin=120,
-                DDnorm=None, DRnorm=None, RRnorm=None, DD=None, DR=None, RR=None):
+                DDnorm=None, DRnorm=None, RRnorm=None, DD=None, DR=None, RR=None, ):
         self.smax, self.sbin, self.mubin =smax, sbin, mubin
         if filename != None:
             self.DDnorm, self.DRnorm, self.RRnorm = [float(xx) for xx in open(filename, 'r').readline().split()[1:4]]
-            self.data = np.loadtxt(filename)
+            self.data = np.loadtxt(filename, )
             self.DD, self.DR, self.RR = [self.data[:sbin*mubin,row].reshape(sbin,mubin) for row in [3,4,6]]
         else:
             self.DDnorm, self.DRnorm, self.RRnorm, self.DD, self.DR, self.RR = DDnorm, DRnorm, RRnorm, DD, DR, RR

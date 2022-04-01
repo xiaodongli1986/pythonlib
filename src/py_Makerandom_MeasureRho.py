@@ -141,7 +141,7 @@ for iarg in range(len(cmdargs)):
             elif opt1 == '-random_rat':
                 random_rat = float(opt2)
 
-print(' (py_SnapCosmoConv_Masscut_MeasureRho) Start.')
+print(' (py_Makerandom_MeasureRho) Start.')
 print('  Read in parameters:')
 print('\tinputfile = ', inputfile)
 print('\tomin,  win  = ', omin, win)
@@ -156,7 +156,7 @@ print('\tcreate_random, random_rat= ', create_random, random_rat)
 
 option_list = [inputfile, omin, win, omout, wout, boxsize, redshift, numNBs, margins, xcol, ycol, zcol, masscol]
 if None in option_list:
-    print(' (py_SnapCosmoConv_Masscut_MeasureRho) Error! One option is None!')
+    print(' (py_Makerandom_MeasureRho) Error! One option is None!')
     sys.exit()
 
 tmpfiles = []
@@ -167,10 +167,11 @@ Hin, Hout = stdA_py3.Hz(omin, win, 0.7, redshift), stdA_py3.Hz(omout, wout, 0.7,
 DArat, Hrat = DAout/DAin, Hout/Hin
 
 Volrat = DArat**2 / Hrat
-#'''#dai
+
 ### Step 1. numdegrade
 
 numdegrade = int(boxsize**3 * Volrat * float(nbar))
+'''
 file_numdegrade = inputfile.strip('.tmpfile') + '.numdegrade_nbar'+nbar+'.tmpfile'; tmpfiles.append(file_numdegrade)
 print('\n ----------------------------------------------------------------------------------------------------------------')
 print(' (py_SnapCosmoConv_Masscut_MeasureRho) (Step 1) numdegrade.\n\t DArat, Hrat, Volrat = ', DArat, Hrat, Volrat )
@@ -206,7 +207,7 @@ else:
         iline += 1
     f1.close(); f2.close()
     print(' (py_SnapCosmoConv_Masscut_MeasureRho) (Step 2) cosmo conv: Done. ',iline,' lines processed.')
-#'''#dai
+
 ### Step 3.  Measure density
 
 print('\n ----------------------------------------------------------------------------------------------------------------')
@@ -225,13 +226,13 @@ for numNB, margin in zip(numNBs, margins):
     print(' (Executing command...)  \n\t', cmdstr)
     os.popen('sleep 1')
     print(os.popen(cmdstr).read())
-
+'''
 
 if create_random:
     file_random = inputfile +'.SnapCosmoConv.omout%.4f'%omout+'wout%.4f'%wout+'.nbar'+nbar+'.x'+str(random_rat)+'ran'
     nran = int(numdegrade * float(random_rat))
     f_ran = open(file_random, 'w')
-    print(' (py_SnapCosmoConv_Masscut_MeasureRho) (Step 4) Create random file: nran = ', nran)
+    print(' (py_Makerandom_MeasureRho) Create random file: nran = ', nran)
     print('    output = ', file_random)
     for row in range(nran  ):
         x = np.random.uniform(0, xsize)
@@ -258,7 +259,7 @@ if rm_tmpfiles:
     for nowfile in tmpfiles:
         print('\t', rmcmd,  nowfile)
         os.popen(rmcmd+' '+nowfile).read()
-print(' (py_SnapCosmoConv_Masscut_MeasureRho) (Step 3) Measure rho: Done. Outputs = ')
+print(' (py_Makerandom_MeasureRho) (Step 3) Measure rho: Done. Outputs = ')
 for nowfile in outputfiles:
     print('\t', nowfile)
 
